@@ -60,7 +60,7 @@ new Agent({
 ### 3. Retrieve Token Balances for Wallet on Base Chain
 
 ```js
-const balances = agent.getTokenBalancesForWalletAddress(BaseChain, "demo.eth");
+const balances = agent.onchain.getTokenBalancesForWalletAddress(BaseChain, "demo.eth");
 ```
 
 ## 🤝 Contributing
