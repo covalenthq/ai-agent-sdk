@@ -17,14 +17,16 @@
 ## Features
 
 Currently available:
-* Read onchain data using the [GoldRush API](https://goldrush.dev/)
+
+- Read onchain data using the [GoldRush API](https://goldrush.dev/)
 
 Roadmap:
-* Access offchain and private data
-* Train and fine-tune Large/Small Language Models
-* Identity services to securely store your agent's private keys
-* Communication services to post to social media
-* Memory Bank to provide a trustless, verifiable persistent store for critical states, outputs and decisions
+
+- Access offchain and private data
+- Train and fine-tune Large/Small Language Models
+- Identity services to securely store your agent's private keys
+- Communication services to post to social media
+- Memory Bank to provide a trustless, verifiable persistent store for critical states, outputs and decisions
 
 ## Using the SDK
 
@@ -32,28 +34,30 @@ Roadmap:
 
 > yarn install
 
-or 
+or
 
 > npm install
 
 ### 2. Initialization
 
 ```js
-import { Agent, BaseChain, GoldRushAPI } from "@covalenthq/ai-agent-sdk";
+import { Agent, BaseChain, OnchainProvider } from "@covalenthq/ai-agent-sdk";
 
 new Agent({
     onchain: {
         key: "XXX",
-        provider: GoldRushAPI
-    }
-})
-
+        provider: OnchainProvider.GoldRushAPI,
+    },
+});
 ```
 
 ### 3. Retrieve Token Balances for Wallet on Base Chain
 
 ```js
-const balances = agent.onchain.getTokenBalancesForWalletAddress(BaseChain, "demo.eth");
+const balances = agent.onchain.getTokenBalancesForWalletAddress(
+    BaseChain,
+    "demo.eth",
+);
 ```
 
 ## 🤝 Contributing
