@@ -66,8 +66,13 @@ export class Agent {
 
     /**
      * Initializes a new instances of the Agent class.
-     * @param options -
-     * @param options.
+     *
+     * @param options - Configuration options for the Agent
+     * @param options.onchain - On-chain data provider configuration
+     * @param options.onchain.key - API key for accessing the on-chain data
+     *      provider
+     * @param options.onchain.provider - The on-chain data provider to use
+     *      (e.g. GoldRushAPI)
      */
     constructor(options: {
         onchain: {
