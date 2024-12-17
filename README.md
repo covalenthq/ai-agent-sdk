@@ -39,9 +39,7 @@ or
 ### 2. Initialization
 
 ```js
-import { Agent, BaseChain } from "@covalenthq/ai-agent-sdk";
-
-const agent = new Agent("GOLDRUSH_API_KEY");
+import { Agent, BaseChain, GoldRushAPI } from "@covalenthq/ai-agent-sdk";
 
 new Agent({
     onchain: {
