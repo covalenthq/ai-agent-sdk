@@ -73,12 +73,6 @@ export class Agent {
      * @param key - The GoldRush API key. If not supplied, the agent will revert
      *     back to the AI_AGENT_SDK_API_KEY environment variable.
      */
-<<<<<<< Updated upstream
-    constructor(
-        private key: string = process.env["AI_AGENT_SDK_API_KEY"] ?? "",
-    ) {
-        this.client = new GoldRushClient(key, { source: USER_AGENT_NAME });
-=======
     constructor(options: {
         onchain: {
             key: string;
@@ -93,7 +87,6 @@ export class Agent {
         this.client = new GoldRushClient(options.onchain.key, {
             source: USER_AGENT_NAME,
         });
->>>>>>> Stashed changes
     }
 
     private get headers() {
