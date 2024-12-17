@@ -42,10 +42,6 @@ export enum OnChainProvider {
     GoldRushAPI = "GoldRushAPI",
 }
 
-export enum LLMProvider {
-    Ollama = "Ollama",
-}
-
 /**
  * A powerful interface for retrieving blockchain data, designed specifically
  * for AI agents.
@@ -66,21 +62,17 @@ export enum LLMProvider {
 export class Agent {
     private client: GoldRushClient;
     private onChainProviderKey: string =
-        process.env["AGENT_SEMANTIC_SDK_API_KEY"] ?? "";
+        process.env["AI_AGENT_SDK_API_KEY"] ?? "";
 
     /**
      * Initializes a new instances of the Agent class.
-     * @param key - The GoldRush API key. If not supplied, the agent will revert
-     *     back to the AI_AGENT_SDK_API_KEY environment variable.
+     * @param options -
+     * @param options.
      */
     constructor(options: {
         onchain: {
             key: string;
             provider: OnChainProvider;
-        };
-        llm?: {
-            key: string;
-            provider: LLMProvider;
         };
     }) {
         this.onChainProviderKey = options.onchain.key;
