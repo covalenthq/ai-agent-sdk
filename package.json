@@ -3,12 +3,12 @@
     "version": "0.1.0",
     "description": "Covalent Agent SDK. Build cool AI agents for the blockchain",
     "main": "dist",
-    "types": "dist",
+    "types": "./dist/index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc",
         "clean": "rm -rf dist",
-        "prepublishOnly": "npm run clean && npm run build",
+        "prepublishOnly": "npm run build",
         "lint": "eslint .",
         "pretty": "prettier . --write"
     },
@@ -31,5 +31,35 @@
         "eslint-plugin-prettier": "^5.2.1",
         "prettier-plugin-tailwindcss": "^0.6.9",
         "typescript": "^5.7.2"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "files": [
+        "/dist"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/covalenthq/ai-agent-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
+    },
+    "homepage": "https://github.com/covalenthq/ai-agent-sdk#readme",
+    "keywords": [
+        "frontend",
+        "blockchain",
+        "cryptocurrency",
+        "web3",
+        "ai",
+        "ai-agent",
+        "blockchain-data"
+    ],
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "default": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        }
     }
 }
