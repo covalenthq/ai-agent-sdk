@@ -11,7 +11,7 @@ export type {
  * A powerful interface for retrieving blockchain data, designed specifically
  * for AI agents.
  *
- * The Agent class provides seamless access to on-chain data, enabling AI agents
+ * The Agent class provides seamless access to onchain data, enabling AI agents
  * to fetch real-time and historical data information tokens, NFTs, and wallet
  * activities across multiple chains. This data can be used for:
  *
@@ -31,10 +31,10 @@ export class Agent {
      * Initializes a new instances of the Agent class.
      *
      * @param options - Configuration options for the Agent
-     * @param options.onchain - On-chain data provider configuration
-     * @param options.onchain.key - API key for accessing the on-chain data
+     * @param options.onchain - Onchain data provider configuration
+     * @param options.onchain.key - API key for accessing the onchain data
      *      provider
-     * @param options.onchain.provider - The on-chain data provider to use
+     * @param options.onchain.provider - The onchain data provider to use
      *      (e.g. GoldRushAPI)
      */
     constructor(options: {

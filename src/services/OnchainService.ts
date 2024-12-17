@@ -39,7 +39,7 @@ export type Currency =
 const USER_AGENT_NAME = "AIAgentSDK";
 
 /**
- * The supported on-chain data providers.
+ * The supported onchain data providers.
  */
 
 export enum OnchainProvider {
@@ -47,7 +47,7 @@ export enum OnchainProvider {
 }
 
 /**
- * On-chain API
+ * Onchain API
  */
 export class OnchainService {
     private client: GoldRushClient;
@@ -57,12 +57,12 @@ export class OnchainService {
     /**
      * Initializes a new instances of the Agent class.
      *
-     * @param options - Configuration options for the Agent
-     * @param options.onchain - On-chain data provider configuration
-     * @param options.onchain.key - API key for accessing the on-chain data
-     *      provider
-     * @param options.onchain.provider - The on-chain data provider to use
-     *      (e.g. GoldRushAPI)
+     * @param options - Configuration options for the Agent.
+     * @param options.onchain - Onchain data provider configuration.
+     * @param options.onchain.key - API key for accessing the onchain data
+     *      provider.
+     * @param options.onchain.provider - The onchain data provider to use
+     *      (e.g. GoldRushAPI).
      */
     constructor(options: {
         onchain: {
@@ -86,10 +86,10 @@ export class OnchainService {
     /**
      * Retrieves the total balance of an ERC20 token that belongs to a given wallet
      * address.
-     * @param chainName - The chain to lookup
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress - The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
-     * @returns A promise that contains the balances for a single wallet.
+     * @returns A promise that contains the token balances for a single wallet.
      */
     async getTokenBalancesForWalletAddress(
         chainName: ChainName,
@@ -104,14 +104,14 @@ export class OnchainService {
     }
 
     /**
-     * Retrieves the historical token balances for the supplied address.
-     * @param chainName - The chain that we're going to be working with
+     * Retrieves the historical token balances for the given wallet address.
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress - The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
      * @param options - Some aditional optional parameters
      * @param options.date - Ending date to define a block range (YYYY-MM-DD).
      *     Omitting this parameter defaults to the current date.
-     * @returns A promise that contains the historical balance.
+     * @returns A promise that contains the historical balances.
      */
     async getHistoricalTokenBalancesForWalletAddress(
         chainName: ChainName,
@@ -134,14 +134,14 @@ export class OnchainService {
      * specified blockchain. This includes detailed information about token
      * holdings and their value changes over time.
      *
-     * @param chainName - The blockchain network to query
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
      * @param options - Some additional options.
      * @param options.days The number of days to return data for. Defaults to
      *     30 days.
      * @return A promise that contains the historical portfolio for wallet
-     *     address
+     *     address.
      */
     async getHistoricalPortfolioForWalletAddress(
         chainName: ChainName,
@@ -162,10 +162,10 @@ export class OnchainService {
      * blockchain. The summary includes total transaction count, earliest
      * transaction details, gas usage statistics, and other relevant metadata.
      *
-     * @param chainName - The name of the blockchain to query
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress - The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
-     * @returns A promise that contains the transaction summary data
+     * @returns A promise that contains the transaction summary data.
      */
     async getTransactionSummaryForAddress(
         chainName: ChainName,
@@ -182,7 +182,7 @@ export class OnchainService {
     /**
      * Retrieves the transaction history for a given wallet address on a specified blockchain.
      *
-     * @param chainName - The name of the blockchain to query.
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
      * @returns An async iterable that provide transactions for a single
@@ -209,7 +209,7 @@ export class OnchainService {
      *
      * @param walletAddress - The requested addresses. Passing in an `ENS`,
      *     `RNS`, `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
-     * @param options - some additional options
+     * @param options - some additional options.
      * @param options.before - Pagination cursor pointing to fetch transactions
      *     before a certain point.
      * @param options.after - Pagination cursor pointing to fetch transaction
@@ -270,7 +270,7 @@ export class OnchainService {
     /**
      * Retrieves all NFTs that a wallet owns.
      *
-     * @param chainName - The blockchain network to query
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress - The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
      * @returns A promise that contains a list of NFTs that a wallet owns.
@@ -288,12 +288,12 @@ export class OnchainService {
      * Retrieves the floor price history for an NFT collection on a specific
      * blockchain.
      *
-     * @param chainName - The blockchain network to query
+     * @param chainName - The chain that we're going to be working with.
      * @param contractAddress - The requested contract address. Passing in an
      *     `ENS`, `RNS`, `Lens Handle`, or an `Unstoppable Domain` resolves
      *     automatically.
      * @returns A promise that contains the floor price of a given NFT
-     *     collection
+     *     collection.
      */
     async getNFTFloorPrice(chainName: ChainName, contractAddress: string) {
         const options = {
@@ -312,11 +312,11 @@ export class OnchainService {
     /**
      * Retrieves the token approvals for a given wallet address on a specific chain.
      *
-     * @param chainName - The blockchain network to query
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress - The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
      * @returns A promise that contains a list of all token approvals on a
-     *     chain, for a given wallet
+     *     chain, for a given wallet.
      */
     async getTokenApprovals(chainName: ChainName, walletAddress: string) {
         return (
@@ -330,10 +330,10 @@ export class OnchainService {
     /**
      * Retrieves the token approvals for a given wallet address on a specific chain.
      *
-     * @param chainName - The blockchain network to query
+     * @param chainName - The chain that we're going to be working with.
      * @param walletAddress - The requested address. Passing in an `ENS`, `RNS`,
      *     `Lens Handle`, or an `Unstoppable Domain` resolves automatically.
-     * @returns A promise that resolves to the token approvals data
+     * @returns A promise that resolves to the token approvals data.
      */
     async getNFTApprovals(chainName: ChainName, walletAddress: string) {
         return (
@@ -345,17 +345,17 @@ export class OnchainService {
     }
 
     /**
-     * Retrieves the current price quote for an ERC20 token on a specific chain.
+     * Retrieves the spot price quote for an ERC20 token on a specific chain.
      *
-     * @param chainName - The blockchain network to query
-     * @param options - The parameters for the quote request
+     * @param chainName - The chain that we're going to be working with.
+     * @param options - The parameters for the quote request.
      * @param options.contractAddress - The contract address of the
-     *     token
+     *     token.
      * @param options.currency - The currency to get the price quote in
-     *     (e.g. "USD")
-     * @param options.from - The start time for the quote range
-     * @param options.to - The end time for the quote range
-     * @returns A promise that resolves to the token price data
+     *     (e.g. "USD").
+     * @param options.from - The start time for the quote range.
+     * @param options.to - The end time for the quote range.
+     * @returns A promise that resolves to the token price data.
      */
     async getQuote(
         chainName: ChainName,
