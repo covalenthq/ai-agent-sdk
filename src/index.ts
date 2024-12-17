@@ -36,7 +36,7 @@ export type Currency =
     | "CHF"
     | "GBP";
 
-const USER_AGENT_NAME = "AgentAISDK";
+const USER_AGENT_NAME = "AIAgentSDK";
 
 /**
  * A powerful interface for retrieving blockchain data, designed specifically
@@ -61,10 +61,10 @@ export class Agent {
     /**
      * Initializes a new instances of the Agent class.
      * @param key - The GoldRush API key. If not supplied, the agent will revert
-     *     back to the AGENT_AI_SDK_API_KEY environment variable.
+     *     back to the AI_AGENT_SDK_API_KEY environment variable.
      */
     constructor(
-        private key: string = process.env["AGENT_AI_SDK_API_KEY"] ?? "",
+        private key: string = process.env["AI_AGENT_SDK_API_KEY"] ?? "",
     ) {
         this.client = new GoldRushClient(key, { source: USER_AGENT_NAME });
     }
