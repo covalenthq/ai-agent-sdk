@@ -42,14 +42,14 @@ const USER_AGENT_NAME = "AIAgentSDK";
  * The supported on-chain data providers.
  */
 
-export enum OnChainProvider {
+export enum OnchainProvider {
     GoldRushAPI = "GoldRushAPI",
 }
 
 /**
  * On-chain API
  */
-export class OnChainService {
+export class OnchainService {
     private client: GoldRushClient;
     private onChainProviderKey: string =
         process.env["AI_AGENT_SDK_API_KEY"] ?? "";
@@ -67,7 +67,7 @@ export class OnChainService {
     constructor(options: {
         onchain: {
             key: string;
-            provider: OnChainProvider;
+            provider: OnchainProvider;
         };
     }) {
         this.onChainProviderKey = options.onchain.key;

@@ -1,11 +1,11 @@
-import { OnChainService } from "./services/OnChainService";
-import type { OnChainProvider } from "./services/OnChainService";
+import { OnchainService } from "./services/OnchainService";
+import type { OnchainProvider } from "./services/OnchainService";
 
 export type {
     ChainName,
     Currency,
-    OnChainProvider,
-} from "./services/OnChainService";
+    OnchainProvider,
+} from "./services/OnchainService";
 
 /**
  * A powerful interface for retrieving blockchain data, designed specifically
@@ -25,7 +25,7 @@ export type {
  * schemas to ensure type safety and data integrity.
  */
 export class Agent {
-    public OnChainService: OnChainService;
+    public OnchainService: OnchainService;
 
     /**
      * Initializes a new instances of the Agent class.
@@ -40,9 +40,9 @@ export class Agent {
     constructor(options: {
         onchain: {
             key: string;
-            provider: OnChainProvider;
+            provider: OnchainProvider;
         };
     }) {
-        this.OnChainService = new OnChainService(options);
+        this.OnchainService = new OnchainService(options);
     }
 }
