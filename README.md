@@ -47,11 +47,6 @@ new Agent({
     onchain: {
         key: "XXX",
         provider: GoldRushAPI
-    },
-
-    llm: {
-        key: "OLLAMA_KEY",
-        provider: "OLLAMA"
     }
 })
 
