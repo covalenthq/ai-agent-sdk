@@ -38,6 +38,10 @@ export type Currency =
 
 const USER_AGENT_NAME = "AIAgentSDK";
 
+export enum OnChainProvider {
+    GoldRushAPI = "GoldRushAPI",
+}
+
 /**
  * A powerful interface for retrieving blockchain data, designed specifically
  * for AI agents.
@@ -57,21 +61,34 @@ const USER_AGENT_NAME = "AIAgentSDK";
  */
 export class Agent {
     private client: GoldRushClient;
+    private onChainProviderKey: string =
+        process.env["AI_AGENT_SDK_API_KEY"] ?? "";
 
     /**
      * Initializes a new instances of the Agent class.
-     * @param key - The GoldRush API key. If not supplied, the agent will revert
-     *     back to the AI_AGENT_SDK_API_KEY environment variable.
+     *
+     * @param options - Configuration options for the Agent
+     * @param options.onchain - On-chain data provider configuration
+     * @param options.onchain.key - API key for accessing the on-chain data
+     *      provider
+     * @param options.onchain.provider - The on-chain data provider to use
+     *      (e.g. GoldRushAPI)
      */
-    constructor(
-        private key: string = process.env["AI_AGENT_SDK_API_KEY"] ?? "",
-    ) {
-        this.client = new GoldRushClient(key, { source: USER_AGENT_NAME });
+    constructor(options: {
+        onchain: {
+            key: string;
+            provider: OnChainProvider;
+        };
+    }) {
+        this.onChainProviderKey = options.onchain.key;
+        this.client = new GoldRushClient(options.onchain.key, {
+            source: USER_AGENT_NAME,
+        });
     }
 
     private get headers() {
         return {
-            Authorization: `Bearer ${this.key}`,
+            Authorization: `Bearer ${this.onChainProviderKey}`,
             "X-Requested-With": `${USER_AGENT_NAME}/${packageJson.version}`,
         };
     }
