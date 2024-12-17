@@ -8,7 +8,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "tsc",
         "clean": "rm -rf dist",
-        "prepublishOnly": "npm run build",
+        "prepublishOnly": "npm run clean && npm run build",
         "lint": "eslint .",
         "pretty": "prettier . --write"
     },
