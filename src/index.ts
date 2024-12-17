@@ -38,6 +38,14 @@ export type Currency =
 
 const USER_AGENT_NAME = "AIAgentSDK";
 
+export enum OnChainProvider {
+    GoldRushAPI = "GoldRushAPI",
+}
+
+export enum LLMProvider {
+    Ollama = "Ollama",
+}
+
 /**
  * A powerful interface for retrieving blockchain data, designed specifically
  * for AI agents.
@@ -57,21 +65,40 @@ const USER_AGENT_NAME = "AIAgentSDK";
  */
 export class Agent {
     private client: GoldRushClient;
+    private onChainProviderKey: string =
+        process.env["AGENT_SEMANTIC_SDK_API_KEY"] ?? "";
 
     /**
      * Initializes a new instances of the Agent class.
      * @param key - The GoldRush API key. If not supplied, the agent will revert
      *     back to the AI_AGENT_SDK_API_KEY environment variable.
      */
+<<<<<<< Updated upstream
     constructor(
         private key: string = process.env["AI_AGENT_SDK_API_KEY"] ?? "",
     ) {
         this.client = new GoldRushClient(key, { source: USER_AGENT_NAME });
+=======
+    constructor(options: {
+        onchain: {
+            key: string;
+            provider: OnChainProvider;
+        };
+        llm?: {
+            key: string;
+            provider: LLMProvider;
+        };
+    }) {
+        this.onChainProviderKey = options.onchain.key;
+        this.client = new GoldRushClient(options.onchain.key, {
+            source: USER_AGENT_NAME,
+        });
+>>>>>>> Stashed changes
     }
 
     private get headers() {
         return {
-            Authorization: `Bearer ${this.key}`,
+            Authorization: `Bearer ${this.onChainProviderKey}`,
             "X-Requested-With": `${USER_AGENT_NAME}/${packageJson.version}`,
         };
     }
