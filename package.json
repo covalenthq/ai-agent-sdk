@@ -1,6 +1,6 @@
 {
     "name": "@covalenthq/ai-agent-sdk",
-    "version": "1.0.0",
+    "version": "0.1.1",
     "description": "Covalent Agent SDK. Build cool AI agents for the blockchain",
     "main": "dist",
     "types": "./dist/index.d.ts",
