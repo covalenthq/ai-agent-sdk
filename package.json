@@ -1,0 +1,16 @@
+{
+	"name": "ai-agent-sdk",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "pnpm -r build",
+		"test": "pnpm -r test",
+		"lint": "pnpm -r lint",
+		"clean": "pnpm -r clean",
+		"publish-packages": "pnpm -r publish"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+}
