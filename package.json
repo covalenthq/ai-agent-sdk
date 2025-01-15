@@ -3,6 +3,10 @@
 	"version": "1.0.0",
 	"description": "",
 	"main": "index.js",
+	"private": true,
+	"workspaces": [
+		"packages/*"
+	],
 	"scripts": {
 		"build": "pnpm -r build",
 		"test": "pnpm -r test",
