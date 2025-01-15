@@ -1,6 +1,13 @@
 import TelegramBot from "node-telegram-bot-api";
 import { Command } from "commander";
 
+type History = {
+	type: "user" | "agent";
+	content: string;
+};
+
+const chatHistories = new Map<string, History[]>();
+
 const program = new Command();
 
 program
@@ -24,12 +31,14 @@ if (!token) {
 
 const bot = new TelegramBot(token, { polling: true });
 
-bot.onText(/\/start/, (msg) => {
-	bot.sendMessage(msg.chat.id, "Welcome! I am a Telegram bot.");
-});
-
 bot.on("text", (msg) => {
-	bot.sendMessage(msg.chat.id, `You said: ${msg.text}`);
+	if (!msg.chat.username || !msg.text) {
+		return;
+	}
+	const history = chatHistories.get(msg.chat.username) ?? [];
+	history.push({ type: "user", content: msg.text });
+	chatHistories.set(msg.chat.username, history);
+	bot.sendMessage(msg.chat.id, "Welcome! I am a Telegram bot.");
 });
 
 export default async function main() {
