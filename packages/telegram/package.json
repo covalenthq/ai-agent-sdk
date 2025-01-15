@@ -1,9 +1,18 @@
 {
-	"name": "telegram",
-	"version": "1.0.0",
+	"name": "sals-awesome-org-telegram",
+	"version": "0.2.0",
 	"main": "index.js",
+	"private": false,
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc",
+		"prepare": "npm run build",
+		"prepublishOnly": "npm run build"
+	},
+	"bin": {
+		"sals-awesome-org-telegram": "./bin/index.js"
 	},
 	"keywords": [],
 	"author": "",

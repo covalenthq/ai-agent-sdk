@@ -4,7 +4,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 import fs from "fs";
 
-export default async function main() {
+export async function main() {
 	console.log("Starting bot...");
 
 	const openai = new OpenAI();
