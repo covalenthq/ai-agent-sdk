@@ -1,5 +1,9 @@
 import TelegramBot from "node-telegram-bot-api";
 import { Command } from "commander";
+import OpenAI from "openai";
+import { z } from 'zod';
+
+const openai = new OpenAI();
 
 type History = {
 	type: "user" | "agent";
@@ -14,7 +18,10 @@ program
 	.name("telegram-bot")
 	.description("Telegram bot for interacting with the Covalent API")
 	.version("1.0.0")
-	.option("-t, --token <token>", "Telegram bot token");
+	.option("-t, --token <token>", "Telegram bot token")
+	.option("-c, --character <path>", "Path to character configuration file");
+
+
 
 program.parse();
 
@@ -38,7 +45,29 @@ bot.on("text", (msg) => {
 	const history = chatHistories.get(msg.chat.username) ?? [];
 	history.push({ type: "user", content: msg.text });
 	chatHistories.set(msg.chat.username, history);
-	bot.sendMessage(msg.chat.id, "Welcome! I am a Telegram bot.");
+
+
+
+	openai.chat.completions
+		.create({
+			messages: [{ role: "system", content:  }, { role: "user", content: msg.text }],
+			model: "gpt-3.5-turbo",
+		})
+		.then(async (completion) => {
+			const response = completion.choices[0]?.message?.content;
+			if (response) {
+				history.push({ type: "agent", content: response });
+				chatHistories.set(msg.chat.username!, history);
+				await bot.sendMessage(msg.chat.id, response);
+			}
+		})
+		.catch(async (error) => {
+			console.error("Error calling OpenAI:", error);
+			await bot.sendMessage(
+				msg.chat.id,
+				"Sorry, I encountered an error processing your message."
+			);
+		});
 });
 
 export default async function main() {
