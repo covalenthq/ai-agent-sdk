@@ -52,7 +52,7 @@ export default [
             "prettier/prettier": "error",
             "@typescript-eslint/no-var-requires": "off",
             "@typescript-eslint/no-unused-vars": [
-                "warn",
+                "error",
                 {
                     vars: "all",
                     args: "after-used",

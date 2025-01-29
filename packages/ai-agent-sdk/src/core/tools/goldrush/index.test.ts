@@ -12,7 +12,6 @@ import type {
 } from "openai/resources";
 import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
 import { expect, test, beforeAll } from "vitest";
-import { z } from "zod";
 
 let apiKey: string;
 
@@ -45,16 +44,6 @@ test("blockchain research agent with goldrush tools", async () => {
         ],
         tools,
     });
-
-    const schema = {
-        analysis: z.object({
-            wallet_summary: z.string(),
-            token_holdings: z.string(),
-            nft_holdings: z.string(),
-            transaction_patterns: z.string(),
-            risk_assessment: z.string(),
-        }),
-    };
 
     const state = StateFn.root(agent.description);
     state.messages.push(

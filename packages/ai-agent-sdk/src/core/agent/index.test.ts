@@ -73,13 +73,6 @@ test("research agent with tools", async () => {
         },
     });
 
-    const schema = {
-        article: z.object({
-            title: z.string(),
-            text: z.string(),
-        }),
-    };
-
     const state = StateFn.root(agent.description);
 
     const result = await agent.run(state);
