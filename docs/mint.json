@@ -17,8 +17,8 @@
     },
     "topbarLinks": [
         {
-            "name": "Support",
-            "url": "mailto:hi@mintlify.com"
+            "name": "TG Support",
+            "url": "https://t.me/CXT_Agent_SDK"
         }
     ],
     "topbarCtaButton": {
@@ -35,7 +35,7 @@
         {
             "name": "Community",
             "icon": "telegram",
-            "url": "https://mintlify.com/community"
+            "url": "https://t.me/CXT_Agent_SDK"
         },
         {
             "name": "GitHub",
