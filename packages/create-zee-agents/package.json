@@ -1,7 +1,7 @@
 {
     "name": "@covalenthq/create-zee-agents",
     "version": "0.2.1",
-    "description": "Create a new Zee agents application with one command",
+    "description": "Create a new ZEE agents application to build your own autonomous agents.",
     "type": "module",
     "bin": {
         "create-zee-agents": "bin/index"
