@@ -1,6 +1,6 @@
 {
     "$schema": "https://mintlify.com/schema.json",
-    "name": "Covalent AI Agent SDK",
+    "name": "AI Agent SDK",
     "logo": {
         "dark": "/logo/dark.svg",
         "light": "/logo/light.svg"
