@@ -4,10 +4,7 @@ export default defineConfig({
     test: {
         exclude: [
             "dist",
-            "node_modules",
-            "src/core/agent/index.test.ts",
-            "src/core/llm/index.test.ts",
-            "src/core/zee/index.test.ts",
+            "node_modules"
         ],
         testTimeout: 120_000,
     },
