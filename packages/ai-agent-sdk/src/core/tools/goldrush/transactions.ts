@@ -3,7 +3,7 @@ import { type Chain } from "@covalenthq/client-sdk";
 import { z } from "zod";
 
 export const TransactionsSchema = BaseGoldRushSchema.extend({
-    timeframe: z.enum(["1h", "24h", "7d", "30d"]).optional(),
+    timeframe: z.enum(["1h", "24h", "7d", "30d"]),
 });
 
 export type TransactionsParams = z.infer<typeof TransactionsSchema>;
