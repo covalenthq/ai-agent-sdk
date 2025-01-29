@@ -1,0 +1,41 @@
+{
+    "name": "create-zee-agents-template",
+    "version": "0.2.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "run": "ts-node src/index.ts"
+    },
+    "keywords": [
+        "blockchain",
+        "cryptocurrency",
+        "web3",
+        "blockchain-data",
+        "ai-agent",
+        "ai-agents-framework",
+        "zero-employee-enterprise",
+        "zee",
+        "autonomous-agents",
+        "autonomous-agent-framework",
+        "autonomous-agent-sdk",
+        "ai-agent-sdk"
+    ],
+    "author": "Covalent",
+    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/covalenthq/ai-agent-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
+    },
+    "license": "MIT",
+    "description": "",
+    "devDependencies": {
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.7"
+    }
+}

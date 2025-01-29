@@ -1,10 +1,9 @@
 {
     "name": "ai-agent-sdk",
-    "version": "0.2.0",
-    "private": true,
     "description": "Monorepo for AI Agent SDK",
     "workspaces": [
         "packages/ai-agent-sdk",
+        "packages/create-zee-agents",
         "docs/"
     ],
     "scripts": {
@@ -14,9 +13,16 @@
         "lint": "pnpm run -r lint",
         "format": "prettier --write ."
     },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
+    "author": "Covalent",
+    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/covalenthq/ai-agent-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
+    },
+    "license": "MIT",
     "devDependencies": {
         "@eslint/eslintrc": "^3.2.0",
         "@eslint/js": "^9.19.0",

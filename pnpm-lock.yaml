@@ -70,7 +70,7 @@ importers:
         specifier: ^3.0.2
         version: 3.0.4(@types/debug@4.1.12)(@types/node@22.10.10)(yaml@2.7.0)
 
-  packages/create-zee-app:
+  packages/create-zee-agents:
     dependencies:
       '@clack/prompts':
         specifier: ^0.9.1

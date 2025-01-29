@@ -1,10 +1,10 @@
 {
-    "name": "@covalenthq/create-zee-app",
+    "name": "@covalenthq/create-zee-agents",
     "version": "0.2.0",
-    "description": "Create a new Zee application with one command",
+    "description": "Create a new Zee agents application with one command",
     "type": "module",
     "bin": {
-        "create-zee-app": "bin/index"
+        "create-zee-agents": "bin/index"
     },
     "files": [
         "dist",
@@ -25,6 +25,14 @@
         "test": "echo \"No tests specified\""
     },
     "author": "Covalent",
+    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/covalenthq/ai-agent-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
+    },
     "license": "MIT",
     "devDependencies": {
         "@types/node": "^22.10.7",

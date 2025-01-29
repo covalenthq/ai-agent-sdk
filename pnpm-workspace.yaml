@@ -4,6 +4,6 @@ packages:
     # exclude test directories
     - "!**/test/**"
     # Ignore the template
-    - "!packages/create-zee-app/template"
+    - "!packages/create-zee-agents/template"
     # exclude build directories
     - "!**/dist/**"

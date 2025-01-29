@@ -11,6 +11,29 @@
         "access": "public"
     },
     "license": "MIT",
+    "keywords": [
+        "blockchain",
+        "cryptocurrency",
+        "web3",
+        "blockchain-data",
+        "ai-agent",
+        "ai-agents-framework",
+        "zero-employee-enterprise",
+        "zee",
+        "autonomous-agents",
+        "autonomous-agent-framework",
+        "autonomous-agent-sdk",
+        "ai-agent-sdk"
+    ],
+    "author": "Covalent",
+    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/covalenthq/ai-agent-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
+    },
     "scripts": {
         "test": "vitest",
         "build": "tsc",
