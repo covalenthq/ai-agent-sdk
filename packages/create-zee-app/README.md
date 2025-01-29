@@ -20,7 +20,6 @@ and follow the prompts to create your new ZEE app.
 
 A ZEE, or Zero-Employee Enterprise, is a new business model where traditional workforces are augmented by a decentralized system of autonomous agents. These agents collaborate and iteratively solve complex tasks with precision and adaptability for the onchain world.
 
-
 **Why use Create ZEE App?**
 
 Create ZEE App is a powerful tool that simplifies the process of setting up a new ZEE application with the Covalent [AI Agent SDK](https://github.com/covalenthq/ai-agent-sdk) within seconds. Here are some reasons why you should use Create ZEE App:
