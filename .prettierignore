@@ -1,0 +1,42 @@
+# Ignore artifacts
+dist/
+build/
+node_modules/
+coverage/
+*.min.js
+*.min.css
+
+# Ignore configuration files
+*.config.js
+*.config.ts
+.env
+.env.local
+
+# Ignore common files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Ignore documentation
+CHANGELOG.md
+LICENSE
+README.md
+
+# Ignore specific patterns
+**/*.svg
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.ico
+**/*.woff
+**/*.woff2
+**/*.ttf
+**/*.eot
+**/*.mp4
+**/*.webm
+**/*.ogg
+**/*.mp3
+**/*.wav
+**/*.flac
+**/*.aac
