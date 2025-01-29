@@ -1,10 +1,10 @@
 {
     "name": "@covalenthq/create-zee-agents",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "description": "Create a new Zee agents application with one command",
     "type": "module",
     "bin": {
-        "create-zee-agents": "bin/index"
+        "create-zee-agents": "bin/create-zee-agents"
     },
     "files": [
         "dist",
