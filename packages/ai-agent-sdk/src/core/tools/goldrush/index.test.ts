@@ -1,16 +1,16 @@
 import { Agent } from "../../agent";
 import { user } from "../../base";
 import { StateFn } from "../../state";
-import { Tool } from "../index";
+import type { Tool } from "../index";
 import { NFTBalancesTool } from "./nft-balances";
 import { TokenBalancesTool } from "./token-balances";
 import { TransactionsTool } from "./transactions";
 import "dotenv/config";
-import {
+import type {
     ChatCompletionToolMessageParam,
     ChatCompletionAssistantMessageParam,
 } from "openai/resources";
-import { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
+import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
 import { expect, test, beforeAll } from "vitest";
 import { z } from "zod";
 
