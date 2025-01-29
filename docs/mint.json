@@ -57,7 +57,14 @@
             "pages": [
                 "concepts/llms",
                 "concepts/agents",
-                "concepts/tools",
+                {
+                    "group": "Tools",
+                    "icon": "screwdriver-wrench",
+                    "pages": [
+                        "concepts/tools/overview",
+                        "concepts/tools/goldrush"
+                    ]
+                },
                 "concepts/zeeworkflows"
             ]
         }
