@@ -1,0 +1,28 @@
+---
+title: Tools
+icon: "screwdriver-wrench"
+description: Extend the capabilities of your agents with tools.
+---
+
+Tools are functions that can be used to extend the capabilities of your agents. There are two core use-cases for tools:
+
+1. **Function Calling**: Tools are functions that can be used to call other agents, connect to external APIs, or interact with your database. In the context of a blockchain system, tools can be used to manage private keys, sign transactions and relay them to the blockchain.
+
+2. **Structured Output**: Tools are functions that can be used to generate structured output. This is useful for generating JSON, CSV, or other structured data.
+
+Tools are optional and can be added to an Agent to extend its capabilities. Tools are included in the calls to the language model through features like OpenAI's [function calling](https://platform.openai.com/docs/guides/function-calling) or Claude's [tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use).
+
+## Creating a Tool
+
+Tools are created using the `createTool` function and can be sent to the agent using the `tools` property during initialization.
+
+```typescript
+const tool = createTool({
+    id: "get-company-report",
+    description: "This tool is used to get the current state of the company",
+    schema: z.object({}),
+    execute: async (params) => {
+        return "The current state of the company is good";
+    },
+});
+```

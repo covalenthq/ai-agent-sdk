@@ -1,7 +1,9 @@
 import { FlatCompat } from "@eslint/eslintrc";
 import js from "@eslint/js";
-// import prettier from "eslint-config-prettier";
-// import prettierPlugin from "eslint-plugin-prettier";
+import typescriptPlugin from "@typescript-eslint/eslint-plugin";
+import typescriptParser from "@typescript-eslint/parser";
+import prettier from "eslint-config-prettier";
+import prettierPlugin from "eslint-plugin-prettier";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,29 +17,58 @@ const compat = new FlatCompat({
 
 export default [
     {
-        ignores: ["**/*.config.js", "**/dist"],
+        ignores: [
+            "**/*.config.js",
+            "**/dist",
+            "jest.config.js",
+            "**/template/**",
+        ],
     },
-    ...compat.extends(
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-    ),
-    // prettier, // Add the prettier config directly
     {
-        // plugins: {
-        //     prettier: prettierPlugin,
-        // },
+        files: ["**/*.ts", "**/*.tsx"],
+        languageOptions: {
+            parser: typescriptParser,
+            parserOptions: {
+                ecmaVersion: "latest",
+                sourceType: "module",
+                project: ["./packages/*/tsconfig.json"],
+            },
+            globals: {
+                console: true,
+                process: true,
+            },
+        },
+        plugins: {
+            "@typescript-eslint": typescriptPlugin,
+            prettier: prettierPlugin,
+        },
         rules: {
+            ...js.configs.recommended.rules,
+            ...typescriptPlugin.configs.recommended.rules,
             semi: "error",
             "no-multiple-empty-lines": "error",
             indent: "off",
             "no-unsafe-optional-chaining": "warn",
-            // "prettier/prettier": "error",
+            "prettier/prettier": "error",
             "@typescript-eslint/no-var-requires": "off",
-            "@typescript-eslint/no-unused-vars": "warn",
+            "@typescript-eslint/no-unused-vars": [
+                "warn",
+                {
+                    vars: "all",
+                    args: "after-used",
+                    ignoreRestSiblings: true,
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^_",
+                },
+            ],
+            "@typescript-eslint/no-empty-object-type": "error",
+            "@typescript-eslint/no-unsafe-function-type": "error",
+            "@typescript-eslint/no-wrapper-object-types": "error",
             "@typescript-eslint/no-inferrable-types": "off",
             "@typescript-eslint/no-non-null-assertion": "off",
             "@typescript-eslint/consistent-type-imports": "error",
             "@typescript-eslint/no-explicit-any": "warn",
         },
     },
+    prettier,
 ];

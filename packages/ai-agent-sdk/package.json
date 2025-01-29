@@ -1,0 +1,37 @@
+{
+    "name": "@covalent/ai-agent-sdk",
+    "version": "0.0.2",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "license": "MIT",
+    "scripts": {
+        "test": "vitest",
+        "build": "tsc",
+        "clean": "rm -rf dist",
+        "prepublishOnly": "npm run clean && npm run build",
+        "lint": "eslint .",
+        "pretty": "prettier . --write"
+    },
+    "dependencies": {
+        "commander": "^13.1.0",
+        "dotenv": "^16.4.7",
+        "openai": "^4.79.1",
+        "pino": "^9.6.0",
+        "pino-pretty": "^13.0.0",
+        "typescript": "^5.7.3",
+        "zod": "^3.24.1",
+        "zod-to-json-schema": "^3.24.1"
+    },
+    "devDependencies": {
+        "@types/node": "^22.10.7",
+        "node-fetch": "^3.3.2",
+        "vitest": "^3.0.2"
+    }
+}

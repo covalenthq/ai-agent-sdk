@@ -1,0 +1,38 @@
+name: CI
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+        branches:
+            - main
+        types: [opened, synchronize]
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                command: [lint, build]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - uses: pnpm/action-setup@v4
+              name: Install pnpm
+              with:
+                  version: 10
+                  run_install: false
+
+            - name: Cache node_modules
+              uses: actions/cache@v4
+              id: cache-nodemodules
+              with:
+                  path: node_modules
+                  key: ${{ runner.os }}-${{ env.NODE_VERSION }}-nodemodules-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Run ${{ matrix.command }}
+              run: pnpm ${{ matrix.command }}

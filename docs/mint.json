@@ -1,0 +1,69 @@
+{
+    "$schema": "https://mintlify.com/schema.json",
+    "name": "Covalent Agent SDK",
+    "logo": {
+        "dark": "/logo/dark.svg",
+        "light": "/logo/light.svg"
+    },
+    "favicon": "/favicon.svg",
+    "colors": {
+        "primary": "#0D9373",
+        "light": "#07C983",
+        "dark": "#0D9373",
+        "anchors": {
+            "from": "#0D9373",
+            "to": "#07C983"
+        }
+    },
+    "topbarLinks": [
+        {
+            "name": "Support",
+            "url": "mailto:hi@mintlify.com"
+        }
+    ],
+    "topbarCtaButton": {
+        "url": "https://github.com/covalenthq/ai-agent-sdk",
+        "type": "github"
+    },
+    "tabs": [
+        {
+            "name": "API Reference",
+            "url": "api-reference"
+        }
+    ],
+    "anchors": [
+        {
+            "name": "Community",
+            "icon": "telegram",
+            "url": "https://mintlify.com/community"
+        },
+        {
+            "name": "GitHub",
+            "icon": "github",
+            "url": "https://github.com/covalenthq/ai-agent-sdk"
+        }
+    ],
+    "navigation": [
+        {
+            "group": "Get Started",
+            "pages": [
+                "overview",
+                "getting-started/quickstart",
+                "getting-started/installation"
+            ]
+        },
+        {
+            "group": "Concepts",
+            "pages": [
+                "concepts/llms",
+                "concepts/agents",
+                "concepts/tools",
+                "concepts/zeeworkflows"
+            ]
+        }
+    ],
+    "footerSocials": {
+        "x": "https://x.com/Covalent_HQ",
+        "github": "https://github.com/covalenthq/ai-agent-sdk"
+    }
+}

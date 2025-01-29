@@ -1,0 +1,51 @@
+---
+title: Agents
+icon: "head-side-gear"
+description: Overview of agents in the Zero-Employee Enterprise.
+---
+
+Agents are the building blocks of Zero-Employee Enterprise. They are the ones that do the work. Agents are stateless and have a single purpose and can optionally use [Tools](/concepts/tools) to help them achieve their goal.
+
+Agents can be called individually or composed together to form a ZEE to iteratively and collaboratively solve complex problems.
+
+## Creating an Agent
+
+The simplest way to create an Agent is to use initialize an Agent with a model, description, instructions and optionally tools.
+
+```typescript
+const agent = new Agent({
+    name: "Reporting Agent",
+    model: {
+        provider: "OPEN_AI",
+        name: "gpt-4o-mini",
+    },
+    description: "This agent is responsible for generating reports",
+    instructions: ["Generate a report on the current state of the company"],
+});
+```
+
+## Adding tools
+
+[Tools](/concepts/tools) are optional and can be added to an Agent to extend its capabilities. Tools are included in the calls to the language model through features like OpenAI's [function calling](https://platform.openai.com/docs/guides/function-calling) or Claude's [tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use).
+
+Tools are created using the `createTool` function and can be sent to the agent using the `tools` property during initialization.
+
+```typescript
+const agent = new Agent({
+    name: "Reporting Agent",
+    ...
+    tools: [tool1, tool2, tool3],
+});
+```
+
+Read more about [Tools](/concepts/tools) to learn how to create them.
+
+## Running an Agent
+
+Agents can be run standalone or as part of a ZEE workflow. Running an agent standalone is useful for testing and debugging. The `run` method will return the final state of the agent.
+
+```typescript
+const result = await agent.run();
+```
+
+Running an agent as part of a ZEE workflow is useful for solving complex problems. Read more about [ZEE](/concepts/zeeworkflows) to learn how to run agents in a ZEE workflow.

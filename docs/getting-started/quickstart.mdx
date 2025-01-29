@@ -1,0 +1,41 @@
+---
+title: Quickstart
+icon: "bolt"
+description: Learn the basics of the Covalent Agent SDK in a few minutes.
+---
+
+<Steps>
+    <Step title="Start with a template">
+        ```npx create-zee-app```
+    </Step>
+    <Step title="Modify the agent">
+```tsx
+const agent1 = new Agent({
+    name: "Agent1",
+    model: {
+        provider: "OPEN_AI",
+        name: "gpt-4o-mini",
+    },
+    description: "A helpful AI assistant that can engage in conversation.",
+});
+```
+    </Step>
+    <Step title="Modify the ZEE Workflow">
+```tsx
+const zee = new ZeeWorkflow({
+    description: "A workflow of agents that do stuff together",
+    output: "Just bunch of stuff",
+    agents: { agent1, agent2 },
+});
+```
+    </Step>
+    <Step title="Run the Zee Workflow">
+```tsx
+(async function main() {
+    const result = await zee.run();
+    console.log(result);
+})();
+```
+
+    </Step>
+</Steps>

@@ -1,0 +1,68 @@
+---
+title: LLMs
+description: Overview of supported language models, including OpenAI, Anthropic, and Google Gemini, Grok, and more.
+icon: "computer-classic"
+---
+
+Each LLM is an adapter around a language model provider and the specific model version, eg: `gpt-4o-mini`. Each [Agent](./agents) can pick their own model and a [ZeeWorkflow](./zeeworkflow) can be configured to use a specific LLM as default.
+
+```tsx
+const llm = new LLM({
+    provider: "OPEN_AI",
+    name: "gpt-4o-mini",
+    apiKey: process.env.OPENAI_API_KEY,
+});
+```
+
+## List of supported LLMs
+
+### Open AI
+
+<CodeGroup>
+
+```plaintext OpenAI
+"gpt-4"
+"gpt-4-turbo"
+"gpt-3.5-turbo"
+"gpt-4o"
+"gpt-4o-mini"
+```
+
+```plaintext DeepSeek
+"deepseek-chat"
+"deepseek-coder"
+```
+
+```plaintext Grok
+"grok-2-latest"
+"grok-beta"
+```
+
+```plaintext Gemini
+"gemini-1.5-flash"
+"gemini-1.5-pro"
+```
+
+</CodeGroup>
+
+## Environment Variables
+
+<CodeGroup>
+
+```plaintext OpenAI
+OPENAI_API_KEY
+```
+
+```plaintext DeepSeek
+DEEPSEEK_API_KEY
+```
+
+```plaintext Grok
+GROK_API_KEY
+```
+
+```plaintext Gemini
+GEMINI_API_KEY
+```
+
+</CodeGroup>

@@ -1,0 +1,9 @@
+packages:
+    # all packages in subdirs of packages/
+    - "packages/*"
+    # exclude test directories
+    - "!**/test/**"
+    # Ignore the template
+    - "!packages/create-zee-app/template"
+    # exclude build directories
+    - "!**/dist/**"

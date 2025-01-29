@@ -1,0 +1,27 @@
+---
+title: ZEE Workflows
+description: Compose agents to solve complex problems.
+icon: "chart-network"
+---
+
+The Zero-Employee Enterprise (ZEE) is a new business model where traditional workforces are augmented by autonomous agents. The business logic behind ZEE makes the agents autonomous and able to solve complex problems.
+
+A ZEE workflow contains a couple of components:
+
+- The [Agents](/concepts/agents) that are used to solve the problem.
+- A **State** database that stores past messages and results.
+- A **Router** that decides which agent to run next.
+
+## Creating a Workflow
+
+To create a workflow, you need to create a new instance of the `ZeeWorkflow` class.
+
+```typescript
+const zee = new ZeeWorkflow({
+    description: "...",
+    output: "The goal of this workflow is to...",
+    agents: { agent1, agent2 },
+});
+
+const result = await ZeeWorkflow.run(zee);
+```

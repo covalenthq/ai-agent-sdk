@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "target": "ES2022",
-        "module": "NodeNext",
-        "moduleResolution": "NodeNext",
+        "module": "CommonJS",
+        "moduleResolution": "node",
         "lib": ["ES2022", "DOM"],
         "rootDir": "./src",
         "outDir": "./dist",
@@ -25,7 +25,8 @@
         "removeComments": true,
         "preserveConstEnums": true,
         "isolatedModules": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "types": ["node"]
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "dist"]

@@ -12,52 +12,53 @@
 
 </div>
 
-<p>A TypeScript SDK to build, deploy and interact with AI agents. Create intelligent, context-aware agents with unprecedented ease and functionality.</p>
+<p>Build autonomous AI agents for the Zero-Employee Enterprise (ZEE). Create intelligent, context-aware agents with unprecedented ease and functionality. The Agent SDK supports single model inference calls to multi-agent systems that use tools. The SDK provides primitives that are designed to be easily composable, extendable and flexible for advanced use cases.</p>
 
-## Features
+## Features 
 
-Currently available:
+- LLMs - a unified interface for all LLMs
+- Agents - a single model with a system prompt and a set of tools
+- Tools - extend the capabilities of agents with external tools
+- ZEE Workflows - compose agents to solve complex problems
 
-- Read onchain data using the [GoldRush API](https://goldrush.dev/)
+## Using the SDK (Quick Start)
 
-Roadmap:
+### 1. Start with a template
 
-- Access offchain and private data
-- Train and fine-tune Large/Small Language Models
-- Identity services to securely store your agent's private keys
-- Communication services to post to social media
-- Memory Bank to provide a trustless, verifiable persistent store for critical states, outputs and decisions
+> npx create-zee-app 
 
-## Using the SDK
+This will create a new project with a basic setup.
 
-### 1. Setup and installation
-
-> yarn install
-
-or
-
-> npm install
-
-### 2. Initialization
+### 2. Modify the agent 
 
 ```js
-import { Agent, BaseChain, OnchainProvider } from "@covalenthq/ai-agent-sdk";
-
-new Agent({
-    onchain: {
-        key: "XXX",
-        provider: OnchainProvider.GoldRushAPI,
+const agent1 = new Agent({
+    name: "Agent1",
+    model: {
+        provider: "OPEN_AI",
+        name: "gpt-4o-mini",
     },
+    description: "A helpful AI assistant that can engage in conversation.",
 });
 ```
 
-### 3. Retrieve Token Balances for Wallet on Base Chain
+### 3. Modify the ZEE Workflow
 
 ```js
-const balances = agent.onchain.getTokenBalancesForWalletAddress(
-    BaseChain,
-    "demo.eth",
-);
+const zee = new ZeeWorkflow({
+    description: "A workflow of agents that do stuff together",
+    output: "Just bunch of stuff",
+    agents: { agent1, agent2 },
+});
+```
+
+### 4. Run the Zee Workflow
+
+```js
+(async function main() {
+    const result = await zee.run();
+    console.log(result);
+})();
 ```
 
 ## 🤝 Contributing

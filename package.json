@@ -1,65 +1,30 @@
 {
-    "name": "@covalenthq/ai-agent-sdk",
-    "version": "0.1.1",
-    "description": "Covalent Agent SDK. Build cool AI agents for the blockchain",
-    "main": "dist",
-    "types": "./dist/index.d.ts",
+    "name": "ai-agent-sdk",
+    "version": "0.0.2",
+    "private": true,
+    "description": "Monorepo for AI Agent SDK",
+    "workspaces": [
+        "packages/ai-agent-sdk",
+        "docs/"
+    ],
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "build": "tsc",
-        "clean": "rm -rf dist",
-        "prepublishOnly": "npm run clean && npm run build",
-        "lint": "eslint .",
-        "pretty": "prettier . --write"
+        "build": "pnpm run -r build",
+        "clean": "pnpm run -r clean",
+        "test": "pnpm run -r test",
+        "lint": "pnpm run -r lint",
+        "format": "prettier --write ."
     },
-    "author": {
-        "name": "covalenthq",
-        "url": "https://covalenthq.com"
-    },
-    "license": "MIT",
-    "dependencies": {
-        "@covalenthq/client-sdk": "^2.2.1",
-        "zod": "^3.23.8"
-    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
     "devDependencies": {
-        "@trivago/prettier-plugin-sort-imports": "^5.2.0",
-        "@types/node": "^22.10.1",
-        "@typescript-eslint/eslint-plugin": "^8.18.0",
-        "@typescript-eslint/parser": "^8.18.0",
-        "eslint": "^9.16.0",
-        "eslint-config-prettier": "^9.1.0",
-        "eslint-plugin-prettier": "^5.2.1",
-        "prettier-plugin-tailwindcss": "^0.6.9",
-        "typescript": "^5.7.2"
-    },
-    "publishConfig": {
-        "access": "public"
-    },
-    "files": [
-        "/dist"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/covalenthq/ai-agent-sdk.git"
-    },
-    "bugs": {
-        "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
-    },
-    "homepage": "https://github.com/covalenthq/ai-agent-sdk#readme",
-    "keywords": [
-        "frontend",
-        "blockchain",
-        "cryptocurrency",
-        "web3",
-        "ai",
-        "ai-agent",
-        "blockchain-data"
-    ],
-    "exports": {
-        ".": {
-            "import": "./dist/index.js",
-            "default": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        }
+        "@eslint/eslintrc": "^3.2.0",
+        "@eslint/js": "^9.19.0",
+        "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+        "@typescript-eslint/eslint-plugin": "^8.20.0",
+        "@typescript-eslint/parser": "^8.20.0",
+        "eslint": "^9.18.0",
+        "eslint-config-prettier": "^10.0.1",
+        "eslint-plugin-prettier": "^5.1.3"
     }
 }

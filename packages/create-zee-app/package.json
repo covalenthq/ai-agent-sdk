@@ -1,0 +1,40 @@
+{
+    "name": "@covalent/create-zee-app",
+    "version": "0.0.2",
+    "description": "Create a new Zee application with one command",
+    "type": "module",
+    "bin": {
+        "create-zee-app": "bin/index"
+    },
+    "files": [
+        "dist",
+        "template",
+        "README.md"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "start": "node dist/index.js",
+        "prepublishOnly": "npm run build",
+        "pretty": "prettier . --write",
+        "lint": "eslint .",
+        "test": "echo \"No tests specified\""
+    },
+    "author": "Covalent",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^22.10.7",
+        "typescript": "^5.7.3"
+    },
+    "dependencies": {
+        "@clack/prompts": "^0.9.1",
+        "@types/fs-extra": "^11.0.0",
+        "fs-extra": "^11.0.0",
+        "gradient-string": "^3.0.0",
+        "ora": "^7.0.1",
+        "picocolors": "^1.1.1"
+    }
+}
