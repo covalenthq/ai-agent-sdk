@@ -25,3 +25,155 @@ const zee = new ZeeWorkflow({
 
 const result = await ZeeWorkflow.run(zee);
 ```
+
+## Example Crypto-Native Workflow Use Cases
+Agent workflows can facilitate collaboration on specific tasks across a wide variety of use cases. Below is a list of example crypto-native use cases.
+
+### 1. DeFi Investment Agent: Automated Portfolio Manager for Yield Optimization
+
+**Concept**: An autonomous agent that dynamically manages crypto portfolios by reallocating assets across DeFi protocols to maximize yield.
+
+- **Features**:
+    - Pulls real-time liquidity pool and yield farming data from Covalent’s API.
+    - Uses reinforcement learning to monitor, analyze, and optimize yield strategies based on market conditions and risk profiles.
+    - Allocates or rebalances funds automatically in lending protocols, liquidity pools, or staking platforms.
+    - Sends notifications to users on portfolio changes, yield updates, and recommendations for optimizing returns.
+
+### 2. NFT Valuation and Rarity Analyzer: Market-Pricing Model for Digital Assets
+
+**Concept**: An AI model that provides a rarity and value estimate for NFTs based on onchain data, rarity, and transaction history. NFT collectors and investors can leverage this tool to make informed decisions when buying, selling, or holding NFTs based on projected market trends.
+
+- **Features**:
+    - Analyzes data on NFT trades, transfers, and token metadata using Covalent's API.
+    - Employs a machine learning model to predict the market value of NFTs based on rarity traits, trading volume, and past sale prices.
+    - Provides real-time NFT pricing, rarity scoring, and market trend visualization, highlighting growth in specific NFT sectors (e.g., gaming vs. art).
+    - Alerts users to emerging valuable collections or assets based on trading patterns.
+
+### 3. Onchain Identity Scorer: Web3 Profile and Trustworthiness Model
+
+**Concept**: An AI tool that assigns trust and activity scores to wallets based on transaction patterns, DeFi participation, and social behaviors on the blockchain.
+
+- **Features**:
+    - Analyzes wallet behaviors, including transaction history, staking activities, loan repayments, and NFT holdings, using Covalent's data.
+    - Applies clustering and classification algorithms to segment users into behavior categories, such as "DeFi power user," "whale," or "NFT collector."
+    - Builds a “trust score” based on onchain behaviors, useful for evaluating users’ reliability in DAO governance or decentralized lending.
+    - Integrates with DeFi platforms to offer enhanced KYC and AML (anti-money laundering) features based on users’ onchain reputation.
+
+### 4. NFT Creation Agent: AI-Powered NFT Design and Deployment Assistant
+
+**Concept**: An agent that helps artists and creators design and deploy NFTs onchain, simplifying the creation process and expanding access to the NFT market.
+
+- **Features**:
+    - Integrates with Covalent’s API to pull trend data on popular NFT attributes, themes, and pricing patterns.
+    - Leverages generative AI models to create art styles and themes, allowing users to customize traits or rarity levels.
+    - Deploys NFTs directly to blockchain networks, with metadata stored on IPFS for decentralized access.
+    - Provides a launch strategy based on marketplace analysis, recommending listing prices, timing, and rarity settings.
+
+### 5. Transaction Risk Assessment Agent: Real-Time Fraud Detection for Onchain Transactions
+
+**Concept**: An agent that analyzes real-time transactions and flags potentially risky or suspicious activity to protect users from scams.
+
+- **Features**:
+    - Monitors transaction patterns, sender history, token movement, and transaction amounts using Covalent’s API.
+    - Detects anomalies such as unusual transaction sizes, rapid asset movement across multiple wallets, or transactions to known scam wallets.
+    - Uses machine learning to identify patterns associated with scams (e.g., phishing, rug pulls, and pump-and-dump schemes).
+    - Sends real-time alerts to users, warning them of potentially fraudulent transactions and advising on preventive actions.
+
+### 6. Wallet Risk Assessment Agent: AI-Powered Insurance Risk Scorer
+
+**Concept**: An AI tool that evaluates wallet activity and assigns a risk score, enabling insurance providers to assess policy eligibility and premiums for onchain users.
+
+**Features**:
+
+- Analyzes wallet transaction history, including DeFi participation, staking, borrowing, and repayment behaviors, using Covalent’s API.
+- Detects patterns associated with risky activities, such as frequent liquidations, high leverage, or interactions with suspicious wallets.
+- Uses clustering and classification algorithms to segment wallets into risk categories (e.g., low-risk saver, moderate-risk trader, high-risk speculator).
+- Assigns a comprehensive risk score based on historical activity, fund flows, and exposure to volatile assets.
+- Provides real-time risk assessments and insurance premium recommendations, helping users and providers manage blockchain-related risks effectively.
+
+### 7. Agent to Perform Onchain Actions
+
+**Concept**: An intelligent agent that automates complex onchain transactions for DeFi users, simplifying blockchain interactions.
+
+**Features**:
+
+- Executes actions like swapping tokens, bridging assets, staking, borrowing, and repaying loans.
+- Optimizes transaction parameters such as gas fees and liquidity pool choices using Covalent's API data.
+- Uses AI to ensure transaction safety by detecting potential risks before execution.
+- Automates workflows, enabling multi-step operations (e.g., swapping, bridging, and staking in a single transaction).
+- Provides detailed transaction logs and user-friendly updates.
+
+### 8. Onchain Betting Algorithm: AI-Powered Prediction Market System
+
+**Concept**: An AI-driven betting platform that leverages onchain data to offer predictions and dynamic betting markets, enabling users to engage with decentralized prediction markets.
+
+**Features**:
+
+- Pulls real-time onchain data such as token prices, transaction volumes, and protocol metrics using Covalent’s API.
+- Employs machine learning models to forecast outcomes of events, such as token price changes, governance proposal results, or market trends.
+- Dynamically adjusts betting odds based on real-time data and user activity to ensure accurate and fair market pricing.
+- Detects anomalies and potential manipulation in betting patterns using AI-powered anomaly detection algorithms.
+- Provides detailed insights into potential payouts and risk levels for each bet, helping users make informed decisions.
+- Integrates with decentralized wallets for seamless onchain betting and payout distribution.
+
+### 9. AI Boiler Room: Autonomous Agents Simulating Market Dynamics Across Chains
+
+**Concept**: A network of AI agents that interact with each other in a simulated blockchain environment, mimicking market dynamics and user behaviors based on real onchain activity.
+
+**Features**:
+
+- Pulls cross-chain transaction data, token swaps, liquidity movements, and wallet interactions from Covalent’s API.
+- Creates AI agents with distinct profiles (e.g., traders, arbitrage bots, NFT collectors) to simulate various blockchain user types.
+- Agents analyze real onchain data to make decisions like swapping tokens, bridging assets, or participating in DeFi protocols.
+- Simulates market reactions and liquidity flows by enabling AI agents to interact with each other in real time.
+- Provides insights into potential market scenarios, such as price fluctuations, liquidity crunches, or arbitrage opportunities.
+- Useful for stress testing DeFi protocols, exploring economic strategies, or building predictive models for market behavior.
+
+### 10. DeFi Lending Optimizer (Chaos Labs)
+
+**Concept**: An AI agent that maximizes returns for DeFi lenders by optimizing lending and borrowing activities.
+
+**Features**:
+
+- Pulls real-time interest rates, utilization rates, and collateral factors from Covalent’s API.
+- Recommends optimal platforms and lending strategies based on user preferences and market conditions.
+- Monitors liquidation risks and alerts users to potential threats.
+- Utilizes RF to test out different parameters to increase borrowing without exposing risk on the protocol
+- Automates rebalancing across multiple protocols for enhanced yield optimization.
+- Generates user-friendly reports on lending performance and opportunities.
+
+### 11. Cross-Chain Arbitrage Finder
+
+**Concept**: An AI assistant that identifies profitable arbitrage opportunities across blockchains and DEXs.
+
+**Features**:
+
+- Aggregates token price and liquidity data from Covalent’s API across multiple platforms.
+- Detects price discrepancies and suggests actionable arbitrage opportunities.
+- Recommends steps for executing trades, including gas fee optimization.
+- Tracks historical arbitrage performance to refine future recommendations.
+- Provides real-time alerts on emerging opportunities.
+
+### 12. Meme Coin Trend Forecaster: Predictive Market Tool for Hype-Driven Tokens
+
+**Concept**: An AI-powered tool that predicts emerging trends and market movements in meme coins, enabling investors to identify high-growth opportunities early.
+
+**Features**:
+
+- Pulls real-time trading volumes, wallet activity, and token performance metrics for meme coins using Covalent’s API.
+- Incorporates social sentiment data from platforms like Twitter, Reddit, and Discord to gauge community hype and interest.
+- Uses machine learning models to forecast meme coin price movements and detect potential breakout tokens.
+- Highlights emerging meme coins based on unusual trading activity, wallet accumulation, and increased sentiment scores.
+- Sends alerts for trending meme coins or potential sell opportunities, helping users optimize their investments.
+
+### 13. Sentiment-Based Meme Coin Trading Bot
+
+**Concept**: A trading bot that combines sentiment analysis with onchain data to automate profitable meme coin trades.
+
+**Features**:
+
+- Uses Covalent’s API to monitor meme coin trading activity and floor price movements.
+- Integrates off-chain sentiment analysis from social media and news to predict market behavior.
+- Automates buy/sell actions based on predefined profit thresholds and sentiment scores.
+- Sends real-time updates on trade outcomes and market conditions.
+- Provides detailed performance summaries and optimizes strategies based on historical data.

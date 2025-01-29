@@ -1,0 +1,61 @@
+---
+title: GoldRush Onchain Data
+icon: "network-wired"
+description: Tools for interacting with blockchain data through the GoldRush API.
+---
+
+## GoldRush Onchain Data
+
+The SDK includes built-in tools for interacting with blockchain data through the [GoldRush API](https://goldrush.dev/). These tools allow agents to fetch token balances, NFT holdings, and transaction history across 100+ blockchains.
+
+### Available GoldRush Tools
+
+1. **Token Balances Tool**: Fetch token balances for any wallet address across supported blockchains. This tool provides detailed information including:
+    - Token amounts and USD values
+    - Token metadata (symbol, decimals, contract address)
+
+```typescript
+const tokenBalances = new TokenBalancesTool(apiKey);
+```
+
+2. **NFT Holdings Tool**: Fetch NFT holdings for any wallet address with comprehensive metadata:
+    - Collection information
+    - Token IDs and ownership details
+    - Media URLs and metadata
+    - Floor prices and estimated values
+
+```typescript
+const nftHoldings = new NFTHoldingsTool(apiKey);
+```
+
+3. **Transaction History Tool**: Fetch detailed transaction history for any wallet address including:
+    - Transaction types (transfers, swaps, mints)
+    - Token movements and values
+    - Timestamps and block information
+    - Gas costs and transaction status
+
+```typescript
+const transactionHistory = new TransactionHistoryTool(apiKey);
+```
+
+### Using GoldRush Tools
+
+To use GoldRush tools in your agent:
+
+```typescript
+const agent = new Agent({
+    name: "blockchain researcher",
+    model: {
+        provider: "OPEN_AI",
+        name: "gpt-4o-mini",
+    },
+    description: "You are a blockchain researcher analyzing wallet activities.",
+    tools: {
+        tokenBalances: new TokenBalancesTool(apiKey),
+        nftBalances: new NFTBalancesTool(apiKey),
+        transactions: new TransactionsTool(apiKey),
+    },
+});
+```
+
+Each GoldRush tool requires an API key which can be set through the `GOLDRUSH_API_KEY` environment variable or passed directly to the tool constructor. Tools can be used independently or combined for comprehensive blockchain analysis.
