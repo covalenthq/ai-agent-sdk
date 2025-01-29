@@ -1,6 +1,6 @@
 {
     "name": "@covalenthq/create-zee-app",
-    "version": "0.0.2",
+    "version": "0.2.0",
     "description": "Create a new Zee application with one command",
     "type": "module",
     "bin": {
