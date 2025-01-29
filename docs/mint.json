@@ -1,6 +1,6 @@
 {
     "$schema": "https://mintlify.com/schema.json",
-    "name": "Covalent Agent SDK",
+    "name": "Covalent AI Agent SDK",
     "logo": {
         "dark": "/logo/dark.svg",
         "light": "/logo/light.svg"
@@ -15,12 +15,6 @@
             "to": "#07C983"
         }
     },
-    "topbarLinks": [
-        {
-            "name": "TG Support",
-            "url": "https://t.me/CXT_Agent_SDK"
-        }
-    ],
     "topbarCtaButton": {
         "url": "https://github.com/covalenthq/ai-agent-sdk",
         "type": "github"
