@@ -7,9 +7,14 @@ Creating a new ZEE app is simple and straightforward. It's simply a matter of ru
 npx create-zee-app@latest
 ```
 
+**What is a ZEE?**
+
+A ZEE, or Zero-Employee Enterprise, is a revolutionary business model that leverages advanced AI and automation to operate without human employees. In a ZEE, intelligent agents and automated systems handle all aspects of the business, from customer interactions to backend operations. This model allows for unprecedented efficiency, scalability, and cost-effectiveness, enabling businesses to focus on innovation and growth without the constraints of traditional workforce management. ZEEs are designed to be highly adaptable and can be customized to meet the unique needs of any industry or market.
+
+
 **Why use Create ZEE App?**
 
-Create Next App is a powerful tool that simplifies the process of setting up a new ZEE application. Here are some reasons why you should use Create Next App:
+Create ZEE App is a powerful tool that simplifies the process of setting up a new ZEE application. Here are some reasons why you should use Create ZEE App:
 
 - **Quick Setup**: Get your project up and running in minutes with a single command.
 - **Best Practices**: The generated project follows industry best practices, ensuring a solid foundation for your app.
