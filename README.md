@@ -2,6 +2,8 @@
 
 # AI Agent SDK for TypeScript
 
+[![NPM Version](https://img.shields.io/npm/v/@covalenthq/ai-agent-sdk)](https://www.npmjs.com/package/@covalenthq/ai-agent-sdk)
+[![NPM Downloads](https://img.shields.io/npm/dt/@covalenthq/ai-agent-sdk)](https://www.npmjs.com/package/@covalenthq/ai-agent-sdk)
 [![GitHub license](https://img.shields.io/github/license/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/blob/main/LICENSE)
 [![GitHub last commit](https://img.shields.io/github/last-commit/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/commits/master)
 [![GitHub contributors](https://img.shields.io/github/contributors/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/graphs/contributors)
@@ -14,7 +16,7 @@
 
 <p>Build autonomous AI agents for the Zero-Employee Enterprise (ZEE). Create intelligent, context-aware agents with unprecedented ease and functionality. The Agent SDK supports single model inference calls to multi-agent systems that use tools. The SDK provides primitives that are designed to be easily composable, extendable and flexible for advanced use cases.</p>
 
-## Features 
+## Features
 
 - LLMs - a unified interface for all LLMs
 - Agents - a single model with a system prompt and a set of tools
@@ -25,11 +27,11 @@
 
 ### 1. Start with a template
 
-> npx create-zee-app 
+> npx create-zee-app
 
 This will create a new project with a basic setup.
 
-### 2. Modify the agent 
+### 2. Modify the agent
 
 ```js
 const agent1 = new Agent({
