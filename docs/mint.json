@@ -56,7 +56,7 @@
                     "icon": "screwdriver-wrench",
                     "pages": [
                         "concepts/tools/overview",
-                        "concepts/tools/goldrush"
+                        "concepts/tools/goldrush-onchain-data"
                     ]
                 },
                 "concepts/zeeworkflows"
