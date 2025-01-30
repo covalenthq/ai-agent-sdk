@@ -66,9 +66,7 @@ const zee = new ZeeWorkflow({
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
-Feel free to check the <a href="https://github.com/covalenthq/ai-agent-sdk/issues">issues</a> page.
-
-Or join the [AI Agent SDK Working Group](https://t.me/CXT_Agent_SDK).
+Feel free to check <a href="https://github.com/covalenthq/ai-agent-sdk/issues">issues</a> page.
 
 ## Show your support
 
