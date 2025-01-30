@@ -7,6 +7,8 @@ import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completi
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import z from "zod";
 
+type Retrieval = { content: string };
+
 type AgentConfig = {
     name: string;
     model: ModelConfig;
@@ -15,6 +17,13 @@ type AgentConfig = {
     instructions?: string[];
 
     tools?: Record<AgentName, Tool>;
+
+    retrievers?: ((
+        messages: ChatCompletionMessageParam[],
+        agent: Agent,
+        state: ZeeWorkflowState
+    ) => Promise<Retrieval[]>)[];
+
     runFn?: (
         agent: Agent,
         state: ZeeWorkflowState
@@ -52,9 +61,34 @@ const defaultFn = async (
     agent: Agent,
     state: ZeeWorkflowState
 ): Promise<ZeeWorkflowState> => {
+    const retrievers = agent.retrievers ?? [];
+
+    const result = await Promise.all(
+        retrievers.map(async (retriever) => {
+            try {
+                return await retriever(state.messages, agent, state);
+            } catch (error) {
+                console.error("Error retrieving documents", error);
+                // Fail silently
+                return null;
+            }
+        })
+    );
+
+    const retrievals = result.filter((r): r is Retrieval[] => r !== null);
+
     const messages = [
         system(`
-            ${agent.description}
+            ${agent.description}${retrievals
+                .map(
+                    (retrieval) => `
+
+            <retrieval>
+                ${retrieval.map(({ content }) => content).join("\n")}
+            </retrieval>
+            `
+                )
+                .join("")}
 
             Your job is to complete the assigned task:
               - You can break down complex tasks into multiple steps if needed.
@@ -284,6 +318,10 @@ export class Agent extends Base {
 
     get instructions() {
         return this.config.instructions;
+    }
+
+    get retrievers() {
+        return this.config.retrievers;
     }
 
     get tools(): Record<AgentName, Tool> {
