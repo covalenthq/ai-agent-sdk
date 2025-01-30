@@ -1,6 +1,6 @@
 # Create ZEE App
 
-The easiest way to get started with Zero-Employee Enterprises and Autonomous Agents is by using `@covalenthq/create-zee-app`. This CLI tool enables you to quickly start building a new ZEE application using the Covalent [AI Agent SDK](https://github.com/covalenthq/ai-agent-sdk), with everything setup for you. You can create a new ZEE app usign the default template, or one of the many templates available.
+The easiest way to get started with Zero-Employee Enterprises and Autonomous Agents is by using `@covalenthq/create-zee-app`. This CLI tool enables you to quickly start building a new ZEE application using the Covalent [AI Agent SDK](https://github.com/covalenthq/ai-agent-sdk), with everything setup for you. You can create a new ZEE app using the default template, or one of the many templates available.
 
 To get started, simply run the following command:
 
