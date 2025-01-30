@@ -51,15 +51,20 @@
             "pages": [
                 "concepts/llms",
                 "concepts/agents",
-                {
-                    "group": "Tools",
-                    "icon": "screwdriver-wrench",
-                    "pages": [
-                        "concepts/tools/overview",
-                        "concepts/tools/goldrush-onchain-data"
-                    ]
-                },
+                "concepts/tools",
                 "concepts/zeeworkflows"
+            ]
+        },
+        {
+            "group": "",
+            "pages": [
+                "use-cases/overview"
+            ]
+        },
+        {
+            "group": "Tools",
+            "pages": [
+                "tools/goldrush-onchain-data"
             ]
         }
     ],
