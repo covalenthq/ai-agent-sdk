@@ -33,9 +33,12 @@
     "description": "A barebones template for creating a new ZEE application.",
     "devDependencies": {
         "ts-node": "^10.9.2",
-        "typescript": "^5.7.3"
+        "typescript": "^5.7.3",
+        "@types/node-telegram-bot-api": "^0.64.7"
     },
     "dependencies": {
-        "dotenv": "^16.4.7"
+        "dotenv": "^16.4.7",
+        "node-telegram-bot-api": "^0.66.0",
+        "@covalenthq/ai-agent-sdk": "0.2.0"
     }
 }

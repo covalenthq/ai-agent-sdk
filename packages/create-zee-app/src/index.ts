@@ -58,11 +58,11 @@ async function main() {
         options: [
             {
                 value: "001-zee-barebones",
-                label: "Just a barebones Zee workflow",
+                label: "Barebones: Just a barebones Zee workflow",
             },
             {
                 value: "002-agent-telegram",
-                label: "An agent that can interact with Telegram",
+                label: "Telegram Agent: An agent that can interact with Telegram",
             },
         ],
     });
