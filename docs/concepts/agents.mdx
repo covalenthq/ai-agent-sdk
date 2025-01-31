@@ -45,7 +45,9 @@ Read more about [Tools](/concepts/tools) to learn how to create them.
 Agents can be run standalone or as part of a ZEE workflow. Running an agent standalone is useful for testing and debugging. The `run` method will return the final state of the agent.
 
 ```typescript
-const result = await agent.run();
+import { StateFn } from "@covalenthq/ai-agent-sdk/core/state";
+
+const result = await agent.run(StateFn.root(agent.description));
 ```
 
 Running an agent as part of a ZEE workflow is useful for solving complex problems. Read more about [ZEE](/concepts/zeeworkflows) to learn how to run agents in a ZEE workflow.
