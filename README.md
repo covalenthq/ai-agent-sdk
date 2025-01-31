@@ -2,6 +2,10 @@
 
 # AI Agent SDK for TypeScript
 
+[![Documentation](https://cxt.build/)](https://cxt.build/)
+
+<br />
+
 [![NPM Version](https://img.shields.io/npm/v/@covalenthq/ai-agent-sdk)](https://www.npmjs.com/package/@covalenthq/ai-agent-sdk)
 [![NPM Downloads](https://img.shields.io/npm/dt/@covalenthq/ai-agent-sdk)](https://www.npmjs.com/package/@covalenthq/ai-agent-sdk)
 [![GitHub license](https://img.shields.io/github/license/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/blob/main/LICENSE)
@@ -9,6 +13,8 @@
 [![GitHub contributors](https://img.shields.io/github/contributors/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/graphs/contributors)
 [![GitHub issues](https://img.shields.io/github/issues/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/pulls)
+
+
 [![GitHub stars](https://img.shields.io/github/stars/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/network/members)
 
