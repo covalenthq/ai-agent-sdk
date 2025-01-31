@@ -36,6 +36,7 @@
         "typescript": "^5.7.3"
     },
     "dependencies": {
-        "dotenv": "^16.4.7"
+        "dotenv": "^16.4.7",
+        "@covalenthq/ai-agent-sdk": "0.2.0"
     }
 }
