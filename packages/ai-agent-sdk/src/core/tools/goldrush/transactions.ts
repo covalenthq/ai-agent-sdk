@@ -22,10 +22,14 @@ export class TransactionsTool extends BaseGoldRushTool {
         try {
             const { chain, address, timeframe = "24h" } = params;
             const txs =
-                await this.client.TransactionService.getTransactionsForAddressV3(
+                await this.client.TransactionService.getAllTransactionsForAddressByPage(
                     chain as Chain,
                     address,
-                    1
+                    {
+                        quoteCurrency: "USD",
+                        noLogs: true,
+                        withSafe: true,
+                    }
                 );
 
             if (txs.error) {
