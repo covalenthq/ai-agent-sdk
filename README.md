@@ -34,7 +34,7 @@
 
 ### 1. Start with a template
 
-> npx @covalenthq/create-zee-app
+> npx @covalenthq/create-zee-app@latest
 
 This will create a new project with a basic setup.
 
