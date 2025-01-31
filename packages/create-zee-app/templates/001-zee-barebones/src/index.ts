@@ -26,6 +26,6 @@ const zee = new ZeeWorkflow({
 });
 
 (async function main() {
-    const result = await zee.run();
+    const result = await ZeeWorkflow.run(zee);
     console.log(result);
 })();
