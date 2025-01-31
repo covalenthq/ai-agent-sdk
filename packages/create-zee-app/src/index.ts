@@ -58,7 +58,11 @@ async function main() {
         options: [
             {
                 value: "001-zee-barebones",
-                label: "Just a barebones template",
+                label: "Just a barebones Zee workflow",
+            },
+            {
+                value: "002-agent-telegram",
+                label: "An agent that can interact with Telegram",
             },
         ],
     });
@@ -83,6 +87,31 @@ async function main() {
         await fs.writeFile(envPath, `OPENAI_API_KEY=${openaiApiKey}\n`, {
             flag: "a",
         });
+
+        if (template === "002-agent-telegram") {
+            const telegramBotToken = await text({
+                message:
+                    "Please input your Telegram bot token (will be stored in .env file). You can get one from https://t.me/botfather",
+                validate: (value) => {
+                    if (value.length === 0)
+                        return "Telegram bot token is required";
+                    return;
+                },
+            });
+
+            if (isCancel(telegramBotToken)) {
+                cancel("Operation cancelled");
+                process.exit(0);
+            }
+
+            await fs.writeFile(
+                envPath,
+                `TELEGRAM_BOT_TOKEN=${telegramBotToken}\n`,
+                {
+                    flag: "a",
+                }
+            );
+        }
 
         // Update package.json with project name
         const packageJsonPath = path.join(targetDir, "package.json");
