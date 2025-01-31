@@ -84,3 +84,49 @@ test("research agent with tools", async () => {
     // expect(result.value['title']).toBeDefined();
     // expect(result.value['text']).toBeDefined();
 });
+
+test("research agent with tools", async () => {
+    const weather = createTool({
+        id: "weather-tool",
+        description: "Fetch the current weather in Vancouver, BC",
+        schema: z.object({
+            temperature: z.number(),
+        }),
+        execute: async (_args) => {
+            const lat = 49.2827,
+                lon = -123.1207;
+
+            const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+
+            const r = await fetch(url);
+            const data = await r.json();
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            return `Current temperature in Vancouver, BC is ${data.current_weather.temperature}°C`;
+        },
+    });
+
+    const agent = new Agent({
+        name: "research agent",
+        model: {
+            provider: "OPEN_AI",
+            name: "gpt-4o-mini",
+        },
+        description:
+            "You are a senior NYT researcher writing an article on the current weather in Vancouver, BC.",
+        instructions: ["Use the weather tool to get the current weather"],
+        tools: {
+            weather,
+        },
+    });
+
+    const result = await agent.run();
+    console.log(result);
+
+    expect(result.messages.length).toEqual(2);
+    expect(result.status).toEqual("paused");
+
+    // expect(result.value['title']).toBeDefined();
+    // expect(result.value['text']).toBeDefined();
+});
