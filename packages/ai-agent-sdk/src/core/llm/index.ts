@@ -54,11 +54,22 @@ type GeminiConfig = {
     apiKey?: string;
 };
 
+export type OllamaModel = string; // here it is a strring because ollama model is not fixed
+
+type OllamaConfig = {
+    provider: "OLLAMA";
+    name: OllamaModel;
+    toolChoice?: "auto" | "required";
+    apiKey?: string;
+    baseURL?: string; // option to overide the base url
+};
+
 export type ModelConfig =
     | OpenAIConfig
     | DeepSeekConfig
     | GrokConfig
-    | GeminiConfig;
+    | GeminiConfig
+    | OllamaConfig;
 
 const entryToObject = ([key, value]: [string, ZodObject<any>]) => {
     return z.object({ type: z.literal(key), value });
@@ -141,6 +152,12 @@ export class LLM extends Base {
                 config.baseURL = "https://api.gemini.google.com/v1";
                 config.apiKey =
                     process.env["GEMINI_API_KEY"] || this.model.apiKey;
+                break;
+            case "OLLAMA":
+                // Use environment variable OLLAMA_BASE_URL or default to localhost
+                config.baseURL = process.env["OLLAMA_BASE_URL"] || 
+                               this.model.baseURL || 
+                               "http://localhost:11434";
                 break;
             default:
                 var _exhaustiveCheck: never = provider;
