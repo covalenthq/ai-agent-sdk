@@ -12,6 +12,13 @@ const llm = new LLM({
     name: "gpt-4o-mini",
     apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Example with Ollama
+const llm = new LLM({
+    provider: "OLLAMA",
+    name: "llama2", // or any model you've pulled in Ollama
+    baseURL: "http://localhost:11434", // optional, defaults to this
+});
 ```
 
 ## List of supported LLMs
@@ -44,6 +51,15 @@ const llm = new LLM({
 "gemini-1.5-pro"
 ```
 
+```plaintext Ollama
+Any model name that you have pulled in Ollama
+Examples:
+"llama2"
+"codellama"
+"mistral"
+"neural-chat"
+```
+
 </CodeGroup>
 
 ## Environment Variables
@@ -66,4 +82,29 @@ GROK_API_KEY
 GEMINI_API_KEY
 ```
 
+```plaintext Ollama
+OLLAMA_BASE_URL=http://localhost:11434  # Optional
+```
+
 </CodeGroup>
+
+## Using Local Models with Ollama
+
+To use Ollama:
+
+1. Install Ollama from [ollama.ai](https://ollama.ai)
+2. Pull your desired model:
+```bash
+ollama pull llama2
+```
+3. Configure your agent to use Ollama:
+```typescript
+const agent = new Agent({
+    name: "LocalAgent",
+    model: {
+        provider: "OLLAMA",
+        name: "llama2",  // use the model name you pulled
+    },
+    description: "A locally-running AI assistant",
+});
+```
