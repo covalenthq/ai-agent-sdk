@@ -40,6 +40,43 @@ const agent = new Agent({
 
 Read more about [Tools](/concepts/tools) to learn how to create them.
 
+## Adding a retrieval function
+
+Agents can be configured with a retrieval function that will be used to retrieve information from the conversation history. This is useful for agents that need to reference previous messages in the conversation.
+
+One of the primary use cases for retrieval functions is to allow agents to reference an ontology of information that the developer wants the agent to have access to. Perhaps a company Wiki for example. This can typically be done by vectorizing the supplied message.
+
+```typescript
+const retriever = async (messages: ChatCompletionMessageParam) => {
+    // Hit the embedding model to get the query embedding
+    const response = await openai.embeddings.create({
+        model: "text-embedding-3-large", // Use the latest embedding model
+        input: messages
+            .filter(({ content }) => !!content)
+            .map(({ content }) => content).join("\n"),
+    });
+
+    const embedding = response.data[0].embedding;
+
+    // Query the vector database with the query embedding
+    const { data: documents } = await supabase
+        .rpc('match_documents', {
+            query_embedding: embedding,
+            match_threshold: 0.8,
+            match_count: 10
+        });
+
+    return documents.map(({ content }) => ({ content }));
+};
+
+const agent = new Agent({
+    //...
+    retrievers: [retriever],
+});
+```
+
+The implementation of the `retriever` function has been inspired by the [guide by Supbase](https://supabase.com/blog/openai-embeddings-postgres-vector) on getting a vector database up and running. That said, the implementation is entirely up to you to decide.
+
 ## Running an Agent
 
 Agents can be run standalone or as part of a ZEE workflow. Running an agent standalone is useful for testing and debugging. The `run` method will return the final state of the agent.
