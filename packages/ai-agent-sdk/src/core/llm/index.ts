@@ -1,5 +1,5 @@
 import { Base } from "../base";
-import type { Tool } from "../tools";
+import type { Tool } from "../tools/base";
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";

@@ -1,4 +1,4 @@
-import { Tool } from "../index";
+import { Tool } from "../base";
 import { GoldRushClient, ChainName } from "@covalenthq/client-sdk";
 import { z } from "zod";
 
