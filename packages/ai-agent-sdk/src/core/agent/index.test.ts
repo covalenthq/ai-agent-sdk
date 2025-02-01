@@ -1,6 +1,6 @@
 import { user } from "../base";
 import { StateFn } from "../state";
-import { createTool } from "../tools";
+import { createTool } from "../tools/base";
 import { Agent } from "./index";
 import fetch from "node-fetch";
 import { expect, test } from "vitest";
