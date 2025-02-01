@@ -17,7 +17,8 @@ export type OpenAIModel =
     | "gpt-4-turbo"
     | "gpt-3.5-turbo"
     | "gpt-4o"
-    | "gpt-4o-mini";
+    | "gpt-4o-mini"
+    | "o3-mini";
 
 type OpenAIConfig = {
     provider: "OPEN_AI";
