@@ -19,6 +19,14 @@ const llm = new LLM({
     name: "llama2", // or any model you've pulled in Ollama
     baseURL: "http://localhost:11434", // optional, defaults to this
 });
+
+// Example with Ollama with all options
+const llm = new LLM({
+    provider: "OLLAMA",
+    name: "llama2",             // any model you've pulled in Ollama
+    baseURL: "http://localhost:11434", // optional, defaults to this
+    toolChoice: "auto",         // optional
+});
 ```
 
 ## List of supported LLMs
@@ -90,21 +98,75 @@ OLLAMA_BASE_URL=http://localhost:11434  # Optional
 
 ## Using Local Models with Ollama
 
-To use Ollama:
+To use Ollama with the SDK:
 
 1. Install Ollama from [ollama.ai](https://ollama.ai)
-2. Pull your desired model:
+2. Start the Ollama service:
 ```bash
-ollama pull llama2
+ollama serve
 ```
-3. Configure your agent to use Ollama:
+3. Pull your desired model:
+```bash
+ollama pull llama2  # or any other model
+```
+4. Configure your agent to use Ollama:
 ```typescript
 const agent = new Agent({
     name: "LocalAgent",
     model: {
         provider: "OLLAMA",
         name: "llama2",  // use the model name you pulled
+        baseURL: "http://localhost:11434", // optional
     },
     description: "A locally-running AI assistant",
 });
+```
+
+### Response Format
+When using the SDK, you'll receive responses in the following structured format:
+
+1. Complete Response Object:
+```json
+{
+  "agent": "router",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Your input message here"
+    },
+    {
+      "role": "assistant",
+      "content": {
+        "thinking": "Detailed thought process...",
+        "answer": "Final response..."
+      }
+    }
+  ],
+  "status": "finished",
+  "children": []
+}
+```
+
+2. Assistant Message Content Structure:
+```json
+{
+  "role": "assistant",
+  "content": {
+    "thinking": "Internal reasoning process that shows how the model arrived at its answer...",
+    "answer": "The final, concise response to the user's query..."
+  }
+}
+```
+
+The response includes:
+- `thinking`: Detailed reasoning process (what the model is considering)
+- `answer`: The final, refined response
+- `status`: Completion status of the request
+- `children`: Array for nested responses (if any)
+
+You can access the latest response using:
+```typescript
+const lastMessage = result.messages[result.messages.length - 1]?.content;
+console.log(lastMessage.content.thinking);  // Get thinking process
+console.log(lastMessage.content.answer);    // Get final answer
 ```

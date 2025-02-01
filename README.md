@@ -75,15 +75,18 @@ const zee = new ZeeWorkflow({
 To use Ollama with the SDK, you need to configure the Ollama provider in your agent setup.
 
 ```js
-const agent1 = new Agent({
-    name: "Agent1",
+const agent = new Agent({
+    name: "LocalAgent",
     model: {
         provider: "OLLAMA",
-        name: "ollama-model-name",// use the model you have pulled from ollama
+        name: "llama2",  // use the model you pulled
+        baseURL: "http://localhost:11434", // optional
     },
-    description: "A helpful AI assistant that can engage in conversation.",
+    description: "A locally-running AI assistant",
 });
 ```
+
+The agent will automatically handle streaming responses and format them appropriately.
 
 ## 🤝 Contributing
 
