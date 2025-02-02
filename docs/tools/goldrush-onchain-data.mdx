@@ -38,6 +38,15 @@ const nftHoldings = new NFTHoldingsTool(apiKey);
 const transactionHistory = new TransactionHistoryTool(apiKey);
 ```
 
+4. **Historical Token Price Tool**: Fetch historical price data for any token across supported blockchains:
+    - Price history over customizable timeframes (1h, 24h, 7d, 30d)
+    - Token prices in USD
+    - Detailed price data points within the selected timeframe
+
+```typescript
+const historicalPrices = new HistoricalTokenPriceTool(apiKey);
+```
+
 ### Using GoldRush Tools
 
 To use GoldRush tools in your agent:
