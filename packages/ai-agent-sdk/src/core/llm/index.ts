@@ -171,32 +171,38 @@ export class LLM extends Base {
                     process.env["GEMINI_API_KEY"] || this.model.apiKey;
                 break;
             case "OLLAMA": {
-                config.baseURL = process.env["OLLAMA_BASE_URL"] || 
-                               this.model.baseURL || 
-                               "http://localhost:11434";
-                
+                config.baseURL =
+                    process.env["OLLAMA_BASE_URL"] ||
+                    this.model.baseURL ||
+                    "http://localhost:11434";
+
                 try {
                     const response = await fetch(`${config.baseURL}/api/chat`, {
-                        method: 'POST',
+                        method: "POST",
                         headers: {
-                            'Content-Type': 'application/json',
+                            "Content-Type": "application/json",
                         },
                         body: JSON.stringify({
                             model: this.model.name,
-                            messages: messages.map(msg => ({
+                            messages: messages.map((msg) => ({
                                 role: msg.role,
-                                content: typeof msg.content === 'string' ? msg.content : ''
+                                content:
+                                    typeof msg.content === "string"
+                                        ? msg.content
+                                        : "",
                             })),
-                            stream: true
-                        })
+                            stream: true,
+                        }),
                     });
 
                     if (!response.ok || !response.body) {
-                        throw new Error(`Ollama API error: ${response.statusText}`);
+                        throw new Error(
+                            `Ollama API error: ${response.statusText}`
+                        );
                     }
 
                     const reader = response.body.getReader();
-                    let fullContent = '';
+                    let fullContent = "";
 
                     try {
                         while (true) {
@@ -204,17 +210,19 @@ export class LLM extends Base {
                             if (done) break;
 
                             const chunk = new TextDecoder().decode(value);
-                            const lines = chunk.split('\n');
+                            const lines = chunk.split("\n");
 
                             for (const line of lines) {
                                 if (line.trim()) {
                                     try {
-                                        const json = JSON.parse(line) as OllamaResponse;
+                                        const json = JSON.parse(
+                                            line
+                                        ) as OllamaResponse;
                                         if (json.message?.content) {
                                             fullContent += json.message.content;
                                         }
                                     } catch (e) {
-                                       // ignore parse errors
+                                        // ignore parse errors
                                     }
                                 }
                             }
@@ -223,14 +231,18 @@ export class LLM extends Base {
                         reader.releaseLock();
                     }
 
-                    const formatResponse = (content: string): FormattedResponse => {
-                        const parts = content.split('</think>');
-                        const thinking = parts.length > 1 && parts[0]
-                            ? parts[0].replace('<think>', '').trim()
-                            : '';
-                        const response = parts.length > 1 
-                            ? parts[1]?.trim() || content.trim()
-                            : content.trim();
+                    const formatResponse = (
+                        content: string
+                    ): FormattedResponse => {
+                        const parts = content.split("</think>");
+                        const thinking =
+                            parts.length > 1 && parts[0]
+                                ? parts[0].replace("<think>", "").trim()
+                                : "";
+                        const response =
+                            parts.length > 1
+                                ? parts[1]?.trim() || content.trim()
+                                : content.trim();
 
                         return { thinking, response };
                     };
@@ -244,19 +256,22 @@ export class LLM extends Base {
                                 role: "assistant",
                                 content: {
                                     thinking: formattedContent.thinking,
-                                    answer: formattedContent.response
-                                }
+                                    answer: formattedContent.response,
+                                },
                             },
                             status: "finished",
-                            children: []
-                        }
+                            children: [],
+                        },
                     } as LLMResponse<T>;
                 } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                    const errorMessage =
+                        error instanceof Error
+                            ? error.message
+                            : "Unknown error";
                     throw new Error(`Ollama API error: ${errorMessage}`);
                 }
             }
-            
+
             default:
                 var _exhaustiveCheck: never = provider;
                 throw new Error(
