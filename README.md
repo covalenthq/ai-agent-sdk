@@ -65,7 +65,7 @@ const zee = new ZeeWorkflow({
 
 ```js
 (async function main() {
-    const result = await zee.run();
+    const result = await ZeeWorkflow.run(zee);
     console.log(result);
 })();
 ```
