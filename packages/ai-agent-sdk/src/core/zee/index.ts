@@ -8,6 +8,7 @@ type ZeeWorkflowOptions = {
     description: string;
     output: string;
     agents: Record<AgentName, Agent>;
+    maxIterations?: number;
 };
 
 const runTools = async (
@@ -57,6 +58,7 @@ const execute = async (
         return StateFn.childState({
             ...state,
             agent: "finalBoss",
+            status: state.status == "running" ? "paused" : state.status,
         });
     }
 
@@ -133,7 +135,8 @@ export class ZeeWorkflow extends Base {
     }
 
     get maxIterations() {
-        return 50;
+        const maxIterations = this.config.maxIterations;
+        return maxIterations > 0 ? maxIterations : 50;
     }
 
     agent(agentName: string): Agent {
