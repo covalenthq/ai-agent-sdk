@@ -297,7 +297,7 @@ export class Agent extends Base {
         return this.llm.generate(messages, response_schema, this.tools);
     }
 
-    async run(state: ZeeWorkflowState) {
+    async run(state: ZeeWorkflowState = StateFn.root(this.description)) {
         return this.config.runFn
             ? this.config.runFn(this, state)
             : defaultFn(this, state);
