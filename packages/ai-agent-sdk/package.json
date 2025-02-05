@@ -36,7 +36,6 @@
     },
     "scripts": {
         "test": "vitest",
-        "test:multimodal": "vitest src/core/llm/llm.test.ts",
         "build": "tsc",
         "clean": "rm -rf dist",
         "prepublishOnly": "cp ../../README.md . && npm run clean && npm run build",
@@ -58,6 +57,5 @@
         "@types/node": "^22.10.7",
         "node-fetch": "^3.3.2",
         "vitest": "^3.0.2"
-    },
-    "type": "module"
+    }
 }
