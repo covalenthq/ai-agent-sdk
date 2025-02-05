@@ -119,6 +119,10 @@ export class LLM extends Base {
             }
         }
 
+        if (this.model.temperature && this.model.temperature > 0 && this.model.temperature <= 2) {
+          requestConfig.temperature = this.model.temperature;
+        }
+
         const response =
             await client.beta.chat.completions.parse(requestConfig);
 

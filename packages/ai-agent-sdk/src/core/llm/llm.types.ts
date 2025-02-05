@@ -13,6 +13,7 @@ export type OpenAIConfig = {
     provider: "OPEN_AI";
     name: OpenAIModel;
     toolChoice?: "auto" | "required";
+    temperature?: number;
     apiKey?: string;
 };
 
@@ -22,6 +23,7 @@ export type DeepSeekConfig = {
     provider: "DEEPSEEK";
     name: DeepSeekModel;
     toolChoice?: "auto" | "required";
+    temperature?: number;
     apiKey?: string;
 };
 
@@ -31,6 +33,7 @@ export type GrokConfig = {
     provider: "GROK";
     name: GrokModel;
     toolChoice?: "auto" | "required";
+    temperature?: number;
     apiKey?: string;
 };
 
@@ -40,6 +43,7 @@ export type GeminiConfig = {
     provider: "GEMINI";
     name: GeminiModel;
     toolChoice?: "auto" | "required";
+    temperature?: number;
     apiKey?: string;
 };
 
