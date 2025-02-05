@@ -36,7 +36,6 @@
     },
     "scripts": {
         "test": "vitest",
-        "test:llm": "vitest src/core/llm/llm.test.ts",
         "test:zee": "vitest src/core/zee/zee.test.ts",
         "build": "tsc",
         "clean": "rm -rf dist",
