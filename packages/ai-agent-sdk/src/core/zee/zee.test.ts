@@ -244,6 +244,4 @@ describe("@ai-agent-sdk/zee", () => {
         });
         expect(zeeWithMaxIterationsAThousand.maxIterations).toEqual(1000);
     });
-
 });
-
