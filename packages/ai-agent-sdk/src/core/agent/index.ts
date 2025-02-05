@@ -1,6 +1,5 @@
 import { assistant, Base, system, user } from "../base";
-import type { ModelConfig } from "../llm";
-import { LLM } from "../llm";
+import { LLM, type ModelConfig } from "../llm";
 import { StateFn, type ZeeWorkflowState } from "../state";
 import type { Tool } from "../tools/base";
 import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
