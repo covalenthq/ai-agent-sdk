@@ -4,6 +4,7 @@ import type { FunctionToolCall, LLMResponse, ModelConfig } from "./llm.types";
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type {
+    ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam,
     ChatCompletionTool,
 } from "openai/resources/chat/completions";
@@ -77,7 +78,8 @@ export class LLM extends Base {
                     process.env["GROK_API_KEY"] || this.model.apiKey;
                 break;
             case "GEMINI":
-                config.baseURL = "https://api.gemini.google.com/v1";
+                config.baseURL =
+                    "https://generativelanguage.googleapis.com/v1beta/openai";
                 config.apiKey =
                     process.env["GEMINI_API_KEY"] || this.model.apiKey;
                 break;
@@ -91,24 +93,58 @@ export class LLM extends Base {
 
         const mappedTools = tools ? formatOpenAITools(tools) : [];
 
-        const response = await client.beta.chat.completions.parse({
+        const requestConfig: ChatCompletionCreateParamsNonStreaming = {
             model: this.model.name,
             messages,
-            response_format: responseAsStructuredOutput(response_schema),
             tools: mappedTools.length > 0 ? mappedTools : undefined,
-        });
+        };
 
-        const message = response.choices[0] && response.choices[0].message;
-
-        if (message && message.tool_calls && message.tool_calls.length > 0) {
-            return {
-                type: "tool_call",
-                value: message.tool_calls,
-            } satisfies FunctionToolCall;
+        switch (provider) {
+            case "GEMINI": {
+                const [schemaKey, schemaValue] =
+                    Object.entries(response_schema)[0] || [];
+                if (!schemaKey || !schemaValue) {
+                    throw new Error("Invalid response schema");
+                }
+                requestConfig.response_format = zodResponseFormat(
+                    schemaValue,
+                    schemaKey
+                );
+                break;
+            }
+            default: {
+                requestConfig.response_format =
+                    responseAsStructuredOutput(response_schema);
+                break;
+            }
         }
 
-        if (message?.parsed?.response) {
-            return message.parsed.response as LLMResponse<T>;
+        const response =
+            await client.beta.chat.completions.parse(requestConfig);
+
+        if (!response?.choices[0]?.message?.parsed) {
+            throw new Error(JSON.stringify(response));
+        }
+
+        const parsed = response.choices[0]?.message?.parsed as {
+            response: {
+                type: keyof T;
+                value: unknown;
+            };
+        };
+        if (provider === "GEMINI") {
+            if (!parsed) {
+                throw new Error("No parsed response from Gemini");
+            }
+
+            return {
+                type: Object.keys(response_schema)[0] as keyof T,
+                value: parsed,
+            } as LLMResponse<T>;
+        }
+
+        if (parsed?.response) {
+            return parsed.response as LLMResponse<T>;
         }
 
         throw new Error("No response in message");

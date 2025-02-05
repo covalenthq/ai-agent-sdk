@@ -67,3 +67,66 @@ GEMINI_API_KEY
 ```
 
 </CodeGroup>
+
+## Use Cases
+
+### Image Analysis
+
+LLMs can also process images along with text using image URL messages. Here's an example of analyzing an image using the LLM:
+
+```typescript
+const messages = [
+    {
+        role: "user",
+        content: [
+            {
+                type: "text",
+                text: "What's in this image? Analyze the logo and suggest improvements.",
+            },
+            {
+                type: "image_url",
+                image_url: {
+                    url: "https://example.com/logo.png",
+                    detail: "auto",
+                },
+            },
+        ],
+    },
+];
+
+const schema = {
+    analysis: z.object({
+        description: z.string(),
+        colors: z.array(z.string()),
+        text_content: z.string().optional(),
+        improvements: z.string().optional(),
+    }),
+};
+
+const result = await llm.generate(messages, schema, {});
+```
+
+The LLM will analyze the image and return a structured response containing the description, colors used, and potential improvements. You can also use base64-encoded images by providing the data URL:
+
+```typescript
+const messages = [
+    {
+        role: "user",
+        content: [
+            {
+                type: "text",
+                text: "What's in this image and what color is it?",
+            },
+            {
+                type: "image_url",
+                image_url: {
+                    url: "data:image/png;base64,..." // Your base64 image data
+                    detail: "auto",
+                },
+            },
+        ],
+    },
+];
+```
+
+Note: Image analysis is currently supported by OpenAI models. Some providers like Gemini may have limited or no support for image analysis.
