@@ -1,6 +1,6 @@
 import { Tool } from "../base";
-import { GoldRushClient, ChainName } from "@covalenthq/client-sdk";
-import { z } from "zod";
+import { ChainName, GoldRushClient } from "@covalenthq/client-sdk";
+import { z, type AnyZodObject } from "zod";
 
 export const BaseGoldRushSchema = z.object({
     chain: z.enum(Object.values(ChainName) as [string, ...string[]]),
@@ -13,7 +13,7 @@ export abstract class BaseGoldRushTool extends Tool {
     constructor(
         id: string,
         description: string,
-        schema: z.ZodType<any>,
+        schema: AnyZodObject,
         apiKey: string = process.env["GOLDRUSH_API_KEY"] ?? ""
     ) {
         super(
@@ -30,9 +30,9 @@ export abstract class BaseGoldRushTool extends Tool {
         this.client = new GoldRushClient(apiKey);
     }
 
-    protected abstract fetchData(params: any): Promise<string>;
+    protected abstract fetchData(params: unknown): Promise<string>;
 
-    protected bigIntReplacer(_key: string, value: any) {
+    protected bigIntReplacer(_key: string, value: unknown) {
         if (typeof value === "bigint") {
             return value.toString();
         }

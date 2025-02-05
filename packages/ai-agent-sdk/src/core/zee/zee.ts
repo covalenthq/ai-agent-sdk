@@ -2,18 +2,12 @@ import type { Agent, AgentName } from "../agent";
 import { resource_planner, router } from "../agent";
 import { assistant, Base } from "../base";
 import { StateFn, type ZeeWorkflowState } from "../state";
+import type { ZeeWorkflowOptions } from "./zee.types";
 import type { ChatCompletionToolMessageParam } from "openai/resources/chat/completions";
-
-type ZeeWorkflowOptions = {
-    description: string;
-    output: string;
-    agents: Record<AgentName, Agent>;
-    maxIterations?: number;
-};
 
 const runTools = async (
     zeeWorkflow: ZeeWorkflow,
-    context: any,
+    context: unknown,
     state: ZeeWorkflowState
 ): Promise<ChatCompletionToolMessageParam[]> => {
     const toolCall = state.messages.at(-1);
@@ -36,7 +30,8 @@ const runTools = async (
                 throw new Error(`Tool ${tc.function.name} not found`);
             }
 
-            const fnResult = await fn.execute(tc.function.arguments);
+            const args = JSON.parse(tc.function.arguments);
+            const fnResult = await fn.execute(args);
 
             return {
                 role: "tool",
@@ -134,7 +129,7 @@ export class ZeeWorkflow extends Base {
     }
 
     get maxIterations() {
-        return this.config.maxIterations ?? 50;
+        return 50;
     }
 
     agent(agentName: string): Agent {
@@ -213,5 +208,3 @@ export class ZeeWorkflow extends Base {
         );
     }
 }
-export * from "./zee";
-export * from "./zee.types";

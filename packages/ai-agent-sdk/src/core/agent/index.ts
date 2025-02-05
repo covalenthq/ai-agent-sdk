@@ -1,11 +1,10 @@
 import { assistant, Base, system, user } from "../base";
-import type { ModelConfig } from "../llm";
-import { LLM } from "../llm";
+import { LLM, type ModelConfig } from "../llm";
 import { StateFn, type ZeeWorkflowState } from "../state";
 import type { Tool } from "../tools/base";
 import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
-import z from "zod";
+import z, { type AnyZodObject } from "zod";
 
 type AgentConfig = {
     name: string;
@@ -290,7 +289,7 @@ export class Agent extends Base {
         return this._tools;
     }
 
-    async generate<T extends Record<string, z.ZodObject<any>>>(
+    async generate<T extends Record<string, AnyZodObject>>(
         messages: ChatCompletionMessageParam[],
         response_schema: T
     ) {

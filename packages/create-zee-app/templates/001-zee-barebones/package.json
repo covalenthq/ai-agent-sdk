@@ -1,6 +1,6 @@
 {
     "name": "create-zee-app-template",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,8 +20,8 @@
         "autonomous-agent-sdk",
         "ai-agent-sdk"
     ],
-    "author": "Covalent",
-    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "author": "covalenthq",
+    "homepage": "https://cxt.build/docs/overview",
     "repository": {
         "type": "git",
         "url": "https://github.com/covalenthq/ai-agent-sdk.git"
