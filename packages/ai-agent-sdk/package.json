@@ -58,6 +58,7 @@
     "devDependencies": {
         "@types/node": "^22.10.7",
         "node-fetch": "^3.3.2",
+        "prettier": "^3.4.2",
         "vitest": "^3.0.2"
     }
 }
