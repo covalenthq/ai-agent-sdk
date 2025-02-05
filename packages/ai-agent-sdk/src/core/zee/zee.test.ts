@@ -173,4 +173,77 @@ describe("@ai-agent-sdk/zee", () => {
         expect(finalMessage?.content).toBeDefined();
         console.log("Final Analysis:", finalMessage?.content);
     });
+
+    test("workflow with dynamic maxIterations", async () => {
+        const script_writer = new Agent({
+            name: "script writer",
+            description:
+                "You are an expert screenplay writer. Given a movie idea and genre, develop a compelling script outline with character descriptions and key plot points.",
+            instructions: [
+                "Write a script outline with 3-5 main characters and key plot points.",
+                "Outline the three-act structure and suggest 2-3 twists.",
+                "Ensure the script aligns with the specified genre and target audience.",
+            ],
+            model: {
+                provider: "OPEN_AI",
+                name: "gpt-4o-mini",
+            },
+        });
+
+        const producer = new Agent({
+            name: "movie producer",
+            description:
+                "Experienced movie producer overseeing script and casting.",
+            instructions: [
+                "Ask script writer for a script outline based on the movie idea.",
+                "Summarize the script outline.",
+                "Provide a concise movie concept overview.",
+            ],
+
+            model: {
+                provider: "OPEN_AI",
+                name: "gpt-4o-mini",
+            },
+        });
+
+        const zeeWorkflowParams = {
+            description:
+                "Plan a script for a movie that is 10 minutes long and has a happy ending.",
+            output: "A scene by scene outline of the movie script.",
+            agents: {
+                script_writer,
+                producer,
+            },
+        };
+        const zeeWithMaxIterationsFive = new ZeeWorkflow({
+            ...zeeWorkflowParams,
+            maxIterations: 5,
+        });
+        expect(zeeWithMaxIterationsFive.maxIterations).toEqual(5);
+
+        const zeeWithMaxIterationsNotSet = new ZeeWorkflow({
+            ...zeeWorkflowParams,
+        });
+        expect(zeeWithMaxIterationsNotSet.maxIterations).toEqual(50);
+
+        const zeeWithMaxIterationsZero = new ZeeWorkflow({
+            ...zeeWorkflowParams,
+            maxIterations: 0,
+        });
+        expect(zeeWithMaxIterationsZero.maxIterations).toEqual(50);
+
+        const zeeWithMaxIterationsMinus = new ZeeWorkflow({
+            ...zeeWorkflowParams,
+            maxIterations: -10,
+        });
+        expect(zeeWithMaxIterationsMinus.maxIterations).toEqual(50);
+
+        const zeeWithMaxIterationsAThousand = new ZeeWorkflow({
+            ...zeeWorkflowParams,
+            maxIterations: 1000,
+        });
+        expect(zeeWithMaxIterationsAThousand.maxIterations).toEqual(1000);
+    });
+
 });
+
