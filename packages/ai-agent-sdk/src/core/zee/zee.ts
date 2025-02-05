@@ -129,7 +129,7 @@ export class ZeeWorkflow extends Base {
     }
 
     get maxIterations() {
-        return 50;
+        return this.config.maxIterations ?? 50;
     }
 
     agent(agentName: string): Agent {
