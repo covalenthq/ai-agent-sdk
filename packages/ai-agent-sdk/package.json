@@ -25,8 +25,8 @@
         "autonomous-agent-sdk",
         "ai-agent-sdk"
     ],
-    "author": "Covalent",
-    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "author": "covalenthq",
+    "homepage": "https://cxt.build/docs/overview",
     "repository": {
         "type": "git",
         "url": "https://github.com/covalenthq/ai-agent-sdk.git"
@@ -36,6 +36,7 @@
     },
     "scripts": {
         "test": "vitest",
+        "test:multimodal": "vitest src/core/llm/llm.test.ts",
         "build": "tsc",
         "clean": "rm -rf dist",
         "prepublishOnly": "cp ../../README.md . && npm run clean && npm run build",
@@ -57,5 +58,6 @@
         "@types/node": "^22.10.7",
         "node-fetch": "^3.3.2",
         "vitest": "^3.0.2"
-    }
+    },
+    "type": "module"
 }

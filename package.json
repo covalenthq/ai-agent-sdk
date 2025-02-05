@@ -13,8 +13,8 @@
         "lint": "pnpm run -r lint",
         "format": "prettier --write ."
     },
-    "author": "Covalent",
-    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "author": "covalenthq",
+    "homepage": "https://cxt.build/docs/overview",
     "repository": {
         "type": "git",
         "url": "https://github.com/covalenthq/ai-agent-sdk.git"
