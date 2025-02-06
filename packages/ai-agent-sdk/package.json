@@ -43,6 +43,7 @@
         "build": "tsc",
         "clean": "rm -rf dist",
         "prepublishOnly": "cp ../../README.md . && npm run clean && npm run build",
+        "postpublish": "rm -f ./README.md",
         "lint": "eslint .",
         "pretty": "prettier . --write"
     },
