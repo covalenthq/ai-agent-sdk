@@ -36,7 +36,9 @@
     },
     "scripts": {
         "test": "vitest",
+        "test:agent": "vitest src/core/agent/agent.test.ts",
         "test:llm": "vitest src/core/llm/llm.test.ts",
+        "test:tools:goldrush": "vitest src/core/tools/goldrush/index.test.ts",
         "test:zee": "vitest src/core/zee/zee.test.ts",
         "build": "tsc",
         "clean": "rm -rf dist",

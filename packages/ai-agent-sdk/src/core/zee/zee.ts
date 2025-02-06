@@ -1,5 +1,4 @@
-import type { Agent, AgentName } from "../agent";
-import { resource_planner, router } from "../agent";
+import { type Agent, type AgentName, resource_planner, router } from "../agent";
 import { assistant, Base } from "../base";
 import { StateFn, type ZeeWorkflowState } from "../state";
 import type { ZeeWorkflowOptions } from "./zee.types";

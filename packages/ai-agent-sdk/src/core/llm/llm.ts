@@ -103,6 +103,7 @@ export class LLM extends Base {
             model: this.model.name,
             messages,
             tools: mappedTools.length > 0 ? mappedTools : undefined,
+            tool_choice: this.model.toolChoice || "auto",
             temperature: mappedTemperature,
         };
 
@@ -128,6 +129,13 @@ export class LLM extends Base {
 
         const response =
             await client.beta.chat.completions.parse(requestConfig);
+
+        if (response?.choices[0]?.message?.tool_calls?.length) {
+            return {
+                type: "tool_call",
+                value: response.choices[0].message.tool_calls,
+            } satisfies FunctionToolCall;
+        }
 
         if (!response?.choices[0]?.message?.parsed) {
             throw new Error(JSON.stringify(response));
