@@ -140,7 +140,7 @@ export const router = () =>
                 5. Use context from completed tasks to inform next steps
               `),
                 assistant("What is the request?"),
-                workflowRequest as any,
+                workflowRequest!,
 
                 ...(_messages.length > 0
                     ? [
