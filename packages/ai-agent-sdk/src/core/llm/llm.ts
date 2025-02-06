@@ -103,7 +103,6 @@ export class LLM extends Base {
             model: this.model.name,
             messages,
             tools: mappedTools.length > 0 ? mappedTools : undefined,
-            tool_choice: this.model.toolChoice || "auto",
             temperature: mappedTemperature,
         };
 
