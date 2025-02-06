@@ -45,7 +45,7 @@ const runTools = async (
 
 const execute = async (
     zeeWorkflow: ZeeWorkflow,
-    context: any,
+    context: unknown[],
     state: ZeeWorkflowState
 ): Promise<ZeeWorkflowState> => {
     if (state.messages.length > zeeWorkflow.maxIterations) {
