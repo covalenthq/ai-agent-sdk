@@ -53,6 +53,9 @@ importers:
       pino-pretty:
         specifier: ^13.0.0
         version: 13.0.0
+      twitter-api-v2:
+        specifier: ^1.18.2
+        version: 1.19.1
       typescript:
         specifier: ^5.7.3
         version: 5.7.3
@@ -1380,6 +1383,9 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  twitter-api-v2@1.19.1:
+    resolution: {integrity: sha512-X7+j1/VBiynw443ugDtEbFspYrWN26WH117uFc89K1+FkAgcSvj2GGMF8mIWPag2K4eS1Vd5HW35zorNdTveOg==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -2741,6 +2747,8 @@ snapshots:
       typescript: 5.7.3
 
   tslib@2.8.1: {}
+
+  twitter-api-v2@1.19.1: {}
 
   type-check@0.4.0:
     dependencies:
