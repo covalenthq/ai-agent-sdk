@@ -93,10 +93,17 @@ export class LLM extends Base {
 
         const mappedTools = tools ? formatOpenAITools(tools) : [];
 
+        const mappedTemperature =
+            this.model.temperature &&
+            this.model.temperature > 0 &&
+            this.model.temperature <= 2
+                ? this.model.temperature
+                : undefined;
         const requestConfig: ChatCompletionCreateParamsNonStreaming = {
             model: this.model.name,
             messages,
             tools: mappedTools.length > 0 ? mappedTools : undefined,
+            temperature: mappedTemperature,
         };
 
         switch (provider) {
@@ -117,10 +124,6 @@ export class LLM extends Base {
                     responseAsStructuredOutput(response_schema);
                 break;
             }
-        }
-
-        if (this.model.temperature && this.model.temperature > 0 && this.model.temperature <= 2) {
-          requestConfig.temperature = this.model.temperature;
         }
 
         const response =
