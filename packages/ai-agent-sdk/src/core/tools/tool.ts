@@ -1,3 +1,4 @@
+import type { ToolOptions } from "./tool.types";
 import type { ChatCompletionToolMessageParam } from "openai/resources";
 import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
 import type { AnyZodObject } from "zod";
@@ -32,13 +33,6 @@ export class Tool {
     execute(parameters: unknown) {
         return this._execute(parameters);
     }
-}
-
-interface ToolOptions {
-    id: string;
-    description: string;
-    schema: AnyZodObject;
-    execute: (parameters: unknown) => Promise<string>;
 }
 
 export const createTool = (options: ToolOptions) => {
