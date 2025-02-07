@@ -278,6 +278,12 @@ export const endgame = () =>
 
             const result = await agent.generate(messages, schema);
 
+            if (result.type !== "task_result") {
+                throw new Error(
+                    "Expected task_result response, got " + result.type
+                );
+            }
+
             return StateFn.finish(
                 state,
                 assistant(result.value["final_answer"])
