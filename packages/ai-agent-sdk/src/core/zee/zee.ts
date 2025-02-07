@@ -1,4 +1,10 @@
-import { type Agent, type AgentName, resource_planner, router } from "../agent";
+import {
+    type Agent,
+    type AgentName,
+    endgame,
+    resource_planner,
+    router,
+} from "../agent";
 import { assistant, Base } from "../base";
 import { StateFn, type ZeeWorkflowState } from "../state";
 import type { ZeeWorkflowOptions } from "./zee.types";
@@ -51,7 +57,7 @@ const execute = async (
     if (state.messages.length > zeeWorkflow.maxIterations) {
         return StateFn.childState({
             ...state,
-            agent: "finalBoss",
+            agent: "endgame",
         });
     }
 
@@ -113,6 +119,7 @@ export class ZeeWorkflow extends Base {
         this._agents = {
             router: router(),
             resource_planner: resource_planner(options.agents),
+            endgame: endgame(),
             ...options.agents,
         };
 
