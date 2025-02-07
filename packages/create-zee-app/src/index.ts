@@ -60,6 +60,10 @@ async function main() {
                 value: "001-zee-barebones",
                 label: "Just a barebones template",
             },
+            {
+                value: "002-onchain-workflow",
+                label: "Onchain Workflow Template",
+            },
         ],
     });
 
@@ -72,19 +76,15 @@ async function main() {
     const templateDir = path.resolve(TEMPLATES_DIR, template);
 
     try {
-        // Create project directory
         await fs.mkdir(targetDir, { recursive: true });
 
-        // Copy template files
         await copyTemplateFiles(templateDir, targetDir);
 
-        // Create .env file with OpenAI API key
         const envPath = path.join(targetDir, ".env");
         await fs.writeFile(envPath, `OPENAI_API_KEY=${openaiApiKey}\n`, {
             flag: "a",
         });
 
-        // Update package.json with project name
         const packageJsonPath = path.join(targetDir, "package.json");
         const packageJson = JSON.parse(
             await fs.readFile(packageJsonPath, "utf-8")
@@ -95,7 +95,6 @@ async function main() {
             JSON.stringify(packageJson, null, 2)
         );
 
-        // Update agent name in index.ts
         const indexTsPath = path.join(targetDir, "src/index.ts");
         const indexTsContent = await fs.readFile(indexTsPath, "utf-8");
         const updatedContent = indexTsContent.replace(
