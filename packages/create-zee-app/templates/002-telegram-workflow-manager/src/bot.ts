@@ -3,7 +3,7 @@ import { openai } from "@ai-sdk/openai";
 import { ZeeWorkflow } from "@covalenthq/ai-agent-sdk";
 import {
     StateFn,
-    ZeeWorkflowState,
+    type ZeeWorkflowState,
 } from "@covalenthq/ai-agent-sdk/dist/core/state";
 import { generateObject, generateText } from "ai";
 
@@ -83,10 +83,12 @@ export async function handleMessage(
                 //   kill the current workflow.
                 break;
             case "get-status":
-                const workflow = workflows.get(chatId);
-                const state = workflowsState.get(workflow!);
-                const summary = await summarize(JSON.stringify(state));
-                messageSender(summary);
+                {
+                    const workflow = workflows.get(chatId);
+                    const state = workflowsState.get(workflow!);
+                    const summary = await summarize(JSON.stringify(state));
+                    messageSender(summary);
+                }
                 break;
             case "kill-workflow":
                 messageSender("Killing workflow…");
@@ -94,37 +96,41 @@ export async function handleMessage(
                 messageSender("Workflow should now be killed");
                 break;
             case "something-else":
-                const response = await generateText({
-                    model: openai("gpt-3.5-turbo"),
-                    system:
-                        "You are a helpful assistant. For the record " +
-                        "the user prompted the chatbot something that " +
-                        "requested for a worklow, nor to get the " +
-                        "current status.\n" +
-                        "Just play along",
-                    prompt: text,
-                });
-                messageSender(response.text);
+                {
+                    const response = await generateText({
+                        model: openai("gpt-3.5-turbo"),
+                        system:
+                            "You are a helpful assistant. For the record " +
+                            "the user prompted the chatbot something that " +
+                            "requested for a worklow, nor to get the " +
+                            "current status.\n" +
+                            "Just play along",
+                        prompt: text,
+                    });
+                    messageSender(response.text);
+                }
                 break;
         }
     } else {
         switch (await classifyWorkflowRequest(text ?? "")) {
             case "start-workflow":
-                const zee = startWorkflow();
+                {
+                    const zee = startWorkflow();
 
-                workflows.set(chatId, zee);
-                const state = StateFn.root(zee.description);
-                workflowsState.set(zee, state);
+                    workflows.set(chatId, zee);
+                    const state = StateFn.root(zee.description);
+                    workflowsState.set(zee, state);
 
-                messageSender("Starting workflow");
+                    messageSender("Starting workflow");
 
-                run(zee, messageSender).then((state) => {
-                    workflows.delete(chatId.toString());
+                    run(zee, messageSender).then((state) => {
+                        workflows.delete(chatId.toString());
 
-                    summarize(JSON.stringify(state)).then((summary) => {
-                        messageSender(summary);
+                        summarize(JSON.stringify(state)).then((summary) => {
+                            messageSender(summary);
+                        });
                     });
-                });
+                }
                 break;
             case "get-status":
                 messageSender("No workflow is running.");
@@ -133,17 +139,19 @@ export async function handleMessage(
                 messageSender("No workflow is running.");
                 break;
             case "something-else":
-                const response = await generateText({
-                    model: openai("gpt-3.5-turbo"),
-                    system:
-                        "You are a helpful assistant. For the record " +
-                        "the user prompted the chatbot something that " +
-                        "requested for a worklow, nor to get the " +
-                        "current status.\n" +
-                        "Just play along",
-                    prompt: text,
-                });
-                messageSender(response.text);
+                {
+                    const response = await generateText({
+                        model: openai("gpt-3.5-turbo"),
+                        system:
+                            "You are a helpful assistant. For the record " +
+                            "the user prompted the chatbot something that " +
+                            "requested for a worklow, nor to get the " +
+                            "current status.\n" +
+                            "Just play along",
+                        prompt: text,
+                    });
+                    messageSender(response.text);
+                }
                 break;
         }
     }
