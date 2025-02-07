@@ -1,7 +1,7 @@
 import type { Agent } from ".";
 import type { ModelConfig } from "../llm";
-import type { ZeeWorkflowState } from "../state";
-import type { Tool } from "../tools/base";
+import type { ZeeWorkflowState } from "../state/state";
+import type { Tool } from "../tools/tool";
 
 export type AgentConfig = {
     name: string;

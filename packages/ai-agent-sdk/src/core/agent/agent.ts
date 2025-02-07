@@ -1,8 +1,8 @@
 import type { AgentConfig, AgentName } from ".";
 import { assistant, Base, system, user } from "../base";
 import { LLM } from "../llm";
-import { StateFn, type ZeeWorkflowState } from "../state";
-import type { Tool } from "../tools/base";
+import { StateFn, type ZeeWorkflowState } from "../state/state";
+import type { Tool } from "../tools/tool";
 import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
 import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import z, { type AnyZodObject } from "zod";

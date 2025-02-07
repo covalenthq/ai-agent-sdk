@@ -1,5 +1,5 @@
 import { Base } from "../base";
-import type { Tool } from "../tools/base";
+import type { Tool } from "../tools/tool";
 import type { FunctionToolCall, LLMResponse, ModelConfig } from "./llm.types";
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";

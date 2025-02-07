@@ -1,7 +1,7 @@
 import { Agent } from ".";
 import { user } from "../base";
 import type { ModelConfig } from "../llm";
-import { StateFn } from "../state";
+import { StateFn } from "../state/state";
 import { createTool, runToolCalls } from "../tools";
 import fetch from "node-fetch";
 import type { ChatCompletionAssistantMessageParam } from "openai/resources";

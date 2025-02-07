@@ -1,7 +1,7 @@
 import { Agent } from "../../agent";
 import { user } from "../../base";
-import { StateFn } from "../../state";
-import { runToolCalls } from "../base";
+import { StateFn } from "../../state/state";
+import { runToolCalls } from "../tool";
 import { HistoricalTokenPriceTool } from "./historical-token-price";
 import { NFTBalancesTool } from "./nft-balances";
 import { TokenBalancesTool } from "./token-balances";

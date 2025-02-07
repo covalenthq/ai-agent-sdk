@@ -1,2 +1,2 @@
 export * from "./goldrush";
-export * from "./base";
+export * from "./tool";
