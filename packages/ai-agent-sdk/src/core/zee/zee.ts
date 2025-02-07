@@ -55,10 +55,23 @@ const execute = async (
     state: ZeeWorkflowState
 ): Promise<ZeeWorkflowState> => {
     if (state.messages.length > zeeWorkflow.maxIterations) {
-        return StateFn.childState({
+        const endgameState = StateFn.childState({
             ...state,
             agent: "endgame",
+            status: "running",
         });
+
+        const agent = zeeWorkflow.agent("endgame");
+        try {
+            return await agent.run(endgameState);
+        } catch (error) {
+            return StateFn.finish(
+                endgameState,
+                assistant(
+                    error instanceof Error ? error.message : "Unknown error"
+                )
+            );
+        }
     }
 
     if (state.children.length > 0) {
@@ -123,7 +136,13 @@ export class ZeeWorkflow extends Base {
             ...options.agents,
         };
 
-        this.config = options;
+        this.config = {
+            ...options,
+            maxIterations:
+                options.maxIterations && options.maxIterations > 0
+                    ? options.maxIterations
+                    : 50,
+        };
     }
 
     get description() {
