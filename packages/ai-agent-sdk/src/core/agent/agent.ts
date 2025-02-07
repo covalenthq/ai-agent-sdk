@@ -286,7 +286,7 @@ export const endgame = () =>
 
             return StateFn.finish(
                 state,
-                assistant(result.value.final_answer)
+                assistant(result.value["final_answer"])
             );
         },
     });
