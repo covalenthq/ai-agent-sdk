@@ -1,4 +1,12 @@
-import { cancel, intro, isCancel, outro, select, text } from "@clack/prompts";
+import {
+    cancel,
+    intro,
+    isCancel,
+    outro,
+    password,
+    select,
+    text,
+} from "@clack/prompts";
 import fs from "fs/promises";
 import { pastel } from "gradient-string";
 import path from "path";
@@ -39,7 +47,7 @@ async function main() {
         process.exit(0);
     }
 
-    const openaiApiKey = await text({
+    const openaiApiKey = await password({
         message:
             "Please input your OpenAI API key (will be stored in .env file)",
         validate: (value) => {
