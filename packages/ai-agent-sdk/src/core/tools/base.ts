@@ -1,10 +1,10 @@
-import type { AnyZodType } from "../base";
 import type { ChatCompletionToolMessageParam } from "openai/resources";
 import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
+import type { AnyZodObject } from "zod";
 
 export class Tool {
     private id: string;
-    private _schema: AnyZodType;
+    private _schema: AnyZodObject;
     private _description: string;
 
     private _execute: (parameters: unknown) => Promise<string>;
@@ -12,7 +12,7 @@ export class Tool {
     constructor(
         id: string,
         description: string,
-        schema: AnyZodType,
+        schema: AnyZodObject,
         execute: (parameters: unknown) => Promise<string>
     ) {
         this.id = id;
@@ -37,7 +37,7 @@ export class Tool {
 interface ToolOptions {
     id: string;
     description: string;
-    schema: AnyZodType;
+    schema: AnyZodObject;
     execute: (parameters: unknown) => Promise<string>;
 }
 

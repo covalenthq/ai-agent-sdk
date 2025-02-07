@@ -6,15 +6,12 @@ import type {
     ChatCompletionUserMessageParam,
 } from "openai/resources/chat/completions";
 import pino from "pino";
-import { type ZodType } from "zod";
 
 export const logger = pino({
     level: "debug",
 });
 
 export type MODULE = "agent" | "llm" | "tools" | "server" | "zee";
-
-export type AnyZodType = ZodType<unknown>;
 
 export class Base {
     private logger: pino.Logger;
