@@ -69,6 +69,22 @@ const zee = new ZeeWorkflow({
     console.log(result);
 })();
 ```
+### Using Hugging Face Inference with the SDK
+
+To use HF inference with the SDK, you need to configure the HF config in your agent setup.
+
+```js
+const hfConfig: HuggingFaceConfig = {
+    provider: "HUGGINGFACE",
+    name: "sentence-transformers/all-MiniLM-L6-v2", // Example Model
+    apiKey: "hf_xxxxxxxxxxxxxxxxxxxxxxxx"
+};
+
+const llm = new LLM(hfConfig);
+const response = await llm.generate(messages, schema, tools);
+```
+
+The agent will automatically handle streaming responses and format them appropriately.
 
 ## 🤝 Contributing
 
