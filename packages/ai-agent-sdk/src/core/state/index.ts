@@ -63,7 +63,7 @@ export const StateFn = {
             return {
                 ...state,
                 status: "finished",
-                messages: [state.messages[0], agentResponse],
+                messages: [...state.messages, agentResponse],
             };
         }
 
