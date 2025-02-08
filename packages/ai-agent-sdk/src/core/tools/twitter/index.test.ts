@@ -4,7 +4,6 @@ import { StateFn } from "../../state";
 import { runToolCalls } from "../base";
 import type { TwitterToolConfig } from "./base";
 import { TwitterAccountDetailsTool } from "./twitter-account-details";
-import { TwitterAccountMentionsTool } from "./twitter-account-mentions";
 import { TwitterPostTweetTool } from "./twitter-post-tweet";
 import { TwitterPostTweetReplyTool } from "./twitter-post-tweet-reply";
 import "dotenv/config";
@@ -39,7 +38,6 @@ beforeAll(() => {
 describe("Twitter Tools Test Suite", () => {
     const tools = {
         accountDetails: new TwitterAccountDetailsTool(config),
-        accountMentions: new TwitterAccountMentionsTool(config),
         postTweet: new TwitterPostTweetTool(config),
         postTweetReply: new TwitterPostTweetReplyTool(config),
     };
@@ -51,8 +49,8 @@ describe("Twitter Tools Test Suite", () => {
         return new Agent({
             name: "twitter-agent",
             model: {
-                provider: "GEMINI",
-                name: "gemini-1.5-flash",
+                provider: "OPEN_AI",
+                name: "gpt-4o-mini",
             },
             description,
             instructions,
@@ -116,18 +114,14 @@ describe("Twitter Tools Test Suite", () => {
         ).toBeDefined();
     });
 
-    test("retrieves account mentions", async () => {
-        const tools = {
-            accountMentions: new TwitterAccountMentionsTool(config),
-        };
-
+    test("post a tweet reply", async () => {
         const agent = createTwitterAgent(
-            "You are a blockchain developer exploring Twitter mentions.",
-            ["Retrieve account mentions", "Analyze recent mentions"]
+            "You are a blockchain developer exploring Twitter account details.",
+            ["Retrieve account details", "Analyze Twitter profile information"]
         );
 
         const state = StateFn.root(agent.description);
-        state.messages.push(user("Retrieve recent mentions"));
+        state.messages.push(user("Retrieve account details"));
 
         const result = await agent.run(state);
         expect(result.status).toEqual("paused");
