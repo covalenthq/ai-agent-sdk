@@ -61,31 +61,31 @@ Provides historical price data with:
 
 ```typescript
 import {
-Agent,
-ZeeWorkflow,
-TokenBalancesTool,
-NFTBalancesTool,
-TransactionsTool,
+    Agent,
+    ZeeWorkflow,
+    TokenBalancesTool,
+    NFTBalancesTool,
+    TransactionsTool,
 } from "@covalenthq/ai-agent-sdk";
 
 const tools = {
-tokenBalances: new TokenBalancesTool(process.env.GOLDRUSH_API_KEY),
-nftBalances: new NFTBalancesTool(process.env.GOLDRUSH_API_KEY),
-transactions: new TransactionsTool(process.env.GOLDRUSH_API_KEY),
+    tokenBalances: new TokenBalancesTool(process.env.GOLDRUSH_API_KEY),
+    nftBalances: new NFTBalancesTool(process.env.GOLDRUSH_API_KEY),
+    transactions: new TransactionsTool(process.env.GOLDRUSH_API_KEY),
 };
 
 const walletAnalyzer = new Agent({
     name: "WalletAnalyzer",
     model: {
-    provider: "OPEN_AI",
-    name: "gpt-4o-mini",
+        provider: "OPEN_AI",
+        name: "gpt-4o-mini",
     },
     description: "An AI assistant that analyzes wallet activities and provides insights about holdings and transactions.",
     instructions: [
-    "Analyze wallet token balances and provide insights about holdings",
-    "Check NFT collections owned by the wallet",
-    "Review recent transactions and identify patterns",
-    "Provide comprehensive analysis of the wallet's activity",
+        "Analyze wallet token balances and provide insights about holdings",
+        "Check NFT collections owned by the wallet",
+        "Review recent transactions and identify patterns",
+        "Provide comprehensive analysis of the wallet's activity",
     ],
     tools,
 });

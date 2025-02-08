@@ -62,7 +62,7 @@ async function main() {
             },
             {
                 value: "002-onchain-workflow",
-                label: "Onchain Workflow Template",
+                label: "Analyze blockchain data to get a wallet's token balances, etc.",
             },
         ],
     });
