@@ -45,6 +45,10 @@ const llm = new LLM({
 "gemini-1.5-pro"
 ```
 
+```plaintext Gradio
+"Any Supported and hosted inference and generation algorithms using gradio python library"
+```
+
 </CodeGroup>
 
 ## Environment Variables
@@ -68,6 +72,73 @@ GEMINI_API_KEY
 ```
 
 </CodeGroup>
+
+## Example Usage:
+
+For deepseek-ai/deepseek-vl2-small:
+
+```typescript
+const gradioConfig: GradioConfig = {
+    provider: "GRADIO",
+    name: "deepseek-vl2-small",
+    appUrl: "deepseek-ai/deepseek-vl2-small",
+    parameters: [
+        [["Hello!", null]],
+        0.9, // topP
+        0.1, // temperature
+        0, // repetitionPenalty
+        100, // maxGenerationTokens
+        0, // maxHistoryTokens
+        "deepseek-ai/deepseek-vl2-small", // model name
+    ],
+};
+
+const llm = new LLM(gradioConfig);
+const response = await llm.generate(
+    [{ role: "user", content: "Hello!" }],
+    { text: z.string() },
+    {}
+);
+console.log(response.value);
+```
+For r3gm/RVC_HF:
+```typescript
+const gradioConfig: GradioConfig = {
+    provider: "GRADIO",
+    name: "RVC_HF",
+    appUrl: "r3gm/RVC_HF",
+    endpoint: "/run_infer_script",
+    parameters: {
+        f0up_key: 0,
+        filter_radius: 5,
+        index_rate: 0,
+        rms_mix_rate: 0,
+        protect: 0,
+        hop_length: 1,
+        f0method: "rmvpe",
+        input_path: "https://raw.githubusercontent.com/Philotheephilix/Tunify/main/public/amidreaming.wav",
+        output_path: "/home/user/app/assets/audios/output.wav",
+        pth_path: "logs/Justin_Bieber_v2/Justin_Bieber_v2.pth",
+        index_path: "logs/Justin_Bieber_v2/added_IVF1005_Flat_nprobe_1_Justin_Bieber_v2_v2.index",
+        clean_strength: 0,
+        export_format: "WAV",
+        embedder_model: "hubert",
+        embedder_model_custom: "",
+        upscale_audio: true,
+    },
+};
+```
+Gradio is used for custom made inference and algorithms so the working depends solely on the developer of the Gradio Project and the api configured for it.
+
+### Initialization example with Gradio
+
+const llm = new LLM(gradioConfig);
+const response = await llm.generate(
+    [], // Messages not used for this model
+    { result: z.string() },
+    {}
+);
+console.log(response.value);
 
 ## Use Cases
 
