@@ -1,7 +1,5 @@
 # Telegram Workflow Manager
 
-# Telegram Workflow Manager
-
 This project is a Telegram bot that manages AI agent workflows. It allows users to start, get the status of, and kill workflows through simple text commands.
 
 ## Features
