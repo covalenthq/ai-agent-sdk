@@ -47,18 +47,33 @@ export type GeminiConfig = {
     apiKey?: string;
 };
 
+export type HuggingFaceModel = string; 
+
+export type HuggingFaceConfig = {
+    provider: "HUGGINGFACE";
+    name: HuggingFaceModel;
+    apiKey?: string;
+    temperature?: number;
+};
+
 export type ModelConfig =
     | OpenAIConfig
     | DeepSeekConfig
     | GrokConfig
-    | GeminiConfig;
+    | GeminiConfig
+    | HuggingFaceConfig;
 
-export type LLMResponse<T extends Record<string, AnyZodObject>> = {
-    [K in keyof T]: {
-        type: K;
-        value: z.infer<T[K]>;
-    };
-}[keyof T];
+    export type LLMResponse<T extends Record<string, AnyZodObject>> =
+    | {
+        [K in keyof T]: {
+          type: K;
+          value: z.infer<T[K]>;
+        };
+      }[keyof T]
+    | {
+        type: "text";
+        value: string;
+      };
 
 export type FunctionToolCall = {
     type: "tool_call";
