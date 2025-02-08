@@ -24,16 +24,43 @@ const banner = [
 
 console.log(pastel(banner.join("\n")));
 
-const { green, red } = picocolors;
+const { green, red, gray } = picocolors;
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const TEMPLATES_DIR = path.resolve(__dirname, "..", "templates");
+
+const ADJECTIVES = [
+    "adorable",
+    "beautiful",
+    "bright",
+    "calm",
+    "delightful",
+    "enchanting",
+    "friendly",
+    "gorgeous",
+    "glorious",
+    "lovely",
+    "perfect",
+    "precious",
+    "shiny",
+    "sparkling",
+    "super",
+    "wicked",
+];
+
+const generateAdjective = () => {
+    const n: string = ADJECTIVES[
+        Math.floor(Math.random() * ADJECTIVES.length)
+    ] as string;
+    return n;
+};
 
 async function main() {
     intro("Build autonomous AI agents for the Zero-Employee Enterprise (ZEE).");
 
     const projectName = await text({
-        message: "What is the name of your project?",
+        message: `What is the name of your project? ${gray("[required]")}`,
+        initialValue: `my-${generateAdjective()}-zee`,
         validate: (value) => {
             if (value.length === 0) return "Project name is required";
             if (!/^[a-z0-9-]+$/.test(value))
@@ -48,12 +75,7 @@ async function main() {
     }
 
     const openaiApiKey = await password({
-        message:
-            "Please input your OpenAI API key (will be stored in .env file)",
-        validate: (value) => {
-            if (value.length === 0) return "OpenAI API key is required";
-            return;
-        },
+        message: `Please input your OpenAI API key (will be stored in .env file) ${gray("[optional]")}`,
     });
 
     if (isCancel(openaiApiKey)) {
