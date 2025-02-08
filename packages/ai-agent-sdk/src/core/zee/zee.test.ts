@@ -49,6 +49,7 @@ describe("@ai-agent-sdk/zee", () => {
                 script_writer,
                 producer,
             },
+            maxIterations: 5,
         });
 
         const result = await ZeeWorkflow.run(zee);

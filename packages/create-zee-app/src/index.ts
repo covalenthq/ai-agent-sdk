@@ -1,4 +1,12 @@
-import { cancel, intro, isCancel, outro, select, text } from "@clack/prompts";
+import {
+    cancel,
+    intro,
+    isCancel,
+    outro,
+    password,
+    select,
+    text,
+} from "@clack/prompts";
 import fs from "fs/promises";
 import { pastel } from "gradient-string";
 import path from "path";
@@ -16,16 +24,43 @@ const banner = [
 
 console.log(pastel(banner.join("\n")));
 
-const { green, red } = picocolors;
+const { green, red, gray } = picocolors;
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const TEMPLATES_DIR = path.resolve(__dirname, "..", "templates");
+
+const ADJECTIVES = [
+    "adorable",
+    "beautiful",
+    "bright",
+    "calm",
+    "delightful",
+    "enchanting",
+    "friendly",
+    "gorgeous",
+    "glorious",
+    "lovely",
+    "perfect",
+    "precious",
+    "shiny",
+    "sparkling",
+    "super",
+    "wicked",
+];
+
+const generateAdjective = () => {
+    const n: string = ADJECTIVES[
+        Math.floor(Math.random() * ADJECTIVES.length)
+    ] as string;
+    return n;
+};
 
 async function main() {
     intro("Build autonomous AI agents for the Zero-Employee Enterprise (ZEE).");
 
     const projectName = await text({
-        message: "What is the name of your project?",
+        message: `What is the name of your project? ${gray("[required]")}`,
+        initialValue: `my-${generateAdjective()}-zee`,
         validate: (value) => {
             if (value.length === 0) return "Project name is required";
             if (!/^[a-z0-9-]+$/.test(value))
@@ -39,13 +74,8 @@ async function main() {
         process.exit(0);
     }
 
-    const openaiApiKey = await text({
-        message:
-            "Please input your OpenAI API key (will be stored in .env file)",
-        validate: (value) => {
-            if (value.length === 0) return "OpenAI API key is required";
-            return;
-        },
+    const openaiApiKey = await password({
+        message: `Please input your OpenAI API key (will be stored in .env file) ${gray("[optional]")}`,
     });
 
     if (isCancel(openaiApiKey)) {
@@ -60,6 +90,10 @@ async function main() {
                 value: "001-zee-barebones",
                 label: "Just a barebones template",
             },
+            {
+                value: "002-onchain-workflow",
+                label: "Analyze blockchain data to get a wallet's token balances, etc.",
+            },
         ],
     });
 
@@ -72,19 +106,15 @@ async function main() {
     const templateDir = path.resolve(TEMPLATES_DIR, template);
 
     try {
-        // Create project directory
         await fs.mkdir(targetDir, { recursive: true });
 
-        // Copy template files
         await copyTemplateFiles(templateDir, targetDir);
 
-        // Create .env file with OpenAI API key
         const envPath = path.join(targetDir, ".env");
         await fs.writeFile(envPath, `OPENAI_API_KEY=${openaiApiKey}\n`, {
             flag: "a",
         });
 
-        // Update package.json with project name
         const packageJsonPath = path.join(targetDir, "package.json");
         const packageJson = JSON.parse(
             await fs.readFile(packageJsonPath, "utf-8")
@@ -95,7 +125,6 @@ async function main() {
             JSON.stringify(packageJson, null, 2)
         );
 
-        // Update agent name in index.ts
         const indexTsPath = path.join(targetDir, "src/index.ts");
         const indexTsContent = await fs.readFile(indexTsPath, "utf-8");
         const updatedContent = indexTsContent.replace(

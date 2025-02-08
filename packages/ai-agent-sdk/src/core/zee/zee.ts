@@ -1,4 +1,10 @@
-import { type Agent, type AgentName, resource_planner, router } from "../agent";
+import {
+    type Agent,
+    type AgentName,
+    endgame,
+    resource_planner,
+    router,
+} from "../agent";
 import { assistant, Base } from "../base";
 import { StateFn, type ZeeWorkflowState } from "../state";
 import type { ZeeWorkflowOptions } from "./zee.types";
@@ -49,10 +55,23 @@ const execute = async (
     state: ZeeWorkflowState
 ): Promise<ZeeWorkflowState> => {
     if (state.messages.length > zeeWorkflow.maxIterations) {
-        return StateFn.childState({
+        const endgameState = StateFn.childState({
             ...state,
-            agent: "finalBoss",
+            agent: "endgame",
+            status: "running",
         });
+
+        const agent = zeeWorkflow.agent("endgame");
+        try {
+            return await agent.run(endgameState);
+        } catch (error) {
+            return StateFn.finish(
+                endgameState,
+                assistant(
+                    error instanceof Error ? error.message : "Unknown error"
+                )
+            );
+        }
     }
 
     if (state.children.length > 0) {
@@ -113,10 +132,17 @@ export class ZeeWorkflow extends Base {
         this._agents = {
             router: router(),
             resource_planner: resource_planner(options.agents),
+            endgame: endgame(),
             ...options.agents,
         };
 
-        this.config = options;
+        this.config = {
+            ...options,
+            maxIterations:
+                options.maxIterations && options.maxIterations > 0
+                    ? options.maxIterations
+                    : 50,
+        };
     }
 
     get description() {
