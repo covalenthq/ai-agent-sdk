@@ -53,6 +53,7 @@ export type GradioConfig = {
     appUrl: string;
     endpoint?: string;
     parameters?: unknown[];
+    temperature?: number; 
     apiKey?: string;
 };
 
