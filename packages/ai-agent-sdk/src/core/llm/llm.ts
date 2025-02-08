@@ -11,6 +11,7 @@ import type {
 import type { AnyZodObject } from "zod";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { Client as GradioClient } from "@gradio/client";
 
 const entryToObject = ([key, value]: [string, AnyZodObject]) => {
     return z.object({ type: z.literal(key), value });
@@ -60,10 +61,20 @@ export class LLM extends Base {
         response_schema: T,
         tools: Record<string, Tool>
     ): Promise<FunctionToolCall | LLMResponse<T>> {
+        const provider = this.model.provider;
+        
+        if (provider === "GRADIO") {
+            const config = this.model as any;
+            const client = await new GradioClient(config.appUrl);
+            const result = await client.predict(config.endpoint || "/predict", config.parameters || []);
+            const [schemaKey, schemaValue] = Object.entries(response_schema)[0] || [];
+            if (!schemaKey || !schemaValue) throw new Error("Invalid schema");
+            return { type: schemaKey, value: schemaValue.parse(result.data) } as LLMResponse<T>;
+        }
+
         const config: ConstructorParameters<typeof OpenAI>[0] = {
             apiKey: this.model.apiKey,
         };
-        const provider = this.model.provider;
         switch (provider) {
             case "OPEN_AI":
                 break;
