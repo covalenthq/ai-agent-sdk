@@ -2,11 +2,11 @@ import { Agent } from "../../agent";
 import { user } from "../../base";
 import { StateFn } from "../../state";
 import { runToolCalls } from "../base";
-import { TwitterAccountDetailsTool } from "./account-details";
-import { TwitterAccountMentionsTool } from "./account-mentions";
 import type { TwitterToolConfig } from "./base";
-import { TwitterPostTweetTool } from "./post-tweet";
-import { TwitterPostTweetReplyTool } from "./post-tweet-reply";
+import { TwitterAccountDetailsTool } from "./twitter-account-details";
+import { TwitterAccountMentionsTool } from "./twitter-account-mentions";
+import { TwitterPostTweetTool } from "./twitter-post-tweet";
+import { TwitterPostTweetReplyTool } from "./twitter-post-tweet-reply";
 import "dotenv/config";
 import type { ChatCompletionAssistantMessageParam } from "openai/resources";
 import { beforeAll, describe, expect, test } from "vitest";
@@ -51,8 +51,8 @@ describe("Twitter Tools Test Suite", () => {
         return new Agent({
             name: "twitter-agent",
             model: {
-                provider: "OPEN_AI",
-                name: "gpt-4o-mini",
+                provider: "GEMINI",
+                name: "gemini-1.5-flash",
             },
             description,
             instructions,
