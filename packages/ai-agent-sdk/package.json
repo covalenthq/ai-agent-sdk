@@ -1,6 +1,6 @@
 {
     "name": "@covalenthq/ai-agent-sdk",
-    "version": "0.2.5",
+    "version": "0.2.6",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -44,6 +44,7 @@
         "build": "tsc",
         "clean": "rm -rf dist",
         "prepublishOnly": "cp ../../README.md . && npm run clean && npm run build",
+        "postpublish": "rm -f ./README.md",
         "lint": "eslint .",
         "pretty": "prettier . --write"
     },

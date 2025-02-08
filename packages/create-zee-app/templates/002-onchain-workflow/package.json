@@ -1,0 +1,42 @@
+{
+    "name": "onchain-workflow-template",
+    "version": "0.2.5",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "ts-node src/index.ts"
+    },
+    "keywords": [
+        "blockchain",
+        "cryptocurrency",
+        "web3",
+        "blockchain-data",
+        "ai-agent",
+        "ai-agents-framework",
+        "zero-employee-enterprise",
+        "zee",
+        "autonomous-agents",
+        "autonomous-agent-framework",
+        "autonomous-agent-sdk",
+        "ai-agent-sdk"
+    ],
+    "author": "covalenthq",
+    "homepage": "https://cxt.build/docs/overview",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/covalenthq/ai-agent-sdk.git"
+    },
+    "bugs": {
+        "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
+    },
+    "license": "MIT",
+    "description": "A template for creating a new onchain workflow using the AI Agent SDK. Showcasing the use of various GoldRush Tools.",
+    "devDependencies": {
+        "ts-node": "^10.9.2",
+        "typescript": "^5.7.3"
+    },
+    "dependencies": {
+        "dotenv": "^16.4.7",
+        "@covalenthq/ai-agent-sdk": "^0.2.0"
+    }
+}

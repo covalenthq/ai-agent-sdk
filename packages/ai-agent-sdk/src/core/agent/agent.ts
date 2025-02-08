@@ -140,7 +140,7 @@ export const router = () =>
                 5. Use context from completed tasks to inform next steps
               `),
                 assistant("What is the request?"),
-                workflowRequest as any,
+                workflowRequest!,
 
                 ...(_messages.length > 0
                     ? [
@@ -249,6 +249,51 @@ export const resource_planner = (agents: Record<AgentName, Agent>) =>
             }
 
             return StateFn.passdown(state, result.value.agent);
+        },
+    });
+
+export const endgame = () =>
+    new Agent({
+        name: "endgame",
+        description: "",
+        model: {
+            provider: "OPEN_AI",
+            name: "gpt-4o-mini",
+        },
+
+        runFn: async (agent: Agent, state) => {
+            const messages = [
+                    system("maxIterations limit hit"),
+                    user(
+                        "Please summarize all previously executed steps and do your best to achieve the main goal while responding with the final answer."
+                    ),
+                ],
+                schema = {
+                    task_result: z.object({
+                        final_answer: z
+                            .string()
+                            .describe("The final result of the task"),
+                    }),
+                };
+
+            const result = await agent.generate(messages, schema);
+            if (!("final_answer" in result.value)) {
+                return StateFn.finish(
+                    state,
+                    assistant("Failed to get final answer")
+                );
+            }
+
+            if (result.type !== "task_result") {
+                throw new Error(
+                    "Expected task_result response, got " + result.type
+                );
+            }
+
+            return StateFn.finish(
+                state,
+                assistant(result.value["final_answer"])
+            );
         },
     });
 
