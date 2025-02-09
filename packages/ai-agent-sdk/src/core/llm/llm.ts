@@ -1,6 +1,12 @@
 import { Base } from "../base";
 import type { Tool } from "../tools/base";
-import type { FunctionToolCall, LLMResponse, ModelConfig } from "./llm.types";
+import type {
+    FunctionToolCall,
+    LLMResponse,
+    ModelConfig,
+    OllamaResponse,
+    FormattedResponse,
+} from "./llm.types";
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type {
@@ -83,6 +89,107 @@ export class LLM extends Base {
                 config.apiKey =
                     process.env["GEMINI_API_KEY"] || this.model.apiKey;
                 break;
+            case "OLLAMA": {
+                config.baseURL =
+                    process.env["OLLAMA_BASE_URL"] ||
+                    this.model.baseURL ||
+                    "http://localhost:11434";
+
+                try {
+                    const response = await fetch(`${config.baseURL}/api/chat`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            model: this.model.name,
+                            messages: messages.map((msg) => ({
+                                role: msg.role,
+                                content:
+                                    typeof msg.content === "string"
+                                        ? msg.content
+                                        : "",
+                            })),
+                            stream: true,
+                        }),
+                    });
+
+                    if (!response.ok || !response.body) {
+                        throw new Error(
+                            `Ollama API error: ${response.statusText}`
+                        );
+                    }
+
+                    const reader = response.body.getReader();
+                    let fullContent = "";
+
+                    try {
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) break;
+
+                            const chunk = new TextDecoder().decode(value);
+                            const lines = chunk.split("\n");
+
+                            for (const line of lines) {
+                                if (line.trim()) {
+                                    try {
+                                        const json = JSON.parse(
+                                            line
+                                        ) as OllamaResponse;
+                                        if (json.message?.content) {
+                                            fullContent += json.message.content;
+                                        }
+                                    } catch (e) {
+                                        // ignore parse errors
+                                    }
+                                }
+                            }
+                        }
+                    } finally {
+                        reader.releaseLock();
+                    }
+
+                    const formatResponse = (
+                        content: string
+                    ): FormattedResponse => {
+                        const parts = content.split("</think>");
+                        const thinking =
+                            parts.length > 1 && parts[0]
+                                ? parts[0].replace("<think>", "").trim()
+                                : "";
+                        const response =
+                            parts.length > 1
+                                ? parts[1]?.trim() || content.trim()
+                                : content.trim();
+
+                        return { thinking, response };
+                    };
+
+                    const formattedContent = formatResponse(fullContent);
+
+                    return {
+                        type: "content" as keyof T,
+                        value: {
+                            result: {
+                                role: "assistant",
+                                content: {
+                                    thinking: formattedContent.thinking,
+                                    answer: formattedContent.response,
+                                },
+                            },
+                            status: "finished",
+                            children: [],
+                        },
+                    } as LLMResponse<T>;
+                } catch (error) {
+                    const errorMessage =
+                        error instanceof Error
+                            ? error.message
+                            : "Unknown error";
+                    throw new Error(`Ollama API error: ${errorMessage}`);
+                }
+            }
             default:
                 var _exhaustiveCheck: never = provider;
                 throw new Error(
