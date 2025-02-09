@@ -11,6 +11,7 @@ const llm = new LLM({
     provider: "OPEN_AI",
     name: "gpt-4o-mini",
     apiKey: process.env.OPENAI_API_KEY,
+    temperature: 0.7
 });
 
 // Example with Ollama
@@ -96,77 +97,69 @@ OLLAMA_BASE_URL=http://localhost:11434  # Optional
 
 </CodeGroup>
 
-## Using Local Models with Ollama
 
-To use Ollama with the SDK:
 
-1. Install Ollama from [ollama.ai](https://ollama.ai)
-2. Start the Ollama service:
-```bash
-ollama serve
-```
-3. Pull your desired model:
-```bash
-ollama pull llama2  # or any other model
-```
-4. Configure your agent to use Ollama:
+=======
+## Use Cases
+
+### Image Analysis
+
+LLMs can also process images along with text using image URL messages. Here's an example of analyzing an image using the LLM:
+
 ```typescript
-const agent = new Agent({
-    name: "LocalAgent",
-    model: {
-        provider: "OLLAMA",
-        name: "llama2",  // use the model name you pulled
-        baseURL: "http://localhost:11434", // optional
-    },
-    description: "A locally-running AI assistant",
-});
-```
-
-### Response Format
-When using the SDK, you'll receive responses in the following structured format:
-
-1. Complete Response Object:
-```json
-{
-  "agent": "router",
-  "messages": [
+const messages = [
     {
-      "role": "user",
-      "content": "Your input message here"
+        role: "user",
+        content: [
+            {
+                type: "text",
+                text: "What's in this image? Analyze the logo and suggest improvements.",
+            },
+            {
+                type: "image_url",
+                image_url: {
+                    url: "https://example.com/logo.png",
+                    detail: "auto",
+                },
+            },
+        ],
     },
-    {
-      "role": "assistant",
-      "content": {
-        "thinking": "Detailed thought process...",
-        "answer": "Final response..."
-      }
-    }
-  ],
-  "status": "finished",
-  "children": []
-}
+];
+
+const schema = {
+    analysis: z.object({
+        description: z.string(),
+        colors: z.array(z.string()),
+        text_content: z.string().optional(),
+        improvements: z.string().optional(),
+    }),
+};
+
+const result = await llm.generate(messages, schema, {});
 ```
 
-2. Assistant Message Content Structure:
-```json
-{
-  "role": "assistant",
-  "content": {
-    "thinking": "Internal reasoning process that shows how the model arrived at its answer...",
-    "answer": "The final, concise response to the user's query..."
-  }
-}
-```
+The LLM will analyze the image and return a structured response containing the description, colors used, and potential improvements. You can also use base64-encoded images by providing the data URL:
 
-The response includes:
-- `thinking`: Detailed reasoning process (what the model is considering)
-- `answer`: The final, refined response
-- `status`: Completion status of the request
-- `children`: Array for nested responses (if any)
-
-You can access the latest response using:
 ```typescript
-const lastMessage = result.messages[result.messages.length - 1]?.content;
-console.log(lastMessage.content.thinking);  // Get thinking process
-console.log(lastMessage.content.answer);    // Get final answer
+const messages = [
+    {
+        role: "user",
+        content: [
+            {
+                type: "text",
+                text: "What's in this image and what color is it?",
+            },
+            {
+                type: "image_url",
+                image_url: {
+                    url: "data:image/png;base64,..." // Your base64 image data
+                    detail: "auto",
+                },
+            },
+        ],
+    },
+];
 ```
+
+Note: Image analysis is currently supported by OpenAI models. Some providers like Gemini may have limited or no support for image analysis.
+

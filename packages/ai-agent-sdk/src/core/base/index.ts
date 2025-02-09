@@ -14,8 +14,7 @@ export const logger = pino({
 
 export type MODULE = "agent" | "llm" | "tools" | "server" | "zee";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AnyZodType = ZodType<any>;
+export type AnyZodType = ZodType<unknown>;
 
 export class Base {
     private logger: pino.Logger;
@@ -26,7 +25,7 @@ export class Base {
         this.module = module;
     }
 
-    info(message: string, ...args: any[]) {
+    info(message: string, ...args: unknown[]) {
         // this.logger.info(`[${this.module}] ${message}`, ...args);
         console.log(`[${this.module}] ${message}`, ...args);
     }

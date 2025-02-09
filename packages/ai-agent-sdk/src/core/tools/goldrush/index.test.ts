@@ -1,18 +1,14 @@
 import { Agent } from "../../agent";
 import { user } from "../../base";
 import { StateFn } from "../../state";
-import type { Tool } from "../base";
+import { runToolCalls } from "../base";
 import { HistoricalTokenPriceTool } from "./historical-token-price";
 import { NFTBalancesTool } from "./nft-balances";
 import { TokenBalancesTool } from "./token-balances";
 import { TransactionsTool } from "./transactions";
 import "dotenv/config";
-import type {
-    ChatCompletionToolMessageParam,
-    ChatCompletionAssistantMessageParam,
-} from "openai/resources";
-import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
-import { expect, test, beforeAll } from "vitest";
+import type { ChatCompletionAssistantMessageParam } from "openai/resources";
+import { beforeAll, expect, test } from "vitest";
 
 let apiKey: string;
 
@@ -398,33 +394,3 @@ test("analyze wallet balances and suggest token swaps based on historical prices
         finalResult.messages[finalResult.messages.length - 1]?.content
     );
 });
-
-async function runToolCalls(
-    tools: Record<string, Tool>,
-    toolCalls: ParsedFunctionToolCall[]
-): Promise<ChatCompletionToolMessageParam[]> {
-    const results = await Promise.all(
-        toolCalls.map(async (tc) => {
-            if (tc.type !== "function") {
-                throw new Error("Tool call needs to be a function");
-            }
-
-            const tool = tools[tc.function.name];
-            if (!tool) {
-                throw new Error(`Tool ${tc.function.name} not found`);
-            }
-
-            const response = await tool.execute(
-                JSON.parse(tc.function.arguments)
-            );
-
-            return {
-                role: "tool",
-                tool_call_id: tc.id,
-                content: response,
-            } satisfies ChatCompletionToolMessageParam;
-        })
-    );
-
-    return results;
-}

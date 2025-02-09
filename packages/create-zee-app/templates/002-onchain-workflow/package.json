@@ -1,5 +1,5 @@
 {
-    "name": "create-zee-app-template",
+    "name": "onchain-workflow-template",
     "version": "0.2.5",
     "main": "index.js",
     "scripts": {
@@ -30,7 +30,7 @@
         "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
     },
     "license": "MIT",
-    "description": "A barebones template for creating a new ZEE application.",
+    "description": "A template for creating a new onchain workflow using the AI Agent SDK. Showcasing the use of various GoldRush Tools.",
     "devDependencies": {
         "ts-node": "^10.9.2",
         "typescript": "^5.7.3"

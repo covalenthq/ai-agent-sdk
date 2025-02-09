@@ -1,6 +1,6 @@
 {
     "name": "@covalenthq/ai-agent-sdk",
-    "version": "0.2.2",
+    "version": "0.2.6",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -25,8 +25,8 @@
         "autonomous-agent-sdk",
         "ai-agent-sdk"
     ],
-    "author": "Covalent",
-    "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+    "author": "covalenthq",
+    "homepage": "https://cxt.build/docs/overview",
     "repository": {
         "type": "git",
         "url": "https://github.com/covalenthq/ai-agent-sdk.git"
@@ -36,9 +36,14 @@
     },
     "scripts": {
         "test": "vitest",
+        "test:agent": "vitest src/core/agent/agent.test.ts",
+        "test:llm": "vitest src/core/llm/llm.test.ts",
+        "test:tools:goldrush": "vitest src/core/tools/goldrush/index.test.ts",
+        "test:zee": "vitest src/core/zee/zee.test.ts",
         "build": "tsc",
         "clean": "rm -rf dist",
         "prepublishOnly": "cp ../../README.md . && npm run clean && npm run build",
+        "postpublish": "rm -f ./README.md",
         "lint": "eslint .",
         "pretty": "prettier . --write"
     },
@@ -56,6 +61,7 @@
     "devDependencies": {
         "@types/node": "^22.10.7",
         "node-fetch": "^3.3.2",
+        "prettier": "^3.4.2",
         "vitest": "^3.0.2"
     }
 }
