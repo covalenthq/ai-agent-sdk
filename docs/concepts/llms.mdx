@@ -11,22 +11,7 @@ const llm = new LLM({
     provider: "OPEN_AI",
     name: "gpt-4o-mini",
     apiKey: process.env.OPENAI_API_KEY,
-    temperature: 0.7
-});
-
-// Example with Ollama
-const llm = new LLM({
-    provider: "OLLAMA",
-    name: "llama2", // or any model you've pulled in Ollama
-    baseURL: "http://localhost:11434", // optional, defaults to this
-});
-
-// Example with Ollama with all options
-const llm = new LLM({
-    provider: "OLLAMA",
-    name: "llama2",             // any model you've pulled in Ollama
-    baseURL: "http://localhost:11434", // optional, defaults to this
-    toolChoice: "auto",         // optional
+    temperature: 0.7,
 });
 ```
 
@@ -60,15 +45,6 @@ const llm = new LLM({
 "gemini-1.5-pro"
 ```
 
-```plaintext Ollama
-Any model name that you have pulled in Ollama
-Examples:
-"llama2"
-"codellama"
-"mistral"
-"neural-chat"
-```
-
 </CodeGroup>
 
 ## Environment Variables
@@ -91,15 +67,8 @@ GROK_API_KEY
 GEMINI_API_KEY
 ```
 
-```plaintext Ollama
-OLLAMA_BASE_URL=http://localhost:11434  # Optional
-```
-
 </CodeGroup>
 
-
-
-=======
 ## Use Cases
 
 ### Image Analysis
@@ -163,3 +132,36 @@ const messages = [
 
 Note: Image analysis is currently supported by OpenAI models. Some providers like Gemini may have limited or no support for image analysis.
 
+## Experimental Features
+
+### Ollama Integration
+
+Ollama integration enables you to use locally hosted language models through Ollama's API. This experimental feature provides a way to run AI models on your own infrastructure.
+
+#### Basic Usage
+
+```tsx
+const llm = new LLM({
+    provider: "OLLAMA",
+    name: "llama2", // or any model you've pulled in Ollama
+    baseURL: "http://localhost:11434", // optional, defaults to this
+});
+```
+
+
+### Supported Models
+
+```plaintext Ollama
+Any model name that you have pulled in Ollama
+Examples:
+"llama2"
+"codellama"
+"mistral"
+"neural-chat"
+```
+
+### Environment Variables
+
+```plaintext Ollama
+OLLAMA_BASE_URL=http://localhost:11434  # Optional
+```
