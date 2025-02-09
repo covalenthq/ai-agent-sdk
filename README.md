@@ -69,6 +69,7 @@ const zee = new ZeeWorkflow({
     console.log(result);
 })();
 ```
+The agent will automatically handle streaming responses and format them appropriately.
 
 ### Using Ollama with the SDK
 
@@ -83,10 +84,10 @@ const agent = new Agent({
         baseURL: "http://localhost:11434", // optional
     },
     description: "A locally-running AI assistant",
+    instructions:["answer the users questions "]
 });
 ```
 
-The agent will automatically handle streaming responses and format them appropriately.
 
 ## 🤝 Contributing
 
