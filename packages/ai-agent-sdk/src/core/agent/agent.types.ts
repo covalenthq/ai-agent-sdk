@@ -1,19 +1,18 @@
-import type { Agent } from ".";
-import type { ZeeWorkflowState } from "../state";
+import type {
+    GenerateTextParams,
+    LLMTextResponse,
+    ModelProvider,
+} from "../llm";
 import type { ToolSet } from "ai";
 
 export type AgentConfig = {
     name: string;
-    // model: ModelConfig;
-
+    model: ModelProvider;
     description: string;
     instructions?: string[];
-
     tools?: ToolSet;
-    runFn?: (
-        agent: Agent,
-        state: ZeeWorkflowState
-    ) => Promise<ZeeWorkflowState>;
 };
 
-export type AgentName = string;
+export type AgentParameters = Omit<GenerateTextParams, "prompt">;
+
+export type AgentResponse = LLMTextResponse;

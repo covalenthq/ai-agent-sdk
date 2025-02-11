@@ -3,13 +3,13 @@ import type {
     LLMParameters,
     LLMResponse,
     LLMStructuredResponse,
-    LLMToolResponse,
+    LLMTextResponse,
     ModelProvider,
 } from "./llm.types";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
-import { generateObject, generateText, type LanguageModel, tool } from "ai";
+import { generateObject, generateText, type LanguageModel } from "ai";
 import type { AnyZodObject, z } from "zod";
 
 export class LLM extends Base {
@@ -30,16 +30,17 @@ export class LLM extends Base {
         }
     }
 
-    public static createTool = tool;
-
     public async generate<ZOD_OBJECT extends AnyZodObject>(
-        args: LLMParameters
+        args: LLMParameters,
+        viaAgent: boolean = false
     ): Promise<LLMResponse<ZOD_OBJECT>> {
         try {
             const hasTools =
                 "tools" in args && Object.keys(args.tools ?? {}).length > 0;
 
-            if (hasTools) {
+            const isTextResponse = viaAgent || hasTools;
+
+            if (isTextResponse) {
                 const response = await generateText({
                     model: this.model,
                     toolChoice: "auto",
@@ -55,9 +56,9 @@ export class LLM extends Base {
                 }
 
                 return {
-                    type: "tool-result",
+                    type: "assistant",
                     value: response.text,
-                } as LLMToolResponse;
+                } as LLMTextResponse;
             } else {
                 const response = await generateObject<z.infer<ZOD_OBJECT>>({
                     model: this.model,

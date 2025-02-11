@@ -70,11 +70,14 @@ export type ModelProvider =
     | AnthropicModelProvider
     | GoogleModelProvider;
 
-type GenerateTextParams = Omit<Parameters<typeof generateText>[0], "model">;
-
-type GenerateObjectParams = Omit<
-    Parameters<typeof generateObject>[0],
+export type GenerateTextParams = Omit<
+    Parameters<typeof generateText>[0],
     "model"
+>;
+
+export type GenerateObjectParams = Omit<
+    Parameters<typeof generateObject>[0],
+    "model" | "schema"
 > & {
     schema: AnyZodObject;
 };
@@ -86,11 +89,11 @@ export interface LLMStructuredResponse<T extends AnyZodObject> {
     value: z.infer<T>;
 }
 
-export interface LLMToolResponse {
-    type: "tool-result";
+export interface LLMTextResponse {
+    type: "assistant";
     value: string;
 }
 
 export type LLMResponse<T extends AnyZodObject> =
     | LLMStructuredResponse<T>
-    | LLMToolResponse;
+    | LLMTextResponse;

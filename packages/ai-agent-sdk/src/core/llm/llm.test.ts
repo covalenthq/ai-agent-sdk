@@ -1,4 +1,5 @@
 import { LLM, type ModelProvider } from ".";
+import { createTool } from "../../functions";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
 
@@ -43,7 +44,7 @@ describe("@ai-agent-sdk/llm", () => {
                 const result = await llm.generate({
                     prompt: "What is the weather in San Francisco?",
                     tools: {
-                        weather: LLM.createTool({
+                        weather: createTool({
                             description: "Get the weather in a location",
                             parameters: z.object({
                                 location: z
@@ -63,10 +64,7 @@ describe("@ai-agent-sdk/llm", () => {
 
                 console.log(result);
 
-                if (result.type !== "tool-result") {
-                    throw new Error("Expected tool result");
-                }
-
+                expect(result.type).toBe("assistant");
                 expect(result.value).toBeDefined();
             });
 
