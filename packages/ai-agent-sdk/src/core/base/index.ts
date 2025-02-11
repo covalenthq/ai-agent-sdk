@@ -1,10 +1,9 @@
-import "dotenv/config";
 import type {
-    ChatCompletionAssistantMessageParam,
-    ChatCompletionMessageParam,
-    ChatCompletionSystemMessageParam,
-    ChatCompletionUserMessageParam,
-} from "openai/resources/chat/completions";
+    CoreAssistantMessage,
+    CoreSystemMessage,
+    CoreUserMessage,
+} from "ai";
+import "dotenv/config";
 import pino from "pino";
 
 export const logger = pino({
@@ -26,26 +25,25 @@ export class Base {
         // this.logger.info(`[${this.module}] ${message}`, ...args);
         console.log(`[${this.module}] ${message}`, ...args);
     }
+
+    public static user(content: string): CoreUserMessage {
+        return {
+            role: "user",
+            content,
+        };
+    }
+
+    public static assistant(content: string): CoreAssistantMessage {
+        return {
+            role: "assistant",
+            content,
+        };
+    }
+
+    public static system(content: string): CoreSystemMessage {
+        return {
+            role: "system",
+            content,
+        };
+    }
 }
-
-export const user = (content: string): ChatCompletionUserMessageParam => ({
-    role: "user",
-    content,
-});
-
-export const assistant = (
-    content: string
-): ChatCompletionAssistantMessageParam => ({
-    role: "assistant",
-    content,
-});
-
-export const system = (content: string): ChatCompletionSystemMessageParam => ({
-    role: "system",
-    content,
-});
-
-export type Conversation = [
-    ChatCompletionUserMessageParam,
-    ...ChatCompletionMessageParam[],
-];

@@ -1,7 +1,7 @@
 import type { AgentName } from "../agent";
-import { user } from "../base";
+import { Base } from "../base";
 import type { ZeeWorkflowState, ZeeWorkflowStateOptions } from "./state.types";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import type { CoreMessage } from "ai";
 
 export const StateFn = {
     childState: (options: ZeeWorkflowStateOptions): ZeeWorkflowState => {
@@ -18,7 +18,7 @@ export const StateFn = {
         return StateFn.childState({
             agent: "router",
             messages: [
-                user(
+                Base.user(
                     `Here is a description of my workflow: ${workflowDescription}`
                 ),
             ],
@@ -34,20 +34,23 @@ export const StateFn = {
 
     assign: (
         state: ZeeWorkflowState,
-        context: [AgentName, ChatCompletionMessageParam][]
+        context: [AgentName, CoreMessage][]
     ): ZeeWorkflowState => {
         return {
             ...state,
             status: "running",
             children: context.map(([agent, message]) =>
-                StateFn.childState({ agent, messages: [message] })
+                StateFn.childState({
+                    agent,
+                    messages: [message],
+                })
             ),
         };
     },
 
     finish: (
         state: ZeeWorkflowState,
-        agentResponse: ChatCompletionMessageParam
+        agentResponse: CoreMessage
     ): ZeeWorkflowState => {
         if (state.messages[0]) {
             return {

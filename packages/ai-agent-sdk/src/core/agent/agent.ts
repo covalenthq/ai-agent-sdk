@@ -1,56 +1,50 @@
 import type { AgentConfig, AgentName } from ".";
-import { assistant, Base, system, user } from "../base";
+import { Base } from "../base";
 import { LLM } from "../llm";
 import { StateFn, type ZeeWorkflowState } from "../state";
-import type { Tool } from "../tools/tool";
-import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import type { CoreMessage, ToolSet } from "ai";
 import z, { type AnyZodObject } from "zod";
 
 export class Agent extends Base {
-    private config: AgentConfig;
-    private llm: LLM;
-    private _tools: Record<AgentName, Tool>;
+    private _config: AgentConfig;
+    private _llm: LLM;
+    private _tools: ToolSet;
     constructor(config: AgentConfig) {
         super("agent");
-        this.config = config;
-        this.llm = new LLM();
+        this._config = config;
+        this._llm = new LLM();
         this._tools = config.tools || {};
     }
 
     get description() {
-        return this.config.description;
+        return this._config.description;
     }
 
     get instructions() {
-        return this.config.instructions;
+        return this._config.instructions;
     }
 
-    get tools(): Record<AgentName, Tool> {
+    get tools() {
         return this._tools;
     }
 
     async generate<T extends Record<string, AnyZodObject>>(
-        messages: ChatCompletionMessageParam[],
+        messages: CoreMessage[],
         response_schema: T
     ) {
-        return this.llm.generate(messages, response_schema, this.tools);
+        return this._llm.generate(messages, response_schema, this.tools);
     }
 
     async run(state: ZeeWorkflowState = StateFn.root(this.description)) {
-        return this.config.runFn
-            ? this.config.runFn(this, state)
+        return this._config.runFn
+            ? this._config.runFn(this, state)
             : defaultFn(this, state);
     }
 }
 
-const getSteps = (conversation: ChatCompletionMessageParam[]) => {
+const getSteps = (conversation: CoreMessage[]) => {
     const messagePairs = conversation.reduce(
-        (
-            pairs: ChatCompletionMessageParam[][],
-            message: ChatCompletionMessageParam,
-            index: number
-        ) => {
+        (pairs: CoreMessage[][], message: CoreMessage, index: number) => {
             if (index % 2 === 0) {
                 pairs.push([message]);
             } else {
@@ -61,7 +55,7 @@ const getSteps = (conversation: ChatCompletionMessageParam[]) => {
         []
     );
     return messagePairs.map(([task, result]) =>
-        user(`
+        Base.user(`
           <step>
             <name>${task?.content}</name>
             <result>${result?.content}</result>
@@ -75,19 +69,19 @@ const defaultFn = async (
     state: ZeeWorkflowState
 ): Promise<ZeeWorkflowState> => {
     const messages = [
-        system(`
+        Base.system(`
             ${agent.description}
 
             Your job is to complete the assigned task:
               - You can break down complex tasks into multiple steps if needed.
               - You can use available tools if needed.
         `),
-        assistant("What have been done so far?"),
-        user(`Here is all the work done so far by other agents:`),
+        Base.assistant("What have been done so far?"),
+        Base.user(`Here is all the work done so far by other agents:`),
         ...getSteps(state.messages),
-        assistant("Is there anything else I need to know?"),
-        user("No, I do not have additional information"),
-        assistant("What is the request?"),
+        Base.assistant("Is there anything else I need to know?"),
+        Base.user("No, I do not have additional information"),
+        Base.assistant("What is the request?"),
         ...state.messages,
     ];
 
@@ -115,9 +109,15 @@ const defaultFn = async (
         }),
     };
 
-    const response = await agent.generate(messages, schema);
+    const data = await agent.generate(messages, schema);
 
-    if (response.type === "tool_call") {
+    // messages.push(Base.system("Parse the given data into the provided schema"));
+
+    const response = await new LLM().generate(messages, schema);
+
+    console.log(response);
+
+    if (data.type === "tool-result") {
         return {
             ...state,
             status: "paused",
@@ -125,15 +125,14 @@ const defaultFn = async (
                 ...state.messages,
                 {
                     role: "assistant",
-                    content: "",
-                    tool_calls: response.value as ParsedFunctionToolCall[],
+                    content: data.value,
                 },
             ],
         };
     }
 
-    const stepResponse = response.value as z.infer<typeof schema.step>;
-    const agentResponse = assistant(stepResponse.result);
+    const stepResponse = data.value as z.infer<typeof schema.step>;
+    const agentResponse = Base.assistant(stepResponse.result);
 
     if (stepResponse.has_next_step) {
         return {
@@ -142,7 +141,7 @@ const defaultFn = async (
             messages: [
                 ...state.messages,
                 agentResponse,
-                user(stepResponse.next_step),
+                Base.user(stepResponse.next_step),
             ],
         };
     }
@@ -156,16 +155,16 @@ export const router = () =>
     new Agent({
         name: "router",
         description: "You are a router that oversees the workflow.",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
+        // model: {
+        //     provider: "OPEN_AI",
+        //     name: "gpt-4o-mini",
+        // },
 
         runFn: async (agent: Agent, state) => {
             const [workflowRequest, ..._messages] = state.messages;
 
             const messages = [
-                system(`
+                Base.system(`
                 You are a planner that breaks down complex workflows into smaller, actionable steps.
                 Your job is to determine the next task that needs to be done based on the <workflow> and what has been completed so far.
 
@@ -176,12 +175,12 @@ export const router = () =>
                 4. Consider dependencies and order of operations
                 5. Use context from completed tasks to inform next steps
               `),
-                assistant("What is the request?"),
+                Base.assistant("What is the request?"),
                 workflowRequest!,
 
                 ...(_messages.length > 0
                     ? [
-                          assistant("What has been completed so far?"),
+                          Base.assistant("What has been completed so far?"),
                           ...getSteps(_messages),
                       ]
                     : []),
@@ -215,7 +214,7 @@ export const router = () =>
 
                 if (result.value["task"]) {
                     const nextState = StateFn.assign(state, [
-                        ["resource_planner", user(result.value["task"])],
+                        ["resource_planner", Base.user(result.value["task"])],
                     ]);
                     return nextState;
                 }
@@ -236,10 +235,10 @@ export const resource_planner = (agents: Record<AgentName, Agent>) =>
     new Agent({
         name: "resource_planner",
         description: "You are a resource planner.",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
+        // model: {
+        //     provider: "OPEN_AI",
+        //     name: "gpt-4o-mini",
+        // },
         runFn: async (agent: Agent, state) => {
             const agents_description = Object.entries(agents)
                 .map(
@@ -249,7 +248,7 @@ export const resource_planner = (agents: Record<AgentName, Agent>) =>
                 .join("");
 
             const messages = [
-                system(`
+                Base.system(`
             You are an agent selector that matches tasks to the most capable agent.
             Analyze the task requirements and each agent's capabilities to select the best match.
 
@@ -259,12 +258,12 @@ export const resource_planner = (agents: Record<AgentName, Agent>) =>
             3. Model capabilities
             4. Previous task context if available
               `),
-                user(`Here are the available agents:
+                Base.user(`Here are the available agents:
             <agents>
                 ${agents_description}
             </agents>
     `),
-                assistant("What is the task?"),
+                Base.assistant("What is the task?"),
                 ...state.messages,
             ];
 

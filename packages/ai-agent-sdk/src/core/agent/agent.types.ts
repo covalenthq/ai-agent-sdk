@@ -1,16 +1,15 @@
 import type { Agent } from ".";
-import type { ModelConfig } from "../llm";
-import type { ZeeWorkflowState } from "../state/state";
-import type { Tool } from "../tools/tool";
+import type { ZeeWorkflowState } from "../state";
+import type { ToolSet } from "ai";
 
 export type AgentConfig = {
     name: string;
-    model: ModelConfig;
+    // model: ModelConfig;
 
     description: string;
     instructions?: string[];
 
-    tools?: Record<AgentName, Tool>;
+    tools?: ToolSet;
     runFn?: (
         agent: Agent,
         state: ZeeWorkflowState

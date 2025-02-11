@@ -1,5 +1,5 @@
 import type { AgentName } from "../agent";
-import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import type { CoreMessage } from "ai";
 
 export type ZeeWorkflowStatus =
     | "idle"
@@ -10,7 +10,7 @@ export type ZeeWorkflowStatus =
 
 export type ZeeWorkflowStateOptions = {
     agent: AgentName;
-    messages: ChatCompletionMessageParam[];
+    messages: CoreMessage[];
     status?: ZeeWorkflowStatus;
     children?: ZeeWorkflowState[];
 };

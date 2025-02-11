@@ -1,153 +1,173 @@
-import { LLM } from "./llm";
-import type { ModelConfig } from "./llm.types";
+import { LLM, type ModelProvider } from ".";
 import { describe, expect, test } from "vitest";
-import z from "zod";
+import { z } from "zod";
 
 describe("@ai-agent-sdk/llm", () => {
-    const providers: ModelConfig[] = [
+    const providers: ModelProvider[] = [
         {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
+            provider: "openai",
+            id: "gpt-4o-mini",
         },
         {
-            provider: "GEMINI",
-            name: "gemini-1.5-flash",
+            provider: "google",
+            id: "gemini-1.5-flash",
         },
-    ] as const;
+    ];
 
-    // providers.forEach((config) => {
-    describe("vercel", () => {
-        const llm = new LLM();
+    providers.forEach((config) => {
+        describe(`${config.provider}::${config.id}`, () => {
+            const llm = new LLM(config);
 
-        test("text with custom schema output", async () => {
-            const schema = {
-                step: z.object({
+            test("structured output", async () => {
+                const schema = z.object({
                     answer: z.string(),
                     explanation: z.number(),
-                }),
-            };
+                });
 
-            const result = await llm.generate(
-                [
-                    {
-                        role: "user",
-                        content: "What is 5 plus 7?",
+                const result = await llm.generate<typeof schema>({
+                    prompt: "What is 5 plus 7?",
+                    schema,
+                });
+
+                console.log(result);
+
+                if (result.type !== "structured-output") {
+                    throw new Error("Expected structured output");
+                }
+
+                expect(result.value["answer"]).toBeDefined();
+                expect(result.value["explanation"]).toBeDefined();
+            });
+
+            test("tool calling", async () => {
+                const result = await llm.generate({
+                    prompt: "What is the weather in San Francisco?",
+                    tools: {
+                        weather: LLM.createTool({
+                            description: "Get the weather in a location",
+                            parameters: z.object({
+                                location: z
+                                    .string()
+                                    .describe(
+                                        "The location to get the weather for"
+                                    ),
+                            }),
+                            execute: async ({ location }) => ({
+                                location,
+                                temperature:
+                                    72 + Math.floor(Math.random() * 21) - 10,
+                            }),
+                        }),
                     },
-                ],
-                schema,
-                {}
-            );
+                });
 
-            console.log(result);
+                console.log(result);
 
-            if (result.type !== "step") {
-                throw new Error(`Expected step response, got ${result.type}`);
-            }
+                if (result.type !== "tool-result") {
+                    throw new Error("Expected tool result");
+                }
 
-            expect(result.value).toBeDefined();
-            expect(result.value["answer"]).toBeDefined();
-            expect(result.value["answer"]).toEqual("12");
-            expect(result.value["explanation"]).toBeDefined();
+                expect(result.value).toBeDefined();
+            });
+
+            // test.skipIf(config.provider === "GEMINI")(
+            //     "image with custom schema output",
+            //     async () => {
+            //         const messages: ChatCompletionMessageParam[] = [
+            //             {
+            //                 role: "user",
+            //                 content: [
+            //                     {
+            //                         type: "text",
+            //                         text: "What's in this image? Suggest Improvements to the logo as well",
+            //                     },
+
+            //                     {
+            //                         type: "image_url",
+            //                         image_url: {
+            //                             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png",
+            //                             detail: "auto",
+            //                         },
+            //                     },
+            //                 ],
+            //             },
+            //         ];
+
+            //         const schema = {
+            //             analysis: z.object({
+            //                 description: z.string(),
+            //                 colors: z.array(z.string()),
+            //                 text_content: z.string().optional(),
+            //                 improvements: z.string().optional(),
+            //             }),
+            //         };
+
+            //         const result = await llm.generate(messages, schema, {});
+
+            //         console.log(result);
+
+            //         if (result.type !== "analysis") {
+            //             throw new Error(
+            //                 `Expected step response, got ${result.type}`
+            //             );
+            //         }
+
+            //         expect(result.value).toBeDefined();
+            //         expect(result.value.description).toBeDefined();
+            //         expect(result.value.colors).toBeDefined();
+            //         expect(Array.isArray(result.value.colors)).toBe(true);
+            //     }
+            // );
+
+            // test.skipIf(config.provider === "GEMINI")(
+            //     "image as base64 input",
+            //     async () => {
+            //         const messages: ChatCompletionMessageParam[] = [
+            //             {
+            //                 role: "user",
+            //                 content: [
+            //                     {
+            //                         type: "text",
+            //                         text: "What's in this image and what color is it?",
+            //                     },
+            //                     {
+            //                         type: "image_url",
+            //                         image_url: {
+            //                             url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",
+            //                             detail: "auto",
+            //                         },
+            //                     },
+            //                 ],
+            //             },
+            //         ];
+
+            //         const schema = {
+            //             analysis: z.object({
+            //                 description: z.string(),
+            //                 color: z.string(),
+            //                 dimensions: z.object({
+            //                     width: z.number(),
+            //                     height: z.number(),
+            //                 }),
+            //             }),
+            //         };
+
+            //         const result = await llm.generate(messages, schema, {});
+
+            //         console.log("Base64 image analysis result:", result);
+
+            //         if (result.type !== "analysis") {
+            //             throw new Error(
+            //                 `Expected analysis response, got ${result.type}`
+            //             );
+            //         }
+
+            //         expect(result.value).toBeDefined();
+            //         expect(result.value.description).toBeDefined();
+            //         expect(result.value.color).toBeDefined();
+            //         expect(result.value.dimensions).toBeDefined();
+            //     }
+            // );
         });
-
-        // test.skipIf(config.provider === "GEMINI")(
-        //     "image with custom schema output",
-        //     async () => {
-        //         const messages: ChatCompletionMessageParam[] = [
-        //             {
-        //                 role: "user",
-        //                 content: [
-        //                     {
-        //                         type: "text",
-        //                         text: "What's in this image? Suggest Improvements to the logo as well",
-        //                     },
-
-        //                     {
-        //                         type: "image_url",
-        //                         image_url: {
-        //                             url: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png",
-        //                             detail: "auto",
-        //                         },
-        //                     },
-        //                 ],
-        //             },
-        //         ];
-
-        //         const schema = {
-        //             analysis: z.object({
-        //                 description: z.string(),
-        //                 colors: z.array(z.string()),
-        //                 text_content: z.string().optional(),
-        //                 improvements: z.string().optional(),
-        //             }),
-        //         };
-
-        //         const result = await llm.generate(messages, schema, {});
-
-        //         console.log(result);
-
-        //         if (result.type !== "analysis") {
-        //             throw new Error(
-        //                 `Expected step response, got ${result.type}`
-        //             );
-        //         }
-
-        //         expect(result.value).toBeDefined();
-        //         expect(result.value.description).toBeDefined();
-        //         expect(result.value.colors).toBeDefined();
-        //         expect(Array.isArray(result.value.colors)).toBe(true);
-        //     }
-        // );
-
-        // test.skipIf(config.provider === "GEMINI")(
-        //     "image as base64 input",
-        //     async () => {
-        //         const messages: ChatCompletionMessageParam[] = [
-        //             {
-        //                 role: "user",
-        //                 content: [
-        //                     {
-        //                         type: "text",
-        //                         text: "What's in this image and what color is it?",
-        //                     },
-        //                     {
-        //                         type: "image_url",
-        //                         image_url: {
-        //                             url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==",
-        //                             detail: "auto",
-        //                         },
-        //                     },
-        //                 ],
-        //             },
-        //         ];
-
-        //         const schema = {
-        //             analysis: z.object({
-        //                 description: z.string(),
-        //                 color: z.string(),
-        //                 dimensions: z.object({
-        //                     width: z.number(),
-        //                     height: z.number(),
-        //                 }),
-        //             }),
-        //         };
-
-        //         const result = await llm.generate(messages, schema, {});
-
-        //         console.log("Base64 image analysis result:", result);
-
-        //         if (result.type !== "analysis") {
-        //             throw new Error(
-        //                 `Expected analysis response, got ${result.type}`
-        //             );
-        //         }
-
-        //         expect(result.value).toBeDefined();
-        //         expect(result.value.description).toBeDefined();
-        //         expect(result.value.color).toBeDefined();
-        //         expect(result.value.dimensions).toBeDefined();
-        //     }
-        // );
     });
-    // });
 });

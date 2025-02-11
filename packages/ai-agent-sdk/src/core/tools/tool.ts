@@ -1,20 +1,16 @@
-import type { ToolOptions } from "./tool.types";
-import type { ChatCompletionToolMessageParam } from "openai/resources";
-import type { ParsedFunctionToolCall } from "openai/resources/beta/chat/completions";
 import type { AnyZodObject } from "zod";
 
 export class Tool {
     private id: string;
     private _schema: AnyZodObject;
     private _description: string;
-
-    private _execute: (parameters: unknown) => Promise<string>;
+    private _execute: (parameters: unknown) => Promise<unknown>;
 
     constructor(
         id: string,
         description: string,
         schema: AnyZodObject,
-        execute: (parameters: unknown) => Promise<string>
+        execute: (parameters: unknown) => Promise<unknown>
     ) {
         this.id = id;
         this._description = description;
@@ -30,46 +26,8 @@ export class Tool {
         return this._schema;
     }
 
-    execute(parameters: unknown) {
-        return this._execute(parameters);
+    async execute(parameters: unknown) {
+        const result = await this._execute(parameters);
+        return typeof result === "string" ? result : JSON.stringify(result);
     }
 }
-
-export const createTool = (options: ToolOptions) => {
-    return new Tool(
-        options.id,
-        options.description,
-        options.schema,
-        options.execute
-    );
-};
-
-export const runToolCalls = async (
-    tools: Record<string, Tool>,
-    toolCalls: ParsedFunctionToolCall[]
-): Promise<ChatCompletionToolMessageParam[]> => {
-    const results = await Promise.all(
-        toolCalls.map(async (tc) => {
-            if (tc.type !== "function") {
-                throw new Error("Tool call needs to be a function");
-            }
-
-            const tool = tools[tc.function.name];
-            if (!tool) {
-                throw new Error(`Tool ${tc.function.name} not found`);
-            }
-
-            const response = await tool.execute(
-                JSON.parse(tc.function.arguments)
-            );
-
-            return {
-                role: "tool",
-                tool_call_id: tc.id,
-                content: response,
-            } satisfies ChatCompletionToolMessageParam;
-        })
-    );
-
-    return results;
-};

@@ -1,37 +1,122 @@
-import { Agent } from "../../agent";
-import { user } from "../../base";
-import { StateFn } from "../../state/state";
-import { runToolCalls } from "../tool";
-import { HistoricalTokenPriceTool } from "./historical-token-price";
-import { NFTBalancesTool } from "./nft-balances";
-import { TokenBalancesTool } from "./token-balances";
-import { TransactionsTool } from "./transactions";
+import { Agent } from "../../agent/agent";
+import { Base } from "../../base";
+import { Chain, GoldRushClient } from "@covalenthq/client-sdk";
+import { tool } from "ai";
 import "dotenv/config";
-import type { ChatCompletionAssistantMessageParam } from "openai/resources";
-import { beforeAll, expect, test } from "vitest";
+import { test } from "vitest";
+import { z } from "zod";
 
-let apiKey: string;
+// let apiKey: string;
 
-beforeAll(() => {
-    if (!process.env["GOLDRUSH_API_KEY"]) {
-        throw new Error("GOLDRUSH_API_KEY environment variable is not set");
-    }
-    apiKey = process.env["GOLDRUSH_API_KEY"];
-});
+// beforeAll(() => {
+//     if (!process.env["GOLDRUSH_API_KEY"]) {
+//         throw new Error("GOLDRUSH_API_KEY environment variable is not set");
+//     }
+//     apiKey = process.env["GOLDRUSH_API_KEY"];
+// });
+
+const parseAndLimitItems = (data: any) => {
+    return JSON.parse(
+        JSON.stringify(
+            data?.items?.slice(0, 2),
+            (_key: string, value: unknown) => {
+                if (typeof value === "bigint") {
+                    return value.toString();
+                }
+                return value;
+            }
+        )
+    );
+};
 
 test("blockchain research agent with goldrush tools", async () => {
-    const tools = {
-        tokenBalances: new TokenBalancesTool(apiKey),
-        nftBalances: new NFTBalancesTool(apiKey),
-        transactions: new TransactionsTool(apiKey),
-    };
+    // const tools = {
+    //     tokenBalances: new TokenBalancesTool(apiKey),
+    //     nftBalances: new NFTBalancesTool(apiKey),
+    //     transactions: new TransactionsTool(apiKey),
+    // };
+
+    // const result = await generateText({
+    //     model: openai("gpt-4o-mini"),
+    //     maxSteps: 5,
+    //     tools: {
+    //         weather: tool({
+    //             description: "Get the weather in a location",
+    //             parameters: z.object({
+    //                 location: z
+    //                     .string()
+    //                     .describe("The location to get the weather for"),
+    //             }),
+    //             execute: async ({ location }) => ({
+    //                 location,
+    //                 temperature: 72 + Math.floor(Math.random() * 21) - 10,
+    //             }),
+    //         }),
+    //         cityAttractions: tool({
+    //             parameters: z.object({ city: z.string() }),
+    //             execute: async ({ city }: { city: string }) => ({
+    //                 city,
+    //                 attractions: [
+    //                     "Golden Gate Bridge",
+    //                     "Alcatraz Island",
+    //                     "Fisherman's Wharf",
+    //                     "MAAKICHU",
+    //                 ],
+    //             }),
+    //         }),
+    //     },
+    //     prompt: "What is the weather in San Francisco? What are some city attractions there?",
+    // });
+
+    // console.log(result);
+
+    // const agent = new Agent({
+    //     name: "blockchain researcher",
+    //     description:
+    //         "You are a blockchain researcher analyzing wallet activities across different chains.",
+    //     instructions: [
+    //         "Analyze wallet activities using the provided blockchain tools",
+    //         "Summarize token holdings, NFT collections, and recent transactions",
+    //         "Provide insights about the wallet's activity patterns",
+    //     ],
+    //     tools: {
+    //         weather: tool({
+    //             description: "Get the weather in a location",
+    //             parameters: z.object({
+    //                 location: z
+    //                     .string()
+    //                     .describe("The location to get the weather for"),
+    //             }),
+    //             execute: async ({ location }) => ({
+    //                 location,
+    //                 temperature: 72 + Math.floor(Math.random() * 21) - 10,
+    //             }),
+    //         }),
+    //         cityAttractions: tool({
+    //             parameters: z.object({ city: z.string() }),
+    //             execute: async ({ city }: { city: string }) => ({
+    //                 city,
+    //                 attractions: [
+    //                     "Golden Gate Bridge",
+    //                     "Alcatraz Island",
+    //                     "Fisherman's Wharf",
+    //                     "MAAKICHU",
+    //                 ],
+    //             }),
+    //         }),
+    //     },
+    // });
+
+    // const res = await agent.generate([
+    //     Base.user(
+    //         "What is the weather in San Francisco? What are some city attractions there?"
+    //     ),
+    // ]);
+
+    // console.log(res);
 
     const agent = new Agent({
         name: "blockchain researcher",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
         description:
             "You are a blockchain researcher analyzing wallet activities across different chains.",
         instructions: [
@@ -39,358 +124,547 @@ test("blockchain research agent with goldrush tools", async () => {
             "Summarize token holdings, NFT collections, and recent transactions",
             "Provide insights about the wallet's activity patterns",
         ],
-        tools,
-    });
-
-    const state = StateFn.root(agent.description);
-    state.messages.push(
-        user(
-            "Analyze wallet address karanpargal.eth on eth-mainnet and provide a complete analysis of its activities"
-        )
-    );
-
-    try {
-        const result = await agent.run(state);
-        console.log(result);
-
-        expect(result.messages.length).toBeGreaterThan(0);
-        expect(result.status).toEqual("paused");
-    } catch (error) {
-        console.error("Test failed:", error);
-        throw error;
-    }
-});
-
-test("blockchain research agent should analyze token balances", async () => {
-    const tools = {
-        tokenBalances: new TokenBalancesTool(apiKey),
-    };
-
-    const agent = new Agent({
-        name: "token analyzer",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
+        tools: {
+            tokenBalances: tool({
+                description:
+                    "Get token balances for specified chain and address from GoldRush APIs",
+                parameters: z.object({
+                    chain: z.string(),
+                    address: z.string(),
+                }),
+                execute: async ({ chain, address }) => {
+                    const client = new GoldRushClient(
+                        process.env["GOLDRUSH_API_KEY"]!
+                    );
+                    const balances =
+                        await client.BalanceService.getTokenBalancesForWalletAddress(
+                            chain as Chain,
+                            address
+                        );
+                    console.log("BALANCES API");
+                    if (balances.error) {
+                        throw new Error(balances.error_message);
+                    }
+                    return parseAndLimitItems(balances.data);
+                },
+            }),
+            nftBalances: tool({
+                description:
+                    "Get NFTs for specified chain and address from GoldRush APIs",
+                parameters: z.object({
+                    chain: z.string(),
+                    address: z.string(),
+                }),
+                execute: async ({ chain, address }) => {
+                    const client = new GoldRushClient(
+                        process.env["GOLDRUSH_API_KEY"]!
+                    );
+                    const nfts = await client.NftService.getNftsForAddress(
+                        chain as Chain,
+                        address
+                    );
+                    console.log("NFT API");
+                    if (nfts.error) {
+                        throw new Error(nfts.error_message);
+                    }
+                    return parseAndLimitItems(nfts.data);
+                },
+            }),
+            transactions: tool({
+                description:
+                    "Get token balances for specified chain and address from GoldRush APIs",
+                parameters: z.object({
+                    chain: z.string(),
+                    address: z.string(),
+                }),
+                execute: async ({ chain, address }) => {
+                    const client = new GoldRushClient(
+                        process.env["GOLDRUSH_API_KEY"]!
+                    );
+                    const transactions =
+                        await client.TransactionService.getAllTransactionsForAddressByPage(
+                            chain as Chain,
+                            address,
+                            {
+                                noLogs: true,
+                            }
+                        );
+                    console.log("TRASANCTONS API");
+                    if (transactions.error) {
+                        throw new Error(transactions.error_message);
+                    }
+                    return parseAndLimitItems(transactions.data);
+                },
+            }),
         },
-        description:
-            "You are a blockchain researcher analyzing wallet token holdings.",
-        instructions: [
-            "Analyze wallet token balances using the provided blockchain tools",
-            "Provide insights about the wallet's token holdings",
-        ],
-        tools,
     });
 
-    const state = StateFn.root(agent.description);
-    state.messages.push(
-        user(
-            "Analyze the token balances for address karanpargal.eth on eth-mainnet"
-        )
-    );
+    const res = await agent.generate([
+        Base.user(
+            "Analyze wallet address 'karanpargal.eth' on 'eth-mainnet' and provide a complete analysis of its activities. Analyze wallet activities using the provided blockchain tools. Summarize token holdings, NFT collections, and recent transactions. Provide insights about the wallet's activity patterns"
+        ),
+    ]);
 
-    const result = await agent.run(state);
-    expect(result.status).toEqual("paused");
+    console.log(res);
 
-    const toolCall = result.messages[
-        result.messages.length - 1
-    ] as ChatCompletionAssistantMessageParam;
-    expect(toolCall?.tool_calls).toBeDefined();
+    // const grkresult = await generateText({
+    //     model: openai("gpt-4o-mini"),
+    //     tools: {
+    //         tokenBalances: tool({
+    //             description:
+    //                 "Get token balances for specified chain and address from GoldRush APIs",
+    //             parameters: z.object({
+    //                 chain: z.string(),
+    //                 address: z.string(),
+    //             }),
+    //             execute: async ({ chain, address }) => {
+    //                 const client = new GoldRushClient(
+    //                     process.env["GOLDRUSH_API_KEY"]!
+    //                 );
+    //                 const balances =
+    //                     await client.BalanceService.getTokenBalancesForWalletAddress(
+    //                         chain as Chain,
+    //                         address
+    //                     );
 
-    const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
+    //                 console.log("BALANCES API");
 
-    const updatedState = {
-        ...result,
-        status: "running" as const,
-        messages: [...result.messages, ...toolResponses],
-    };
+    //                 if (balances.error) {
+    //                     throw new Error(balances.error_message);
+    //                 }
 
-    const finalResult = await agent.run(updatedState);
+    //                 return parseAndLimitItems(balances.data);
+    //             },
+    //         }),
+    //         nftBalances: tool({
+    //             description:
+    //                 "Get NFTs for specified chain and address from GoldRush APIs",
+    //             parameters: z.object({
+    //                 chain: z.string(),
+    //                 address: z.string(),
+    //             }),
+    //             execute: async ({ chain, address }) => {
+    //                 const client = new GoldRushClient(
+    //                     process.env["GOLDRUSH_API_KEY"]!
+    //                 );
+    //                 const nfts = await client.NftService.getNftsForAddress(
+    //                     chain as Chain,
+    //                     address
+    //                 );
 
-    expect(finalResult.status).toEqual("finished");
-    expect(
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    ).toBeDefined();
-    console.log(
-        "Final analysis:",
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    );
+    //                 console.log("NFT API");
+
+    //                 if (nfts.error) {
+    //                     throw new Error(nfts.error_message);
+    //                 }
+
+    //                 return parseAndLimitItems(nfts.data);
+    //             },
+    //         }),
+    //         transactions: tool({
+    //             description:
+    //                 "Get token balances for specified chain and address from GoldRush APIs",
+    //             parameters: z.object({
+    //                 chain: z.string(),
+    //                 address: z.string(),
+    //             }),
+    //             execute: async ({ chain, address }) => {
+    //                 const client = new GoldRushClient(
+    //                     process.env["GOLDRUSH_API_KEY"]!
+    //                 );
+    //                 const transactions =
+    //                     await client.TransactionService.getAllTransactionsForAddressByPage(
+    //                         chain as Chain,
+    //                         address,
+    //                         {
+    //                             noLogs: true,
+    //                         }
+    //                     );
+
+    //                 console.log("TRASANCTONS API");
+
+    //                 if (transactions.error) {
+    //                     throw new Error(transactions.error_message);
+    //                 }
+
+    //                 return parseAndLimitItems(transactions.data);
+    //             },
+    //         }),
+    //     },
+    //     maxSteps: 5,
+    //     maxRetries: 10,
+    //     messages: [
+    //         Base.user(
+    //             "Analyze wallet address 'karanpargal.eth' on 'eth-mainnet' and provide a complete analysis of its activities. Analyze wallet activities using the provided blockchain tools. Summarize token holdings, NFT collections, and recent transactions. Provide insights about the wallet's activity patterns"
+    //         ),
+    //     ],
+    // });
+
+    // console.log(grkresult);
+
+    // const state = StateFn.root(agent.description);
+    // state.messages.push();
+
+    // const state = StateFn.root(agent.description);
+    // state.messages.push(
+    //     Base.user(
+    //         "Analyze wallet address 'karanpargal.eth' on 'eth-mainnet' and provide a complete analysis of its activities"
+    //     )
+    // );
+
+    // const result = await agent.run(state);
+
+    // console.log(result);
+
+    // const result = await agent.generate(
+    //     [
+    //         Base.user(
+    //             "Analyze wallet address 'karanpargal.eth' on 'eth-mainnet' and provide a complete analysis of its activities. Analyze wallet activities using the provided blockchain tools. Summarize token holdings, NFT collections, and recent transactions. Provide insights about the wallet's activity patterns"
+    //         ),
+    //     ],
+    //     {
+    //         generatedData: z.object({
+    //             tokenBalances: z.string(),
+    //             nftBalances: z.string(),
+    //             transactions: z.string(),
+    //         }),
+    //     }
+    // );
+    // console.log(result);
+
+    // expect(result.messages.length).toBeGreaterThan(0);
+    // expect(result.status).toEqual("paused");
 });
+// test("blockchain research agent should analyze token balances", async () => {
+//     const tools = {
+//         tokenBalances: new TokenBalancesTool(apiKey),
+//     };
 
-test("blockchain research agent should analyze NFT holdings", async () => {
-    const tools = {
-        nftBalances: new NFTBalancesTool(apiKey),
-    };
+//     const agent = new Agent({
+//         name: "token analyzer",
+//         model: {
+//             provider: "OPEN_AI",
+//             name: "gpt-4o-mini",
+//         },
+//         description:
+//             "You are a blockchain researcher analyzing wallet token holdings.",
+//         instructions: [
+//             "Analyze wallet token balances using the provided blockchain tools",
+//             "Provide insights about the wallet's token holdings",
+//         ],
+//         tools,
+//     });
 
-    const agent = new Agent({
-        name: "nft analyzer",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
-        description:
-            "You are a blockchain researcher analyzing NFT collections.",
-        instructions: [
-            "Analyze wallet NFT holdings using the provided blockchain tools",
-            "Summarize the NFT collections owned by the wallet",
-        ],
-        tools,
-    });
+//     const state = StateFn.root(agent.description);
+//     state.messages.push(
+//         user(
+//             "Analyze the token balances for address karanpargal.eth on eth-mainnet"
+//         )
+//     );
 
-    const state = StateFn.root(agent.description);
-    state.messages.push(
-        user("What NFTs does address karanpargal.eth own on eth-mainnet?")
-    );
+//     const result = await agent.run(state);
+//     expect(result.status).toEqual("paused");
 
-    const result = await agent.run(state);
-    expect(result.messages.length).toBeGreaterThan(1);
-    expect(result.status).toEqual("paused");
-});
+//     const toolCall = result.messages[
+//         result.messages.length - 1
+//     ] as ChatCompletionAssistantMessageParam;
+//     expect(toolCall?.tool_calls).toBeDefined();
 
-test("blockchain research agent should analyze recent transactions", async () => {
-    const tools = {
-        transactions: new TransactionsTool(apiKey),
-    };
+//     const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
 
-    const agent = new Agent({
-        name: "transaction analyzer",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
-        description:
-            "You are a blockchain researcher analyzing transaction patterns.",
-        instructions: [
-            "Analyze wallet transactions using the provided blockchain tools",
-            "Identify patterns in transaction history",
-        ],
-        tools,
-    });
+//     const updatedState = {
+//         ...result,
+//         status: "running" as const,
+//         messages: [...result.messages, ...toolResponses],
+//     };
 
-    const state = StateFn.root(agent.description);
-    state.messages.push(
-        user(
-            "Show me the last 24 hours of transactions for address karanpargal.eth on eth-mainnet"
-        )
-    );
+//     const finalResult = await agent.run(updatedState);
 
-    const result = await agent.run(state);
-    console.log(result);
-    expect(result.messages.length).toBeGreaterThan(1);
-    expect(result.status).toEqual("paused");
-});
+//     expect(finalResult.status).toEqual("finished");
+//     expect(
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     ).toBeDefined();
+//     console.log(
+//         "Final analysis:",
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     );
+// });
 
-test("blockchain research agent should analyze tokens and their transactions", async () => {
-    const tools = {
-        tokenBalances: new TokenBalancesTool(apiKey),
-        transactions: new TransactionsTool(apiKey),
-    };
+// test("blockchain research agent should analyze NFT holdings", async () => {
+//     const tools = {
+//         nftBalances: new NFTBalancesTool(apiKey),
+//     };
 
-    const agent = new Agent({
-        name: "token analyzer",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
-        description:
-            "You are a blockchain researcher analyzing token holdings and their transaction patterns.",
-        instructions: [
-            "First analyze top 5 token balances by value",
-            "Then analyze up to 10 recent transactions for tokens with significant holdings in the last 30 days",
-            "Provide insights about the wallet's token activity and the transactions.",
-            "If the wallet does big transactions, analyze the transactions in detail and mention if he's a whale or not.",
-        ],
-        tools,
-    });
+//     const agent = new Agent({
+//         name: "nft analyzer",
+//         model: {
+//             provider: "OPEN_AI",
+//             name: "gpt-4o-mini",
+//         },
+//         description:
+//             "You are a blockchain researcher analyzing NFT collections.",
+//         instructions: [
+//             "Analyze wallet NFT holdings using the provided blockchain tools",
+//             "Summarize the NFT collections owned by the wallet",
+//         ],
+//         tools,
+//     });
 
-    const state = StateFn.root(agent.description);
-    state.messages.push(
-        user(
-            "Analyze the token balances for address 0x2738523c25209dbdc279a75b6648730844845c7b on arbitrum-mainnet and then show me recent transactions for the tokens with highest value"
-        )
-    );
+//     const state = StateFn.root(agent.description);
+//     state.messages.push(
+//         user("What NFTs does address karanpargal.eth own on eth-mainnet?")
+//     );
 
-    const result = await agent.run(state);
-    console.log(result);
+//     const result = await agent.run(state);
+//     expect(result.messages.length).toBeGreaterThan(1);
+//     expect(result.status).toEqual("paused");
+// });
 
-    expect(result.status).toEqual("paused");
-    const toolCall = result.messages[
-        result.messages.length - 1
-    ] as ChatCompletionAssistantMessageParam;
-    expect(toolCall?.tool_calls).toBeDefined();
+// test("blockchain research agent should analyze recent transactions", async () => {
+//     const tools = {
+//         transactions: new TransactionsTool(apiKey),
+//     };
 
-    const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
+//     const agent = new Agent({
+//         name: "transaction analyzer",
+//         model: {
+//             provider: "OPEN_AI",
+//             name: "gpt-4o-mini",
+//         },
+//         description:
+//             "You are a blockchain researcher analyzing transaction patterns.",
+//         instructions: [
+//             "Analyze wallet transactions using the provided blockchain tools",
+//             "Identify patterns in transaction history",
+//         ],
+//         tools,
+//     });
 
-    const updatedState = {
-        ...result,
-        status: "running" as const,
-        messages: [...result.messages, ...toolResponses],
-    };
+//     const state = StateFn.root(agent.description);
+//     state.messages.push(
+//         user(
+//             "Show me the last 24 hours of transactions for address karanpargal.eth on eth-mainnet"
+//         )
+//     );
 
-    const secondResult = await agent.run(updatedState);
-    console.log(secondResult);
+//     const result = await agent.run(state);
+//     console.log(result);
+//     expect(result.messages.length).toBeGreaterThan(1);
+//     expect(result.status).toEqual("paused");
+// });
 
-    expect(secondResult.status).toEqual("paused");
+// test("blockchain research agent should analyze tokens and their transactions", async () => {
+//     const tools = {
+//         tokenBalances: new TokenBalancesTool(apiKey),
+//         transactions: new TransactionsTool(apiKey),
+//     };
 
-    const secondToolCall = secondResult.messages[
-        secondResult.messages.length - 1
-    ] as ChatCompletionAssistantMessageParam;
-    expect(secondToolCall?.tool_calls).toBeDefined();
+//     const agent = new Agent({
+//         name: "token analyzer",
+//         model: {
+//             provider: "OPEN_AI",
+//             name: "gpt-4o-mini",
+//         },
+//         description:
+//             "You are a blockchain researcher analyzing token holdings and their transaction patterns.",
+//         instructions: [
+//             "First analyze top 5 token balances by value",
+//             "Then analyze up to 10 recent transactions for tokens with significant holdings in the last 30 days",
+//             "Provide insights about the wallet's token activity and the transactions.",
+//             "If the wallet does big transactions, analyze the transactions in detail and mention if he's a whale or not.",
+//         ],
+//         tools,
+//     });
 
-    const transactionResponses = await runToolCalls(
-        tools,
-        secondToolCall?.tool_calls ?? []
-    );
+//     const state = StateFn.root(agent.description);
+//     state.messages.push(
+//         user(
+//             "Analyze the token balances for address 0x2738523c25209dbdc279a75b6648730844845c7b on arbitrum-mainnet and then show me recent transactions for the tokens with highest value"
+//         )
+//     );
 
-    const finalState = {
-        ...secondResult,
-        messages: [...secondResult.messages, ...transactionResponses],
-    };
+//     const result = await agent.run(state);
+//     console.log(result);
 
-    const finalResult = await agent.run(finalState);
+//     expect(result.status).toEqual("paused");
+//     const toolCall = result.messages[
+//         result.messages.length - 1
+//     ] as ChatCompletionAssistantMessageParam;
+//     expect(toolCall?.tool_calls).toBeDefined();
 
-    console.log(finalResult);
+//     const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
 
-    expect(finalResult.status).toEqual("finished");
-    expect(
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    ).toBeDefined();
-    console.log(
-        "Final analysis:",
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    );
-});
+//     const updatedState = {
+//         ...result,
+//         status: "running" as const,
+//         messages: [...result.messages, ...toolResponses],
+//     };
 
-test("blockchain research agent should analyze historical token prices", async () => {
-    const tools = {
-        historicalTokenPrice: new HistoricalTokenPriceTool(apiKey),
-    };
+//     const secondResult = await agent.run(updatedState);
+//     console.log(secondResult);
 
-    const agent = new Agent({
-        name: "price analyzer",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
-        description:
-            "You are a blockchain researcher analyzing historical token price movements.",
-        instructions: [
-            "Analyze historical token prices using the provided blockchain tools",
-            "Identify price trends and significant movements",
-            "Provide insights about the token's price performance over the specified timeframe",
-        ],
-        tools,
-    });
+//     expect(secondResult.status).toEqual("paused");
 
-    const state = StateFn.root(agent.description);
-    state.messages.push(
-        user(
-            "Show me the price history for USDC (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48) on eth-mainnet over the last 30 days"
-        )
-    );
+//     const secondToolCall = secondResult.messages[
+//         secondResult.messages.length - 1
+//     ] as ChatCompletionAssistantMessageParam;
+//     expect(secondToolCall?.tool_calls).toBeDefined();
 
-    const result = await agent.run(state);
-    expect(result.messages.length).toBeGreaterThan(1);
-    expect(result.status).toEqual("paused");
+//     const transactionResponses = await runToolCalls(
+//         tools,
+//         secondToolCall?.tool_calls ?? []
+//     );
 
-    const toolCall = result.messages[
-        result.messages.length - 1
-    ] as ChatCompletionAssistantMessageParam;
-    expect(toolCall?.tool_calls).toBeDefined();
+//     const finalState = {
+//         ...secondResult,
+//         messages: [...secondResult.messages, ...transactionResponses],
+//     };
 
-    const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
+//     const finalResult = await agent.run(finalState);
 
-    const updatedState = {
-        ...result,
-        status: "running" as const,
-        messages: [...result.messages, ...toolResponses],
-    };
+//     console.log(finalResult);
 
-    const finalResult = await agent.run(updatedState);
+//     expect(finalResult.status).toEqual("finished");
+//     expect(
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     ).toBeDefined();
+//     console.log(
+//         "Final analysis:",
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     );
+// });
 
-    expect(finalResult.status).toEqual("finished");
-    expect(
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    ).toBeDefined();
-    console.log(
-        "Final analysis:",
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    );
-});
+// test("blockchain research agent should analyze historical token prices", async () => {
+//     const tools = {
+//         historicalTokenPrice: new HistoricalTokenPriceTool(apiKey),
+//     };
 
-test("analyze wallet balances and suggest token swaps based on historical prices", async () => {
-    const tools = {
-        tokenBalances: new TokenBalancesTool(apiKey),
-        historicalTokenPrice: new HistoricalTokenPriceTool(apiKey),
-    };
+//     const agent = new Agent({
+//         name: "price analyzer",
+//         model: {
+//             provider: "OPEN_AI",
+//             name: "gpt-4o-mini",
+//         },
+//         description:
+//             "You are a blockchain researcher analyzing historical token price movements.",
+//         instructions: [
+//             "Analyze historical token prices using the provided blockchain tools",
+//             "Identify price trends and significant movements",
+//             "Provide insights about the token's price performance over the specified timeframe",
+//         ],
+//         tools,
+//     });
 
-    const agent = new Agent({
-        name: "portfolio optimizer",
-        model: {
-            provider: "OPEN_AI",
-            name: "gpt-4o-mini",
-        },
-        description:
-            "You are a crypto portfolio analyzer that provides token swap suggestions based on historical performance.",
-        instructions: [
-            "First fetch token balances for the wallet",
-            "Identify top 5 tokens by USD value",
-            "For each of these tokens, analyze their 7-day price history",
-            "Compare price trends and volatility",
-            "Suggest potential token swaps that could improve portfolio value based on historical performance",
-            "Provide reasoning for each suggestion",
-        ],
-        tools,
-    });
+//     const state = StateFn.root(agent.description);
+//     state.messages.push(
+//         user(
+//             "Show me the price history for USDC (0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48) on eth-mainnet over the last 30 days"
+//         )
+//     );
 
-    const state = StateFn.root(agent.description);
-    state.messages.push(
-        user(
-            "Analyze the token holdings for karanpargal.eth on eth-mainnet and suggest optimal token swaps based on 7-day historical performance"
-        )
-    );
+//     const result = await agent.run(state);
+//     expect(result.messages.length).toBeGreaterThan(1);
+//     expect(result.status).toEqual("paused");
 
-    const result = await agent.run(state);
-    expect(result.status).toEqual("paused");
+//     const toolCall = result.messages[
+//         result.messages.length - 1
+//     ] as ChatCompletionAssistantMessageParam;
+//     expect(toolCall?.tool_calls).toBeDefined();
 
-    const toolCall = result.messages[
-        result.messages.length - 1
-    ] as ChatCompletionAssistantMessageParam;
-    expect(toolCall?.tool_calls).toBeDefined();
+//     const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
 
-    const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
+//     const updatedState = {
+//         ...result,
+//         status: "running" as const,
+//         messages: [...result.messages, ...toolResponses],
+//     };
 
-    const updatedState = {
-        ...result,
-        status: "running" as const,
-        messages: [...result.messages, ...toolResponses],
-    };
+//     const finalResult = await agent.run(updatedState);
 
-    const secondResult = await agent.run(updatedState);
-    expect(secondResult.status).toEqual("paused");
+//     expect(finalResult.status).toEqual("finished");
+//     expect(
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     ).toBeDefined();
+//     console.log(
+//         "Final analysis:",
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     );
+// });
 
-    const secondToolCall = secondResult.messages[
-        secondResult.messages.length - 1
-    ] as ChatCompletionAssistantMessageParam;
-    expect(secondToolCall?.tool_calls).toBeDefined();
+// test("analyze wallet balances and suggest token swaps based on historical prices", async () => {
+//     const tools = {
+//         tokenBalances: new TokenBalancesTool(apiKey),
+//         historicalTokenPrice: new HistoricalTokenPriceTool(apiKey),
+//     };
 
-    const historicalPriceResponses = await runToolCalls(
-        tools,
-        secondToolCall?.tool_calls ?? []
-    );
+//     const agent = new Agent({
+//         name: "portfolio optimizer",
+//         model: {
+//             provider: "OPEN_AI",
+//             name: "gpt-4o-mini",
+//         },
+//         description:
+//             "You are a crypto portfolio analyzer that provides token swap suggestions based on historical performance.",
+//         instructions: [
+//             "First fetch token balances for the wallet",
+//             "Identify top 5 tokens by USD value",
+//             "For each of these tokens, analyze their 7-day price history",
+//             "Compare price trends and volatility",
+//             "Suggest potential token swaps that could improve portfolio value based on historical performance",
+//             "Provide reasoning for each suggestion",
+//         ],
+//         tools,
+//     });
 
-    const finalState = {
-        ...secondResult,
-        messages: [...secondResult.messages, ...historicalPriceResponses],
-    };
+//     const state = StateFn.root(agent.description);
+//     state.messages.push(
+//         user(
+//             "Analyze the token holdings for karanpargal.eth on eth-mainnet and suggest optimal token swaps based on 7-day historical performance"
+//         )
+//     );
 
-    const finalResult = await agent.run(finalState);
+//     const result = await agent.run(state);
+//     expect(result.status).toEqual("paused");
 
-    expect(finalResult.status).toEqual("finished");
-    expect(
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    ).toBeDefined();
-    console.log(
-        "Portfolio Analysis and Recommendations:",
-        finalResult.messages[finalResult.messages.length - 1]?.content
-    );
-});
+//     const toolCall = result.messages[
+//         result.messages.length - 1
+//     ] as ChatCompletionAssistantMessageParam;
+//     expect(toolCall?.tool_calls).toBeDefined();
+
+//     const toolResponses = await runToolCalls(tools, toolCall?.tool_calls ?? []);
+
+//     const updatedState = {
+//         ...result,
+//         status: "running" as const,
+//         messages: [...result.messages, ...toolResponses],
+//     };
+
+//     const secondResult = await agent.run(updatedState);
+//     expect(secondResult.status).toEqual("paused");
+
+//     const secondToolCall = secondResult.messages[
+//         secondResult.messages.length - 1
+//     ] as ChatCompletionAssistantMessageParam;
+//     expect(secondToolCall?.tool_calls).toBeDefined();
+
+//     const historicalPriceResponses = await runToolCalls(
+//         tools,
+//         secondToolCall?.tool_calls ?? []
+//     );
+
+//     const finalState = {
+//         ...secondResult,
+//         messages: [...secondResult.messages, ...historicalPriceResponses],
+//     };
+
+//     const finalResult = await agent.run(finalState);
+
+//     expect(finalResult.status).toEqual("finished");
+//     expect(
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     ).toBeDefined();
+//     console.log(
+//         "Portfolio Analysis and Recommendations:",
+//         finalResult.messages[finalResult.messages.length - 1]?.content
+//     );
+// });

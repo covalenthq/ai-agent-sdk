@@ -48,9 +48,11 @@
         "pretty": "prettier . --write"
     },
     "dependencies": {
+        "@ai-sdk/anthropic": "^1.1.6",
+        "@ai-sdk/google": "^1.1.11",
         "@ai-sdk/openai": "^1.1.9",
         "@covalenthq/client-sdk": "^2.2.3",
-        "ai": "^4.1.25",
+        "ai": "^4.1.34",
         "commander": "^13.1.0",
         "dotenv": "^16.4.7",
         "openai": "^4.79.1",
