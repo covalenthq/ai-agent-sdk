@@ -70,6 +70,7 @@ const zee = new ZeeWorkflow({
 })();
 ```
 
+### Refer Configs for other SDK's Integrations like Hugging face, Gemini, Gradio etc. on [llms.mdx Readme File](https://github.com/covalenthq/ai-agent-sdk/blob/main/docs/concepts/llms.mdx)
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!

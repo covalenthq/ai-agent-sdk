@@ -47,11 +47,22 @@ export type GeminiConfig = {
     apiKey?: string;
 };
 
+export type GradioConfig = {
+    provider: "GRADIO";
+    name: string;
+    appUrl: string;
+    endpoint?: string;
+    parameters?: unknown[];
+    temperature?: number; 
+    apiKey?: string;
+};
+
 export type ModelConfig =
     | OpenAIConfig
     | DeepSeekConfig
     | GrokConfig
-    | GeminiConfig;
+    | GeminiConfig
+    | GradioConfig;
 
 export type LLMResponse<T extends Record<string, AnyZodObject>> = {
     [K in keyof T]: {
@@ -63,4 +74,18 @@ export type LLMResponse<T extends Record<string, AnyZodObject>> = {
 export type FunctionToolCall = {
     type: "tool_call";
     value: ParsedFunctionToolCall[];
+};
+
+export type ChatCompletionMessageParam = {
+    role: "user" | "assistant" | "system";
+    content: string;
+};
+
+export type ChatCompletionTool = {
+    type: "function";
+    function: {
+        name: string;
+        description?: string;
+        parameters: Record<string, unknown>;
+    };
 };
