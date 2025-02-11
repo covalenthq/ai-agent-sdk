@@ -169,8 +169,6 @@ export const router = () =>
 
             const result = await agent.generate(messages, schema);
 
-            console.log("Router result", result);
-
             try {
                 if (result.type !== "next_task") {
                     throw new Error(
