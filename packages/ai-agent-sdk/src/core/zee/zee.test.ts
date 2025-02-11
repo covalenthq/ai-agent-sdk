@@ -1,6 +1,6 @@
 import { ZeeWorkflow } from ".";
 import { Agent } from "../agent";
-import { user } from "../base";
+import { user } from "../base/base";
 import { StateFn } from "../state/state";
 import { createTool } from "../tools";
 import { TokenBalancesTool, TransactionsTool } from "../tools/goldrush";

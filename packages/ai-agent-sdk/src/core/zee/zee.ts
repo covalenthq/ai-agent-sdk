@@ -5,7 +5,7 @@ import {
     resource_planner,
     router,
 } from "../agent";
-import { assistant, Base } from "../base";
+import { assistant, Base } from "../base/base";
 import { StateFn, type ZeeWorkflowState } from "../state/state";
 import type { ZeeWorkflowOptions } from "./zee.types";
 import type { ChatCompletionToolMessageParam } from "openai/resources/chat/completions";

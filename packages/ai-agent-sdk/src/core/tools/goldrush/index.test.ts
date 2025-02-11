@@ -1,5 +1,5 @@
 import { Agent } from "../../agent/agent";
-import { Base } from "../../base";
+import { Base } from "../../base/base";
 import { Chain, GoldRushClient } from "@covalenthq/client-sdk";
 import { tool } from "ai";
 import "dotenv/config";

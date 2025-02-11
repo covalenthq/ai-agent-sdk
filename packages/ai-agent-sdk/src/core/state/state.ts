@@ -1,5 +1,5 @@
 import type { AgentName } from "../agent";
-import { Base } from "../base";
+import { Base } from "../base/base";
 import type { ZeeWorkflowState, ZeeWorkflowStateOptions } from "./state.types";
 import type { CoreMessage } from "ai";
 
