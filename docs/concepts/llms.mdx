@@ -14,7 +14,16 @@ const llm = new LLM({
     temperature: 0.7
 });
 ```
+```tsx
+const hfConfig: HuggingFaceConfig = {
+    provider: "HUGGINGFACE",
+    name: "sentence-transformers/all-MiniLM-L6-v2",
+    apiKey: "hf_xxxxxxxxxxxxxxxxxxxxxxxx"
+};
 
+const llm = new LLM(hfConfig);
+const response = await llm.generate(messages, schema, tools);
+```
 ## List of supported LLMs
 
 ### Open AI
@@ -45,6 +54,20 @@ const llm = new LLM({
 "gemini-1.5-pro"
 ```
 
+```plaintext Hugging Face
+Any model name that you have pulled in Ollama
+Examples:
+"llama2"
+"codellama"
+"mistral"
+"neural-chat"
+"DeepSeek-R1"
+"Janus-Pro-7B"
+"Kokoro-82M"
+"Mistral-Small-24B-Instruct-2501"
+And any models available in hugging face inference
+```
+
 </CodeGroup>
 
 ## Environment Variables
@@ -67,7 +90,108 @@ GROK_API_KEY
 GEMINI_API_KEY
 ```
 
+```plaintext Hugging Face Inference
+HF_API_KEY
+```
+
 </CodeGroup>
+
+## Using Hugging Face Models
+
+To use Hugging Face models with the SDK:
+
+1. **Get Hugging Face Token**
+   - Create an account at [huggingface.co](https://huggingface.co)
+   - Generate an access token in [Account Settings](https://huggingface.co/settings/tokens)
+
+2. **Configure your agent**:
+```typescript
+const agent = new Agent({
+    name: "HuggingFaceAgent",
+    model: {
+        provider: "HUGGINGFACE",
+        name: "mistralai/Mixtral-8x7B-Instruct-v0.1",  // Any supported HF model
+        apiKey: "hf_xxxxxxxxxxxxxxxxxxxxxxxx",  // Your Hugging Face token
+        baseURL: "https://api-inference.huggingface.co/models", // optional
+    },
+    description: "Cloud-hosted HF model integration",
+});
+```
+
+### Response Format
+Responses maintain the same structure as other providers:
+
+1. Complete Response Object:
+```json
+{
+  "agent": "hf-agent",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Explain quantum computing briefly"
+    },
+    {
+      "role": "assistant",
+      "content": {
+        "thinking": "Parsing request... Identifying key concepts... Generating concise explanation...",
+        "answer": "Quantum computing uses quantum bits to perform calculations through superposition and entanglement..."
+      }
+    }
+  ],
+  "status": "completed",
+  "children": []
+}
+```
+
+2. Assistant Message Content Structure:
+```json
+{
+  "role": "assistant",
+  "content": {
+    "thinking": "Model's internal processing steps",
+    "answer": "Final response to user query",
+    "details": {
+      "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      "inference_time": 1.23
+    }
+  }
+}
+```
+
+Additional fields:
+- `details`: Contains model-specific metadata
+- `inference_time`: Time taken for response generation (seconds)
+
+Access responses using:
+```typescript
+const lastMessage = result.messages[result.messages.length - 1]?.content;
+console.log(lastMessage.content.thinking);  // Model's reasoning steps
+console.log(lastMessage.content.answer);    // Final response
+console.log(lastMessage.content.details?.inference_time);  // Performance metrics
+```
+
+### Special Features
+1. **Model Switching**:
+```typescript
+// Dynamically switch models mid-conversation
+agent.setModel({
+    provider: "HUGGINGFACE",
+    name: "google/flan-t5-xxl",
+    apiKey: "hf_xxxxxxxxxxxxxxxxxxxxxxxx"
+});
+```
+
+2. **Task-Specific Endpoints**:
+```typescript
+// Directly access specialized endpoints
+const response = await agent.execute({
+    task: "text-to-image",
+    parameters: {
+        prompt: "A cyberpunk cat hacker",
+        model: "stabilityai/stable-diffusion-xl-base-1.0"
+    }
+});
+```
 
 ## Use Cases
 

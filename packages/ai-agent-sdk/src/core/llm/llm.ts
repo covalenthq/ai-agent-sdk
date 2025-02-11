@@ -11,6 +11,7 @@ import type {
 import type { AnyZodObject } from "zod";
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import { HfInference } from "@huggingface/inference";
 
 const entryToObject = ([key, value]: [string, AnyZodObject]) => {
     return z.object({ type: z.literal(key), value });
@@ -83,6 +84,10 @@ export class LLM extends Base {
                 config.apiKey =
                     process.env["GEMINI_API_KEY"] || this.model.apiKey;
                 break;
+            case "HUGGINGFACE":
+                config.baseURL = "https://api-inference.huggingface.com/models";
+                config.apiKey = process.env["HF_API_KEY"] || this.model.apiKey;
+                break;
             default:
                 var _exhaustiveCheck: never = provider;
                 throw new Error(
@@ -90,6 +95,7 @@ export class LLM extends Base {
                 );
         }
         const client = new OpenAI(config);
+        const HuggingFaceClient = new HfInference(config.apiKey);
 
         const mappedTools = tools ? formatOpenAITools(tools) : [];
 
@@ -160,6 +166,24 @@ export class LLM extends Base {
         if (parsed?.response) {
             return parsed.response as LLMResponse<T>;
         }
+
+        if (provider === "HUGGINGFACE") {
+            const hfClient = HuggingFaceClient as HfInference;
+            const response = await hfClient.textGeneration({
+                model: this.model.name,
+                inputs: messages.filter(m => m.role === 'user').pop()?.content || '',
+                parameters: {
+                    temperature: mappedTemperature,
+                    return_full_text: false
+                }
+            });
+    
+            return {
+                type: 'text',
+                value: response.generated_text
+            } as LLMResponse<T>;
+        }
+    
 
         throw new Error("No response in message");
     }
