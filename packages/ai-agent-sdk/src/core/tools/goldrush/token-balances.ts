@@ -3,7 +3,7 @@ import { BaseGoldRushTool } from "./goldrush";
 import { type Chain, ChainName } from "@covalenthq/client-sdk";
 import { z } from "zod";
 
-export const TokenBalancesSchema = z.object({
+const TokenBalancesSchema = z.object({
     chain: z.enum(Object.values(ChainName) as [string, ...string[]]),
     address: z.string(),
 });

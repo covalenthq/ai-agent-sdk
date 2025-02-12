@@ -3,7 +3,7 @@ import type {
     LLMTextResponse,
     ModelProvider,
 } from "../llm";
-import type { ToolSet } from "ai";
+import type { ToolSet } from "../tools";
 
 export type AgentConfig = {
     name: string;
@@ -13,6 +13,9 @@ export type AgentConfig = {
     tools?: ToolSet;
 };
 
-export type AgentParameters = Omit<GenerateTextParams, "prompt">;
+export type AgentGenerateParameters = Omit<
+    GenerateTextParams,
+    "prompt" | "tools" | "toolChoice"
+>;
 
 export type AgentResponse = LLMTextResponse;

@@ -71,11 +71,11 @@ describe("agent", () => {
                         "Use the weather tool to get the current weather in Celsius.",
                         "Elaborate on the weather.",
                     ],
+                    tools,
                 });
 
                 const result = await agent.generate({
                     messages: [userMessage("What is the weather in Delhi?")],
-                    tools,
                 });
 
                 console.log(result);

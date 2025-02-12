@@ -1,19 +1,16 @@
-import type { AgentConfig, AgentParameters, AgentResponse } from ".";
+import type { AgentConfig, AgentGenerateParameters, AgentResponse } from ".";
 import { systemMessage } from "../../functions";
 import { Base } from "../base";
 import { LLM } from "../llm";
-import type { ToolSet } from "ai";
 
 export class Agent extends Base {
     private _config: AgentConfig;
     private _llm: LLM;
-    private _tools: ToolSet;
 
     constructor(config: AgentConfig) {
         super("agent");
         this._config = config;
         this._llm = new LLM(config.model);
-        this._tools = config.tools || {};
     }
 
     get description() {
@@ -24,14 +21,11 @@ export class Agent extends Base {
         return this._config.instructions;
     }
 
-    get tools() {
-        return this._tools;
-    }
-
-    async generate(args: AgentParameters): Promise<AgentResponse> {
+    async generate(args: AgentGenerateParameters): Promise<AgentResponse> {
         const response = await this._llm.generate(
             {
                 ...args,
+                tools: this._config.tools,
                 messages: [
                     systemMessage(this.description),
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
