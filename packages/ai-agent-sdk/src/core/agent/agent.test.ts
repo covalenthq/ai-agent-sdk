@@ -6,7 +6,7 @@ import fetch from "node-fetch";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
 
-describe("agent", () => {
+describe("@ai-agent-sdk/agent", () => {
     const providers: ModelProvider[] = [
         {
             provider: "openai",

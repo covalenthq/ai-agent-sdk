@@ -10,7 +10,7 @@ import { type ModelProvider } from "../../llm";
 import "dotenv/config";
 import { describe, expect, test } from "vitest";
 
-describe("agent", () => {
+describe("@ai-agent-sdk/tools/goldrush", () => {
     const providers: ModelProvider[] = [
         {
             provider: "openai",
