@@ -1,4 +1,4 @@
-import { BaseGoldRushSchema, BaseGoldRushTool } from "./base-goldrush";
+import { BaseGoldRushSchema, BaseGoldRushTool } from "./goldrush";
 import { type Chain } from "@covalenthq/client-sdk";
 import type { z } from "zod";
 

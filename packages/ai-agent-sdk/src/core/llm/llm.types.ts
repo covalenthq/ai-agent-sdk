@@ -1,3 +1,4 @@
+import type { ToolSet } from "../tools";
 import type { generateObject, generateText } from "ai";
 import type { AnyZodObject, z } from "zod";
 
@@ -72,12 +73,14 @@ export type ModelProvider =
 
 export type GenerateTextParams = Omit<
     Parameters<typeof generateText>[0],
-    "model"
->;
+    "model" | "tools"
+> & {
+    tools?: ToolSet;
+};
 
 export type GenerateObjectParams = Omit<
     Parameters<typeof generateObject>[0],
-    "model" | "schema"
+    "model" | "schema" | "tools" | "toolChoice"
 > & {
     schema: AnyZodObject;
 };
@@ -85,7 +88,7 @@ export type GenerateObjectParams = Omit<
 export type LLMParameters = GenerateTextParams | GenerateObjectParams;
 
 export interface LLMStructuredResponse<T extends AnyZodObject> {
-    type: "structured-output";
+    type: "assistant";
     value: z.infer<T>;
 }
 

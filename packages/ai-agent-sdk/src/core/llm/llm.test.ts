@@ -1,5 +1,6 @@
 import { LLM, type ModelProvider } from ".";
-import { createTool } from "../../functions";
+import { Tool, type ToolSet } from "../tools";
+import fetch from "node-fetch";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
 
@@ -15,9 +16,9 @@ describe("@ai-agent-sdk/llm", () => {
         },
     ];
 
-    providers.forEach((config) => {
-        describe(`${config.provider}::${config.id}`, () => {
-            const llm = new LLM(config);
+    providers.forEach((model) => {
+        describe(`${model.provider}::${model.id}`, () => {
+            const llm = new LLM(model);
 
             test("structured output", async () => {
                 const schema = z.object({
@@ -32,34 +33,37 @@ describe("@ai-agent-sdk/llm", () => {
 
                 console.log(result);
 
-                if (result.type !== "structured-output") {
+                if (typeof result.value !== "object") {
                     throw new Error("Expected structured output");
                 }
 
+                expect(result.type).toBe("assistant");
                 expect(result.value["answer"]).toBeDefined();
                 expect(result.value["explanation"]).toBeDefined();
             });
 
             test("tool calling", async () => {
+                const tools: ToolSet = {
+                    weather: new Tool({
+                        provider: model.provider,
+                        name: "weather",
+                        description: "Fetch the current weather in a location",
+                        parameters: z.object({
+                            location: z.string(),
+                        }),
+                        execute: async ({ location }) => {
+                            const response = await fetch(
+                                `https://api.weatherapi.com/v1/current.json?q=${location}&key=88f97127772c41a991095603230604`
+                            );
+                            const data = await response.json();
+                            return data;
+                        },
+                    }),
+                };
+
                 const result = await llm.generate({
                     prompt: "What is the weather in San Francisco?",
-                    tools: {
-                        weather: createTool({
-                            description: "Get the weather in a location",
-                            parameters: z.object({
-                                location: z
-                                    .string()
-                                    .describe(
-                                        "The location to get the weather for"
-                                    ),
-                            }),
-                            execute: async ({ location }) => ({
-                                location,
-                                temperature:
-                                    72 + Math.floor(Math.random() * 21) - 10,
-                            }),
-                        }),
-                    },
+                    tools,
                 });
 
                 console.log(result);

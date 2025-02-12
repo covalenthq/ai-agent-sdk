@@ -1,5 +1,7 @@
 import { Base } from "../base";
 import type {
+    GenerateObjectParams,
+    GenerateTextParams,
     LLMParameters,
     LLMResponse,
     LLMStructuredResponse,
@@ -41,12 +43,16 @@ export class LLM extends Base {
             const isTextResponse = viaAgent || hasTools;
 
             if (isTextResponse) {
+                const { tools, ...textArgs } = args as GenerateTextParams;
                 const response = await generateText({
                     model: this.model,
                     toolChoice: "auto",
                     maxSteps: 3,
                     maxRetries: 5,
-                    ...args,
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    tools,
+                    ...textArgs,
                 });
 
                 if (!response.text) {
@@ -60,14 +66,15 @@ export class LLM extends Base {
                     value: response.text,
                 } as LLMTextResponse;
             } else {
+                const objectArgs = args as GenerateObjectParams;
                 const response = await generateObject<z.infer<ZOD_OBJECT>>({
                     model: this.model,
                     mode: "json",
                     maxRetries: 5,
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
+                    // @ts-expect-error
                     output: "object",
-                    ...args,
+                    ...objectArgs,
                 });
 
                 if (!response.object) {
@@ -75,7 +82,7 @@ export class LLM extends Base {
                 }
 
                 return {
-                    type: "structured-output",
+                    type: "assistant",
                     value: response.object,
                 } as LLMStructuredResponse<ZOD_OBJECT>;
             }

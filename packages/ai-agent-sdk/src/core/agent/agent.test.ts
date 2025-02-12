@@ -1,7 +1,7 @@
 import { Agent } from ".";
-import { createTool, userMessage } from "../../functions";
+import { userMessage } from "../../functions";
 import { type ModelProvider } from "../llm";
-import { type ToolSet } from "ai";
+import { Tool, type ToolSet } from "../tools";
 import fetch from "node-fetch";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
@@ -45,7 +45,9 @@ describe("agent", () => {
 
             test("agent with custom tool", async () => {
                 const tools: ToolSet = {
-                    weather: createTool({
+                    weather: new Tool({
+                        provider: model.provider,
+                        name: "weather",
                         description: "Fetch the current weather in a location",
                         parameters: z.object({
                             location: z.string(),

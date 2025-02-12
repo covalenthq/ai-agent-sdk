@@ -35,12 +35,12 @@ export class Agent extends Base {
                 messages: [
                     systemMessage(this.description),
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
+                    // @ts-expect-error
                     ...(this.instructions?.map((instruction) =>
                         systemMessage(instruction)
                     ) ?? []),
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
+                    // @ts-expect-error
                     ...(args.messages ?? []),
                 ],
             },

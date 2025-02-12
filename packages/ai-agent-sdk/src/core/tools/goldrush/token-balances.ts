@@ -1,36 +1,39 @@
-import { BaseGoldRushSchema, BaseGoldRushTool } from "./base-goldrush";
-import { type Chain } from "@covalenthq/client-sdk";
-import type { z } from "zod";
+import { type ModelProvider } from "../../llm";
+import { BaseGoldRushTool } from "./goldrush";
+import { type Chain, ChainName } from "@covalenthq/client-sdk";
+import { z } from "zod";
 
-export const TokenBalancesSchema = BaseGoldRushSchema;
-export type TokenBalancesParams = z.infer<typeof TokenBalancesSchema>;
+export const TokenBalancesSchema = z.object({
+    chain: z.enum(Object.values(ChainName) as [string, ...string[]]),
+    address: z.string(),
+});
 
-export class TokenBalancesTool extends BaseGoldRushTool {
-    constructor(apiKey?: string) {
-        super(
-            "token-balances",
-            "Fetch token balances for a wallet address on a specific blockchain",
-            TokenBalancesSchema,
-            apiKey
-        );
-    }
+export class TokenBalancesTool extends BaseGoldRushTool<
+    typeof TokenBalancesSchema
+> {
+    constructor(provider: ModelProvider["provider"], apiKey: string) {
+        super({
+            provider,
+            name: "token-balances",
+            description:
+                "Fetch token balances for a wallet address on a specific blockchain",
+            parameters: TokenBalancesSchema,
+            apiKey,
+            execute: async ({ address, chain }) => {
+                const balances =
+                    await this.client.BalanceService.getTokenBalancesForWalletAddress(
+                        chain as Chain,
+                        address
+                    );
 
-    protected async fetchData(params: TokenBalancesParams): Promise<string> {
-        try {
-            const { chain, address } = params;
-            const balances =
-                await this.client.BalanceService.getTokenBalancesForWalletAddress(
-                    chain as Chain,
-                    address
+                if (balances.error) {
+                    throw new Error(balances.error_message);
+                }
+
+                return BaseGoldRushTool.bigIntSerializer(
+                    balances.data.items ?? []
                 );
-
-            if (balances.error) {
-                throw new Error(balances.error_message);
-            }
-
-            return `Token balances for ${address} on ${chain}: ${JSON.stringify(balances.data, this.bigIntReplacer)}`;
-        } catch (error) {
-            return `Error fetching token balances: ${error instanceof Error ? error.message : "Unknown error"}`;
-        }
+            },
+        });
     }
 }
