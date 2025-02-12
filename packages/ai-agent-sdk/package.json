@@ -39,6 +39,7 @@
         "test:agent": "vitest src/core/agent/agent.test.ts",
         "test:llm": "vitest src/core/llm/llm.test.ts",
         "test:tools:goldrush": "vitest src/core/tools/goldrush/index.test.ts",
+        "test:tools:twitter": "vitest src/core/tools/twitter/index.test.ts",
         "test:zee": "vitest src/core/zee/zee.test.ts",
         "build": "tsc",
         "clean": "rm -rf dist",
@@ -54,6 +55,7 @@
         "openai": "^4.79.1",
         "pino": "^9.6.0",
         "pino-pretty": "^13.0.0",
+        "twitter-api-v2": "^1.18.2",
         "typescript": "^5.7.3",
         "zod": "^3.24.1",
         "zod-to-json-schema": "^3.24.1"
