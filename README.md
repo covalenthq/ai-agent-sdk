@@ -69,6 +69,25 @@ const zee = new ZeeWorkflow({
     console.log(result);
 })();
 ```
+The agent will automatically handle streaming responses and format them appropriately.
+
+### Using Ollama with the SDK
+
+To use Ollama with the SDK, you need to configure the Ollama provider in your agent setup.
+
+```js
+const agent = new Agent({
+    name: "LocalAgent",
+    model: {
+        provider: "OLLAMA",
+        name: "llama2",  // use the model you pulled
+        baseURL: "http://localhost:11434", // optional
+    },
+    description: "A locally-running AI assistant",
+    instructions:["answer the users questions "]
+});
+```
+
 
 ## 🤝 Contributing
 

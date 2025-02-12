@@ -47,11 +47,39 @@ export type GeminiConfig = {
     apiKey?: string;
 };
 
+export type OllamaModel = string; // Ollama model is not fixed
+
+export type OllamaConfig = {
+    provider: "OLLAMA";
+    name: OllamaModel;
+    toolChoice?: "auto" | "required";
+    temperature?: number;
+    apiKey?: string;
+    baseURL?: string; // option to override the base url
+};
+
 export type ModelConfig =
     | OpenAIConfig
     | DeepSeekConfig
     | GrokConfig
-    | GeminiConfig;
+    | GeminiConfig
+    | OllamaConfig;
+
+export interface OllamaMessage {
+    role: string;
+    content: string;
+}
+
+export interface OllamaResponse {
+    model: string;
+    message?: OllamaMessage;
+    done: boolean;
+}
+
+export interface FormattedResponse {
+    thinking: string;
+    response: string;
+}
 
 export type LLMResponse<T extends Record<string, AnyZodObject>> = {
     [K in keyof T]: {
