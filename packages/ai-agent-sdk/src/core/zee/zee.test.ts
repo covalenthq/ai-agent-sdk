@@ -16,15 +16,52 @@ describe("@ai-agent-sdk/zee", () => {
     ];
     providers.forEach((model) => {
         describe(`${model.provider}::${model.id}`, () => {
-            test("workflow with two agents", async () => {
+            // test("workflow with two agents", async () => {
+            //     const scriptWriter = new Agent({
+            //         name: "script writer",
+            //         description: "You are an expert screenplay writer...",
+            //         instructions: [
+            //             "Write a script outline with 3-5 main characters and key plot points.",
+            //             "Outline the three-act structure and suggest 2-3 twists.",
+            //             "Ensure the script aligns with the specified genre and target audience.",
+            //         ],
+            //         model,
+            //     });
+
+            //     const producer = new Agent({
+            //         name: "movie producer",
+            //         description: "Experienced movie producer...",
+            //         instructions: [
+            //             "Based on the script outline, plan the cast and crew for the movie.",
+            //             "Summarize the budget for the movie.",
+            //             "Provide a synopsis of the movie.",
+            //         ],
+            //         model,
+            //     });
+
+            //     const zee = new ZeeWorkflow({
+            //         goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget of 500000 USD for the provided script. Suggest a cast and crew for the movie.",
+            //         agents: {
+            //             scriptWriter,
+            //             producer,
+            //         },
+            //         model,
+            //     });
+
+            //     const result = await zee.run();
+
+            //     console.log(result);
+            // });
+
+            test("workflow with agent followup", async () => {
                 const scriptWriter = new Agent({
                     name: "script writer",
                     description:
-                        "You are an expert screenplay writer. Given a movie idea and genre, develop a compelling script outline with character descriptions and key plot points.",
+                        "You are an expert screenplay writer who creates detailed scripts and character descriptions.",
                     instructions: [
-                        "Write a script outline with 3-5 main characters and key plot points.",
-                        "Outline the three-act structure and suggest 2-3 twists.",
-                        "Ensure the script aligns with the specified genre and target audience.",
+                        "Write a brief script outline with main plot points.",
+                        "When asked for more details about characters, provide detailed character descriptions including age, personality, and background.",
+                        "Start your final script with 'COMPLETE:' and your character details with 'COMPLETE:'",
                     ],
                     model,
                 });
@@ -32,29 +69,29 @@ describe("@ai-agent-sdk/zee", () => {
                 const producer = new Agent({
                     name: "movie producer",
                     description:
-                        "Experienced movie producer overseeing script and casting.",
+                        "Experienced movie producer who needs detailed character information for casting.",
                     instructions: [
-                        "Ask script writer for a script outline based on the movie idea.",
-                        "Summarize the script outline.",
-                        "Provide a concise movie concept overview.",
+                        "Review the script outline.",
+                        "Ask the script writer for detailed character descriptions to help with casting.",
+                        "Use 'NEED_INFO:' to request character details.",
+                        "Once you have both script and character details, provide:",
+                        "- Casting suggestions based on character descriptions",
+                        "- Budget breakdown for $500,000",
+                        "Start your final plan with 'COMPLETE:'",
                     ],
                     model,
                 });
 
                 const zee = new ZeeWorkflow({
-                    description:
-                        "Plan a script for a movie that is 10 minutes long and has a happy ending.",
-                    output: "A scene by scene outline of the movie script.",
+                    goal: "Create a 10-minute movie script with detailed character descriptions and matching cast. Include a $500,000 budget breakdown.",
                     agents: {
                         scriptWriter,
                         producer,
                     },
                     model,
-                    // maxIterations: 5,
                 });
 
                 const result = await zee.run();
-
                 console.log(result);
             });
         });
