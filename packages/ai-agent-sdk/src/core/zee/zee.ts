@@ -1,11 +1,11 @@
 import type {
-    AgentMessage,
+    AgentAction,
     ContextItem,
     ZEEDefaultAgents,
     ZeeWorkflowOptions,
     ZEEWorkflowResponse,
 } from ".";
-import { Tool, userMessage } from "../..";
+import { systemMessage, Tool, userMessage } from "../..";
 import { Agent } from "../agent";
 import { Base } from "../base/base";
 import { z } from "zod";
@@ -13,9 +13,7 @@ import { z } from "zod";
 export class ZeeWorkflow extends Base {
     private agents: Record<string | ZEEDefaultAgents, Agent>;
     private context: ContextItem[] = [];
-    private messageQueue: AgentMessage[] = [];
-    private completedTasks: Set<string> = new Set();
-    private conversationHistory: Map<string, AgentMessage[]> = new Map();
+    private actionQueue: AgentAction[] = [];
     private maxIterations: number;
 
     constructor({
@@ -77,30 +75,39 @@ export class ZeeWorkflow extends Base {
 
         const resourcePlannerAgent = new Agent({
             name: "resource planner",
-            description:
-                "You coordinate tasks between agents to achieve the user's goal",
+            description: "You coordinate information flow between agents.",
             instructions: [
-                `Available agents: ${Object.keys(agents).join(", ")}`,
-                "When an agent needs information from another agent:",
-                "1. First check if the information exists in the context provided",
-                "2. If needed, use the executeAgent tool to get information from other agents",
-                "3. Do not try to use any other tools besides executeAgent, pass the desired agent's name and the task to execute",
-                "Example: executeAgent({ agentName: 'scriptWriter', task: 'Write script' })",
-                "The context will contain all completed tasks in format: 'agentName: output'",
+                `The available agents are: ${JSON.stringify(
+                    Object.entries(agents).map(
+                        ([name, { description, instructions }]) => ({
+                            name,
+                            description,
+                            instructions,
+                        })
+                    )
+                )}`,
+                "Your ONLY task is to identify and call the right agent to get requested information.",
+                "1. Identify which agent has the information",
+                "2. Call that agent ONCE using executeAgent",
+                "3. Return their response without modification",
+                "Do not try to process, validate, or get additional information.",
             ],
             model,
             tools: {
                 executeAgent: new Tool({
                     name: "executeAgent",
-                    description: "Execute a task using another agent",
+                    description: "Get information from a single agent",
                     parameters: z.object({
                         agentName: z.string(),
                         task: z.string(),
                     }),
                     execute: async ({ agentName, task }) => {
-                        return this.getAgent(agentName).generate({
+                        const agent = this.getAgent(agentName);
+                        const response = await agent.generate({
                             messages: [userMessage(task)],
                         });
+
+                        return response.value;
                     },
                     provider: model.provider,
                 }),
@@ -137,15 +144,11 @@ export class ZeeWorkflow extends Base {
         );
     }
 
-    private generateConversationId(): string {
-        return `conv_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    }
-
-    private generateMessageId(): string {
-        return `msg_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-    }
-
-    private parseRouterResponse(response: string) {
+    private parseRouterResponse(response: string): {
+        agentName: string;
+        instructions: string[];
+        dependencies: Record<string, string>;
+    }[] {
         console.log("\n📝 Parsing router response");
 
         try {
@@ -160,8 +163,13 @@ export class ZeeWorkflow extends Base {
                     throw new Error(`Invalid task format at index ${index}`);
                 }
                 console.log(
-                    `\n📌 Parsed task for ${task.agentName}:`,
-                    task.instructions
+                    `\n📌 Task for '${task.agentName}':`,
+                    task.instructions,
+                    Object.entries(task.dependencies).length
+                        ? `Dependent on: ${Object.entries(task.dependencies)
+                              .map(([key, value]) => `${key}: ${value}`)
+                              .join(", ")}`
+                        : ""
                 );
             });
 
@@ -175,47 +183,41 @@ export class ZeeWorkflow extends Base {
         }
     }
 
-    private async processMessage(message: AgentMessage) {
-        console.log("\n📨 Processing message:", {
-            id: message.id,
-            type: message.type,
-            from: message.from,
-            to: message.to,
+    private async processActionItem(action: AgentAction) {
+        console.log("\n📨 Processing action:", {
+            type: action.type,
+            from: action.from,
+            to: action.to,
         });
 
-        // Store message in conversation history
-        const conversationId = message.metadata?.conversationId;
-        if (!conversationId) {
-            throw new Error("Message must have a conversation ID");
-        }
-
-        if (!this.conversationHistory.has(conversationId)) {
-            this.conversationHistory.set(conversationId, []);
-        }
-        this.conversationHistory.get(conversationId)!.push(message);
-
-        // Handle completed tasks
-        if (message.type === "response" && message.metadata?.isTaskComplete) {
-            console.log("\n✅ Task completed by:", message.from);
-            console.log("\n📝 Completion content:", message.content);
-            this.completedTasks.add(message.from);
+        if (action.metadata?.isTaskComplete) {
+            switch (action.type) {
+                case "complete": {
+                    console.log(`\n✅ Task completed by: ${action.from}`);
+                    break;
+                }
+                case "response": {
+                    console.log(
+                        `\n☑️ Followup task completed by: ${action.from}`
+                    );
+                    break;
+                }
+            }
             this.context.push({
-                role: message.from,
-                content: message.content,
+                role: action.from,
+                content: action.content,
             });
+            console.log("\n📝 Added to context");
+
             return;
         }
 
-        if (!message.to) {
-            console.warn("⚠️ Message has no recipient:", message);
-            return;
-        }
+        const targetAgent = this.getAgent(action.to);
 
-        const targetAgent = this.getAgent(message.to);
+        console.log("\n📦 Current context:", this.context);
 
-        // If this is resource planner, include ALL completed task outputs
         const relevantContext =
-            (message.to === "resourcePlanner"
+            (action.to === "resourcePlanner"
                 ? this.context
                       .filter((ctx) => ctx.role !== "user")
                       .map((ctx) => `${ctx.role}: ${ctx.content}`)
@@ -223,169 +225,140 @@ export class ZeeWorkflow extends Base {
                 : this.context
                       .filter((ctx) =>
                           Object.keys(
-                              message.metadata?.dependencies || {}
+                              action.metadata?.dependencies || {}
                           ).includes(ctx.role as string)
                       )
                       .map((ctx) => `${ctx.role}: ${ctx.content}`)
                       .join("\n")) || "None";
 
-        console.log("\n📦 Current context:", this.context);
-        console.log(
-            `\n🔍 Filtered context for ${message.to}:`,
-            relevantContext
-        );
+        console.log(`\n🔍 Filtered relevant context for ${action.to}`);
 
-        // Build conversation context
-        const conversationContext = message.metadata?.conversationId
-            ? this.conversationHistory
-                  .get(message.metadata.conversationId)!
-                  .map(
-                      (msg) =>
-                          `${msg.from} -> ${msg.to || "all"}: ${msg.content}`
-                  )
-                  .join("\n")
-            : "None";
-
-        console.log(`\n💭 ${message.to} thinking...`);
         console.log("\n📤 Sending context:", {
             relevantContext: relevantContext,
-            conversationContext: conversationContext,
-            message: message.content,
+            content: action.content,
         });
+        console.log(`\n💭 ${action.to} thinking...`);
 
         const response = await targetAgent.generate({
             messages: [
+                systemMessage(
+                    `You have to:
+                    1. Complete your task by providing a final answer from the context.
+                    2. If the answer in not in the context, try to avoid asking for more information.
+                    3. If you ABSOLUTELY need additional information to complete your task, request more information by asking a question
+
+                    Instructions for responding:
+                    - If you need more information, start with "NEED_INFO:" followed by your question
+                    - If this is your final answer, start with ${
+                        action.type === "followup"
+                            ? "FOLLOWUP_COMPLETE:"
+                            : "COMPLETE:"
+                    } followed by your response.`
+                ),
                 userMessage(
-                    `${relevantContext}
-                    ${conversationContext ? "\nPrevious conversation:\n" + conversationContext : ""}
-                    \nNew message from ${message.from}: ${message.content}
-                    \nYou can:
-                    1. Complete your task by providing a final answer
-                    2. Request more information by asking a question
-                    \nIf possible, provide a final answer. If you ABSOLUTELY need more information, start your response with "NEED_INFO:" followed by your question.
-                    If this is your final answer, start with "COMPLETE:" followed by your response.`
+                    `Relevant context -> ${relevantContext}
+                    \nCurrent task -> ${action.content}`
                 ),
             ],
         });
 
         const responseContent = response.value;
-        const newMessageId = this.generateMessageId();
 
         if (responseContent.startsWith("NEED_INFO:")) {
-            console.log(
-                `❓ ${message.to} needs more information from ${message.from}: ${responseContent.replace("NEED_INFO:", "").trim()}`
-            );
-            this.messageQueue.unshift({
-                id: newMessageId,
+            const infoResponse: AgentAction = {
                 type: "followup",
-                from: message.to!,
-                to: message.from,
+                from: action.to!,
+                to: "resourcePlanner",
                 content: responseContent.replace("NEED_INFO:", "").trim(),
-                metadata: {
-                    conversationId: conversationId,
-                    previousMessageId: message.id,
-                },
-            });
-        } else if (responseContent.startsWith("COMPLETE:")) {
-            this.messageQueue.unshift({
-                id: newMessageId,
+            };
+            this.actionQueue.unshift(infoResponse);
+            console.log(action);
+            this.actionQueue.push(action);
+            console.log(
+                `❓ ${action.to} needs more information`,
+                infoResponse.content
+            );
+        } else if (responseContent.startsWith("FOLLOWUP_COMPLETE:")) {
+            console.log(`✍️ Handling followup response from ${action.to}`);
+            const followupResponse: AgentAction = {
                 type: "response",
-                from: message.to!,
-                to: message.from,
+                from: action.to!,
+                to: action.from,
+                content: responseContent
+                    .replace("FOLLOWUP_COMPLETE:", "")
+                    .trim(),
+                metadata: {
+                    isTaskComplete: true,
+                },
+            };
+            this.actionQueue.unshift(followupResponse);
+        } else if (responseContent.startsWith("COMPLETE:")) {
+            const completeAction: AgentAction = {
+                type: "complete",
+                from: action.to!,
+                to: action.from,
                 content: responseContent.replace("COMPLETE:", "").trim(),
                 metadata: {
-                    conversationId: conversationId,
-                    previousMessageId: message.id,
-                    isTaskComplete: true, // Mark as task completion
+                    isTaskComplete: true,
                 },
-            });
-        } else {
-            console.log(
-                `✍️ ${message.to} responded to followup from ${message.from}: ${responseContent}`
-            );
-            this.messageQueue.push({
-                id: newMessageId,
-                type: "followup_response",
-                from: message.to!,
-                to: message.from,
-                content: responseContent,
-                metadata: {
-                    conversationId: conversationId,
-                    previousMessageId: message.id,
-                },
-            });
+            };
+            this.actionQueue.unshift(completeAction);
         }
     }
 
     public async run(): Promise<ZEEWorkflowResponse> {
         console.log("\n🎬 Starting workflow execution");
 
-        // Initialize with router's task breakdown
         console.log("\n📋 Getting task breakdown from router...");
         const routerResponse = await this.getAgent("router").generate({});
 
         const tasks = this.parseRouterResponse(routerResponse.value);
 
-        // Create initial messages for each agent with unique conversation IDs
         tasks.forEach((task) => {
-            const messageId = this.generateMessageId();
-            const conversationId = this.generateConversationId();
-
-            this.messageQueue.push({
-                id: messageId,
+            this.actionQueue.push({
                 type: "request",
                 from: "resourcePlanner",
                 to: task.agentName,
                 content: task.instructions.join("\n"),
                 metadata: {
-                    conversationId: conversationId,
-                    dependencies: task.dependencies, // Add dependencies from router's response
+                    dependencies: task.dependencies,
                 },
             });
         });
 
-        // Process message queue until all agents complete their tasks
         let iterationCount = 0;
         while (
-            this.messageQueue.length > 0 &&
+            this.actionQueue.length > 0 &&
             iterationCount < this.maxIterations
         ) {
+            if (iterationCount >= this.maxIterations) {
+                console.warn("⚠️ Reached maximum iterations limit");
+            }
+
             iterationCount++;
             console.log(
-                `\n🔄 Iteration ${iterationCount}\nQueue size: ${this.messageQueue.length}\nNext message: ${this.messageQueue[0]?.type} from ${this.messageQueue[0]?.from} to ${this.messageQueue[0]?.to}`
+                `\n🔄 Iteration ${iterationCount}\nQueue size: ${this.actionQueue.length}`,
+                `Next action: ${this.actionQueue[0]?.type} from ${this.actionQueue[0]?.from} to ${this.actionQueue[0]?.to}`
             );
 
-            const message = this.messageQueue.shift()!;
+            const action = this.actionQueue.shift()!;
 
             try {
-                await this.processMessage(message);
+                await this.processActionItem(action);
             } catch (error) {
                 console.error(
-                    `❌ Error processing message from ${message.from}:`,
+                    `❌ Error processing action from ${action.from}:`,
                     error
                 );
                 this.context.push({
                     role: "error",
-                    content: `Error in communication between ${message.from} -> ${message.to}: ${error instanceof Error ? error.message : String(error)}`,
+                    content: `Error in communication between ${action.from} -> ${action.to}: ${error instanceof Error ? error.message : String(error)}`,
                 });
             }
-
-            // Check if all agents have completed their tasks
-            const allAgentsComplete = tasks.every((task) =>
-                this.completedTasks.has(task.agentName)
-            );
-
-            if (allAgentsComplete) {
-                console.log("\n✨ All agents have completed their tasks");
-                break;
-            }
         }
 
-        if (iterationCount >= this.maxIterations) {
-            console.warn("⚠️ Reached maximum iterations limit");
-        }
+        console.log("\n✨ All agents have completed their tasks");
 
-        // Final compilation by endgame agent
         console.log("\n🎭 Getting final compilation from endgame agent...");
         const endgameResponse = await this.getAgent("endgame").generate({
             messages: [userMessage(JSON.stringify(this.context))],

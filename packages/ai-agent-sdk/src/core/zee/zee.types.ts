@@ -10,23 +10,15 @@ export type ZeeWorkflowOptions = {
 
 export type ZEEDefaultAgents = "router" | "resourcePlanner" | "endgame";
 
-export interface AgentMessage {
-    type:
-        | "request"
-        | "response"
-        | "followup"
-        | "followup_response"
-        | "complete";
+export interface AgentAction {
+    type: "request" | "complete" | "followup" | "response";
     from: string;
-    to?: string;
+    to: string;
     content: string;
     metadata?: {
         dependencies?: Record<string, string>;
-        conversationId?: string;
-        previousMessageId?: string;
         isTaskComplete?: boolean;
     };
-    id: string;
 }
 
 export interface ContextItem {

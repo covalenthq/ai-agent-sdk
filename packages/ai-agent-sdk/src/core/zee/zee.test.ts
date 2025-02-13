@@ -23,7 +23,7 @@ describe("@ai-agent-sdk/zee", () => {
             //         instructions: [
             //             "Write a script outline with 3-5 main characters and key plot points.",
             //             "Outline the three-act structure and suggest 2-3 twists.",
-            //             "Ensure the script aligns with the specified genre and target audience.",
+            //             "Ensure the script aligns with a genre and target audience.",
             //         ],
             //         model,
             //     });
@@ -60,8 +60,7 @@ describe("@ai-agent-sdk/zee", () => {
                         "You are an expert screenplay writer who creates detailed scripts and character descriptions.",
                     instructions: [
                         "Write a brief script outline with main plot points.",
-                        "When asked for more details about characters, provide detailed character descriptions including age, personality, and background.",
-                        "Start your final script with 'COMPLETE:' and your character details with 'COMPLETE:'",
+                        "Start your script with 'COMPLETE:'",
                     ],
                     model,
                 });
@@ -69,21 +68,19 @@ describe("@ai-agent-sdk/zee", () => {
                 const producer = new Agent({
                     name: "movie producer",
                     description:
-                        "Experienced movie producer who needs detailed character information for casting.",
+                        "Experienced movie producer who needs specific character details for casting.",
                     instructions: [
                         "Review the script outline.",
-                        "Ask the script writer for detailed character descriptions to help with casting.",
-                        "Use 'NEED_INFO:' to request character details.",
-                        "Once you have both script and character details, provide:",
-                        "- Casting suggestions based on character descriptions",
-                        "- Budget breakdown for $500,000",
+                        "You MUST ask the script writer for detailed character descriptions before making casting decisions.",
+                        "Once you have character details, provide casting suggestions and budget breakdown.",
+                        "Use 'NEED_INFO:' to ask for character details.",
                         "Start your final plan with 'COMPLETE:'",
                     ],
                     model,
                 });
 
                 const zee = new ZeeWorkflow({
-                    goal: "Create a 10-minute movie script with detailed character descriptions and matching cast. Include a $500,000 budget breakdown.",
+                    goal: "Create a 10-minute movie script with matching cast and $500,000 budget breakdown.",
                     agents: {
                         scriptWriter,
                         producer,

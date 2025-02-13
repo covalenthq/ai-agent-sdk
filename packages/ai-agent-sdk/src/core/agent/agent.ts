@@ -45,6 +45,11 @@ export class Agent extends Base {
             },
             true
         );
+
+        console.log("--------------------------------");
+        console.log(this.name.toUpperCase(), "AGENT RESPONSE", response.value);
+        console.log("--------------------------------");
+
         return response as AgentResponse;
     }
 }
