@@ -26,7 +26,6 @@ export class Agent extends Base {
     }
 
     async generate(args: AgentGenerateParameters): Promise<AgentResponse> {
-        console.log("AGENT", this._config.name);
         const response = await this._llm.generate(
             {
                 ...args,
@@ -45,10 +44,6 @@ export class Agent extends Base {
             },
             true
         );
-
-        console.log("--------------------------------");
-        console.log(this.name.toUpperCase(), "AGENT RESPONSE", response.value);
-        console.log("--------------------------------");
 
         return response as AgentResponse;
     }

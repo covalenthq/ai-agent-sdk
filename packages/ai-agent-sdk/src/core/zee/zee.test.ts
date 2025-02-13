@@ -40,7 +40,7 @@ describe("@ai-agent-sdk/zee", () => {
             //     });
 
             //     const zee = new ZeeWorkflow({
-            //         goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget of 500000 USD for the provided script. Suggest a cast and crew for the movie.",
+            //         goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget for the provided script. Suggest a cast and crew for the movie.",
             //         agents: {
             //             scriptWriter,
             //             producer,
@@ -60,7 +60,7 @@ describe("@ai-agent-sdk/zee", () => {
                         "You are an expert screenplay writer who creates detailed scripts and character descriptions.",
                     instructions: [
                         "Write a brief script outline with main plot points.",
-                        "Start your script with 'COMPLETE:'",
+                        "Only if you are providing the script, then start your script with 'COMPLETE:', else just provide desired response.",
                     ],
                     model,
                 });

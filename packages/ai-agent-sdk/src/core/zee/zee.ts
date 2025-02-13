@@ -241,20 +241,26 @@ export class ZeeWorkflow extends Base {
 
         const response = await targetAgent.generate({
             messages: [
-                systemMessage(
-                    `You have to:
-                    1. Complete your task by providing a final answer from the context.
-                    2. If the answer in not in the context, try to avoid asking for more information.
-                    3. If you ABSOLUTELY need additional information to complete your task, request more information by asking a question
+                ...(action.to !== "resourcePlanner"
+                    ? [
+                          systemMessage(
+                              `You have to:
+                        1. Complete your task by providing an answer for the current task from the context.
+                        2. If the answer in not in the context, try to avoid asking for more information.
+                        3. If you ABSOLUTELY need additional information to complete your task, request more information by asking a question
 
-                    Instructions for responding:
-                    - If you need more information, start with "NEED_INFO:" followed by your question
-                    - If this is your final answer, start with ${
-                        action.type === "followup"
-                            ? "FOLLOWUP_COMPLETE:"
-                            : "COMPLETE:"
-                    } followed by your response.`
-                ),
+                        Instructions for responding:
+                        - If you need more information, start with "NEED_INFO:" followed by your question
+                        - If this is your answer, start with "COMPLETE:" followed by your response.`
+                          ),
+                      ]
+                    : action.type === "followup"
+                      ? [
+                            systemMessage(
+                                `start your response with "FOLLOWUP_COMPLETE:[agent name]:" followed by the response from the agent. Replace 'agent name' with the name of the agent that is responding.`
+                            ),
+                        ]
+                      : []),
                 userMessage(
                     `Relevant context -> ${relevantContext}
                     \nCurrent task -> ${action.content}`
@@ -271,21 +277,33 @@ export class ZeeWorkflow extends Base {
                 to: "resourcePlanner",
                 content: responseContent.replace("NEED_INFO:", "").trim(),
             };
+            this.actionQueue.unshift(action);
             this.actionQueue.unshift(infoResponse);
-            console.log(action);
-            this.actionQueue.push(action);
             console.log(
                 `❓ ${action.to} needs more information`,
                 infoResponse.content
             );
         } else if (responseContent.startsWith("FOLLOWUP_COMPLETE:")) {
-            console.log(`✍️ Handling followup response from ${action.to}`);
+            const agentName = responseContent.match(
+                /FOLLOWUP_COMPLETE:(\w+):/
+            )?.[1];
+
+            console.log(
+                `✍️ Handling followup response from ${agentName}`,
+                responseContent.slice(0, 50)
+            );
+
+            if (!agentName) {
+                console.error("❌ No agent name found in response");
+                return;
+            }
+
             const followupResponse: AgentAction = {
                 type: "response",
-                from: action.to!,
+                from: agentName,
                 to: action.from,
                 content: responseContent
-                    .replace("FOLLOWUP_COMPLETE:", "")
+                    .replace(/FOLLOWUP_COMPLETE:\w+:/, "")
                     .trim(),
                 metadata: {
                     isTaskComplete: true,
