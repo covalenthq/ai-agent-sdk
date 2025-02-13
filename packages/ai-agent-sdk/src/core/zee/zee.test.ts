@@ -53,7 +53,7 @@ describe("@ai-agent-sdk/zee", () => {
             //     console.log(result);
             // });
 
-            test("workflow with agent followup", async () => {
+            test("workflow with agent forced followup", async () => {
                 const scriptWriter = new Agent({
                     name: "script writer",
                     description:

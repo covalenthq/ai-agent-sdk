@@ -119,8 +119,8 @@ export class ZeeWorkflow extends Base {
             description:
                 "You conclude the workflow based on all completed tasks.",
             instructions: [
-                "Review all completed tasks and compile a final response",
-                "Ensure the response addresses the original goal",
+                "Review all completed tasks and compile in a single response.",
+                "Ensure the response addresses the original goal.",
             ],
             model,
         });
@@ -175,7 +175,7 @@ export class ZeeWorkflow extends Base {
 
             return tasks;
         } catch (error) {
-            console.error("❌ Error parsing router response:", error);
+            console.error("\n❌ Error parsing router response:", error);
             console.log("Raw response:", response);
             throw new Error(
                 `Failed to parse router response: ${error instanceof Error ? error.message : String(error)}`
@@ -216,20 +216,22 @@ export class ZeeWorkflow extends Base {
 
         console.log("\n📦 Current context:", this.context);
 
-        const relevantContext =
+        const relevantContext: string | null =
             (action.to === "resourcePlanner"
                 ? this.context
                       .filter((ctx) => ctx.role !== "user")
                       .map((ctx) => `${ctx.role}: ${ctx.content}`)
                       .join("\n")
                 : this.context
-                      .filter((ctx) =>
-                          Object.keys(
-                              action.metadata?.dependencies || {}
-                          ).includes(ctx.role as string)
+                      .filter(
+                          (ctx) =>
+                              Object.keys(
+                                  action.metadata?.dependencies || {}
+                              ).includes(ctx.role as string) ||
+                              ctx.role === "user"
                       )
                       .map((ctx) => `${ctx.role}: ${ctx.content}`)
-                      .join("\n")) || "None";
+                      .join("\n")) || null;
 
         console.log(`\n🔍 Filtered relevant context for ${action.to}`);
 
@@ -262,7 +264,7 @@ export class ZeeWorkflow extends Base {
                         ]
                       : []),
                 userMessage(
-                    `Relevant context -> ${relevantContext}
+                    `${relevantContext ? `Relevant context -> ${relevantContext}` : ""}
                     \nCurrent task -> ${action.content}`
                 ),
             ],
@@ -280,7 +282,7 @@ export class ZeeWorkflow extends Base {
             this.actionQueue.unshift(action);
             this.actionQueue.unshift(infoResponse);
             console.log(
-                `❓ ${action.to} needs more information`,
+                `\n❓ ${action.to} needs more information`,
                 infoResponse.content
             );
         } else if (responseContent.startsWith("FOLLOWUP_COMPLETE:")) {
@@ -289,12 +291,12 @@ export class ZeeWorkflow extends Base {
             )?.[1];
 
             console.log(
-                `✍️ Handling followup response from ${agentName}`,
+                `\n✍️ Handling followup response from ${agentName}`,
                 responseContent.slice(0, 50)
             );
 
             if (!agentName) {
-                console.error("❌ No agent name found in response");
+                console.error("\n❌ No agent name found in response");
                 return;
             }
 
@@ -350,7 +352,7 @@ export class ZeeWorkflow extends Base {
             iterationCount < this.maxIterations
         ) {
             if (iterationCount >= this.maxIterations) {
-                console.warn("⚠️ Reached maximum iterations limit");
+                console.warn("\n⚠️ Reached maximum iterations limit");
             }
 
             iterationCount++;
@@ -365,7 +367,7 @@ export class ZeeWorkflow extends Base {
                 await this.processActionItem(action);
             } catch (error) {
                 console.error(
-                    `❌ Error processing action from ${action.from}:`,
+                    `\n❌ Error processing action from ${action.from}:`,
                     error
                 );
                 this.context.push({
@@ -375,7 +377,11 @@ export class ZeeWorkflow extends Base {
             }
         }
 
-        console.log("\n✨ All agents have completed their tasks");
+        if (iterationCount >= this.maxIterations) {
+            console.warn("\n⚠️ Reached maximum iterations limit");
+        } else {
+            console.log("\n✨ All agents have completed their tasks");
+        }
 
         console.log("\n🎭 Getting final compilation from endgame agent...");
         const endgameResponse = await this.getAgent("endgame").generate({
