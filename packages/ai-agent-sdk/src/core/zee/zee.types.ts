@@ -3,12 +3,10 @@ import type { ModelProvider } from "../llm";
 
 export type ZeeWorkflowOptions = {
     goal: string;
-    agents: Record<string, Agent>;
+    agents: Agent[];
     maxIterations?: number;
     model: ModelProvider;
 };
-
-export type ZEEDefaultAgents = "router" | "resourcePlanner" | "endgame";
 
 export interface AgentAction {
     type: "request" | "complete" | "followup" | "response";

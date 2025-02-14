@@ -1,7 +1,6 @@
 import type {
     AgentAction,
     ContextItem,
-    ZEEDefaultAgents,
     ZeeWorkflowOptions,
     ZEEWorkflowResponse,
 } from ".";
@@ -11,7 +10,7 @@ import { Base } from "../base/base";
 import { z } from "zod";
 
 export class ZeeWorkflow extends Base {
-    private agents: Record<string | ZEEDefaultAgents, Agent>;
+    private agents: Record<string, Agent> = {};
     private context: ContextItem[] = [];
     private actionQueue: AgentAction[] = [];
     private maxIterations: number;
@@ -30,15 +29,15 @@ export class ZeeWorkflow extends Base {
 
         this.context.push(userMessage(goal));
 
-        const routerAgent = new Agent({
-            name: "router",
-            description: `You are a router that wants to complete the user's goal - "${goal}".`,
+        const breakdownAgent = new Agent({
+            name: "breakdown",
+            description: `You are a task breakdown agent that wants to complete the user's goal - "${goal}".`,
             instructions: [
                 "Break down the user's goal into smaller sequential tasks",
                 "For every smaller task, select the best agent that can handle the task",
                 `The available agents are: ${JSON.stringify(
-                    Object.entries(agents).map(
-                        ([name, { description, instructions }]) => ({
+                    Object.values(agents).map(
+                        ({ name, description, instructions }) => ({
                             name,
                             description,
                             instructions,
@@ -58,7 +57,7 @@ export class ZeeWorkflow extends Base {
                             dependencies: {},
                         },
                         {
-                            agentName: "budgetManager",
+                            agentName: "budget manager",
                             instructions: ["Create budget breakdown"],
                             dependencies: {
                                 writer: "Needs script to estimate budget",
@@ -73,13 +72,14 @@ export class ZeeWorkflow extends Base {
             model,
         });
 
-        const resourcePlannerAgent = new Agent({
-            name: "resource planner",
-            description: "You coordinate information flow between agents.",
+        const mastermindAgent = new Agent({
+            name: "mastermind",
+            description:
+                "You coordinate information flow between agents to achieve the user's goal.",
             instructions: [
                 `The available agents are: ${JSON.stringify(
-                    Object.entries(agents).map(
-                        ([name, { description, instructions }]) => ({
+                    Object.values(agents).map(
+                        ({ name, description, instructions }) => ({
                             name,
                             description,
                             instructions,
@@ -95,7 +95,7 @@ export class ZeeWorkflow extends Base {
             model,
             tools: {
                 executeAgent: new Tool({
-                    name: "executeAgent",
+                    name: "execute agent",
                     description: "Get information from a single agent",
                     parameters: z.object({
                         agentName: z.string(),
@@ -125,12 +125,15 @@ export class ZeeWorkflow extends Base {
             model,
         });
 
-        this.agents = {
-            router: routerAgent,
-            resourcePlanner: resourcePlannerAgent,
-            endgame: endgameAgent,
-            ...agents,
-        };
+        [breakdownAgent, mastermindAgent, endgameAgent, ...agents].forEach(
+            (agent) => {
+                if (!this.agents[agent.name]) {
+                    this.agents[agent.name] = agent;
+                } else {
+                    throw new Error(`Agent '${agent.name}' already exists`);
+                }
+            }
+        );
     }
 
     private getAgent(agentName: string): Agent {
@@ -144,18 +147,18 @@ export class ZeeWorkflow extends Base {
         );
     }
 
-    private parseRouterResponse(response: string): {
+    private parseBreakdownResponse(response: string): {
         agentName: string;
         instructions: string[];
         dependencies: Record<string, string>;
     }[] {
-        console.log("\n📝 Parsing router response");
+        console.log("\n📝 Parsing 'breakdown' response");
 
         try {
             const tasks = JSON.parse(response);
 
             if (!Array.isArray(tasks)) {
-                throw new Error("Router response must be an array");
+                throw new Error("'breakdown' response must be an array");
             }
 
             tasks.forEach((task, index) => {
@@ -175,10 +178,10 @@ export class ZeeWorkflow extends Base {
 
             return tasks;
         } catch (error) {
-            console.error("\n❌ Error parsing router response:", error);
+            console.error("\n❌ Error parsing 'breakdown' response:", error);
             console.log("Raw response:", response);
             throw new Error(
-                `Failed to parse router response: ${error instanceof Error ? error.message : String(error)}`
+                `Failed to parse 'breakdown' response: ${error instanceof Error ? error.message : String(error)}`
             );
         }
     }
@@ -193,12 +196,12 @@ export class ZeeWorkflow extends Base {
         if (action.metadata?.isTaskComplete) {
             switch (action.type) {
                 case "complete": {
-                    console.log(`\n✅ Task completed by: ${action.from}`);
+                    console.log(`\n✅ Task completed by: '${action.from}'`);
                     break;
                 }
                 case "response": {
                     console.log(
-                        `\n☑️ Followup task completed by: ${action.from}`
+                        `\n☑️ Followup task completed by: '${action.from}'`
                     );
                     break;
                 }
@@ -217,7 +220,7 @@ export class ZeeWorkflow extends Base {
         console.log("\n📦 Current context:", this.context);
 
         const relevantContext: string | null =
-            (action.to === "resourcePlanner"
+            (action.to === "mastermind"
                 ? this.context
                       .filter((ctx) => ctx.role !== "user")
                       .map((ctx) => `${ctx.role}: ${ctx.content}`)
@@ -233,17 +236,17 @@ export class ZeeWorkflow extends Base {
                       .map((ctx) => `${ctx.role}: ${ctx.content}`)
                       .join("\n")) || null;
 
-        console.log(`\n🔍 Filtered relevant context for ${action.to}`);
+        console.log(`\n🔍 Filtered relevant context for '${action.to}'`);
 
         console.log("\n📤 Sending context:", {
             relevantContext: relevantContext,
             content: action.content,
         });
-        console.log(`\n💭 ${action.to} thinking...`);
+        console.log(`\n💭 '${action.to}' thinking...`);
 
         const response = await targetAgent.generate({
             messages: [
-                ...(action.to !== "resourcePlanner"
+                ...(action.to !== "mastermind"
                     ? [
                           systemMessage(
                               `You have to:
@@ -276,27 +279,26 @@ export class ZeeWorkflow extends Base {
             const infoResponse: AgentAction = {
                 type: "followup",
                 from: action.to!,
-                to: "resourcePlanner",
+                to: "mastermind",
                 content: responseContent.replace("NEED_INFO:", "").trim(),
             };
             this.actionQueue.unshift(action);
             this.actionQueue.unshift(infoResponse);
             console.log(
-                `\n❓ ${action.to} needs more information`,
+                `\n❓ '${action.to}' needs more information`,
                 infoResponse.content
             );
         } else if (responseContent.startsWith("FOLLOWUP_COMPLETE:")) {
-            const agentName = responseContent.match(
-                /FOLLOWUP_COMPLETE:(\w+):/
-            )?.[1];
+            const agentName = responseContent
+                .match(/FOLLOWUP_COMPLETE:\[?([\w\s]+)\]?:/)?.[1]
+                ?.trim();
 
-            console.log(
-                `\n✍️ Handling followup response from ${agentName}`,
-                responseContent.slice(0, 50)
-            );
+            console.log(`\n⚙️ Handling followup response from '${agentName}'`);
 
             if (!agentName) {
-                console.error("\n❌ No agent name found in response");
+                console.error(
+                    "\n❌ No agent name found in response from 'mastermind'"
+                );
                 return;
             }
 
@@ -329,15 +331,15 @@ export class ZeeWorkflow extends Base {
     public async run(): Promise<ZEEWorkflowResponse> {
         console.log("\n🎬 Starting workflow execution");
 
-        console.log("\n📋 Getting task breakdown from router...");
-        const routerResponse = await this.getAgent("router").generate({});
+        console.log("\n📋 Getting task breakdown from 'breakdown'...");
+        const breakdownResponse = await this.getAgent("breakdown").generate({});
 
-        const tasks = this.parseRouterResponse(routerResponse.value);
+        const tasks = this.parseBreakdownResponse(breakdownResponse.value);
 
         tasks.forEach((task) => {
             this.actionQueue.push({
                 type: "request",
-                from: "resourcePlanner",
+                from: "mastermind",
                 to: task.agentName,
                 content: task.instructions.join("\n"),
                 metadata: {

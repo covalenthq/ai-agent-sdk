@@ -41,10 +41,7 @@ describe("@ai-agent-sdk/zee", () => {
 
             //     const zee = new ZeeWorkflow({
             //         goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget for the provided script. Suggest a cast and crew for the movie.",
-            //         agents: {
-            //             scriptWriter,
-            //             producer,
-            //         },
+            //         agents: [scriptWriter, producer],
             //         model,
             //     });
 
@@ -81,10 +78,7 @@ describe("@ai-agent-sdk/zee", () => {
 
                 const zee = new ZeeWorkflow({
                     goal: "Create a 10-minute movie script with matching cast and $500,000 budget breakdown.",
-                    agents: {
-                        scriptWriter,
-                        producer,
-                    },
+                    agents: [scriptWriter, producer],
                     model,
                 });
 
