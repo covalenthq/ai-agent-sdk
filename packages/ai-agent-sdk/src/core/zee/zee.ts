@@ -170,7 +170,7 @@ export class ZeeWorkflow extends Base {
                     `\n📌 Task for '${task.agentName}':`,
                     task.instructions,
                     Object.entries(task.dependencies).length
-                        ? `Dependent on: ${Object.entries(task.dependencies)
+                        ? `\nDependent on: ${Object.entries(task.dependencies)
                               .map(([key, value]) => `${key}: ${value}`)
                               .join(", ")}`
                         : ""

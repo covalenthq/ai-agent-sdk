@@ -1,7 +1,10 @@
 import { ZeeWorkflow } from ".";
 import { Agent } from "../agent";
 import { type ModelProvider } from "../llm";
+import { NFTBalancesTool, TokenBalancesTool, Tool } from "../tools";
+import fetch from "node-fetch";
 import { describe, test } from "vitest";
+import { z } from "zod";
 
 describe("@ai-agent-sdk/zee", () => {
     const providers: ModelProvider[] = [
@@ -9,6 +12,7 @@ describe("@ai-agent-sdk/zee", () => {
             provider: "openai",
             id: "gpt-4o-mini",
         },
+        // ! FIX: ZEE is not working with Google models
         // {
         //     provider: "google",
         //     id: "gemini-1.5-flash",
@@ -16,39 +20,39 @@ describe("@ai-agent-sdk/zee", () => {
     ];
     providers.forEach((model) => {
         describe(`${model.provider}::${model.id}`, () => {
-            // test("workflow with two agents", async () => {
-            //     const scriptWriter = new Agent({
-            //         name: "script writer",
-            //         description: "You are an expert screenplay writer...",
-            //         instructions: [
-            //             "Write a script outline with 3-5 main characters and key plot points.",
-            //             "Outline the three-act structure and suggest 2-3 twists.",
-            //             "Ensure the script aligns with a genre and target audience.",
-            //         ],
-            //         model,
-            //     });
+            test("workflow with two agents", async () => {
+                const scriptWriter = new Agent({
+                    name: "script writer",
+                    description: "You are an expert screenplay writer...",
+                    instructions: [
+                        "Write a script outline with 3-5 main characters and key plot points.",
+                        "Outline the three-act structure and suggest 2-3 twists.",
+                        "Ensure the script aligns with a genre and target audience.",
+                    ],
+                    model,
+                });
 
-            //     const producer = new Agent({
-            //         name: "movie producer",
-            //         description: "Experienced movie producer...",
-            //         instructions: [
-            //             "Based on the script outline, plan the cast and crew for the movie.",
-            //             "Summarize the budget for the movie.",
-            //             "Provide a synopsis of the movie.",
-            //         ],
-            //         model,
-            //     });
+                const producer = new Agent({
+                    name: "movie producer",
+                    description: "Experienced movie producer...",
+                    instructions: [
+                        "Based on the script outline, plan the cast and crew for the movie.",
+                        "Summarize the budget for the movie.",
+                        "Provide a synopsis of the movie.",
+                    ],
+                    model,
+                });
 
-            //     const zee = new ZeeWorkflow({
-            //         goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget for the provided script. Suggest a cast and crew for the movie.",
-            //         agents: [scriptWriter, producer],
-            //         model,
-            //     });
+                const zee = new ZeeWorkflow({
+                    goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget for the provided script. Suggest a cast and crew for the movie.",
+                    agents: [scriptWriter, producer],
+                    model,
+                });
 
-            //     const result = await zee.run();
+                const result = await zee.run();
 
-            //     console.log(result);
-            // });
+                console.log(result);
+            });
 
             test("workflow with agent forced followup", async () => {
                 const scriptWriter = new Agent({
@@ -83,197 +87,162 @@ describe("@ai-agent-sdk/zee", () => {
                 });
 
                 const result = await zee.run();
+
+                console.log(result);
+            });
+
+            test("workflow with custom tools", async () => {
+                const weatherAgent = new Agent({
+                    name: "weather agent",
+                    model,
+                    description:
+                        "You provided weather information for a location.",
+                    instructions: [
+                        "Call the weather tool to get the current weather information for a location.",
+                    ],
+                    tools: {
+                        weather: new Tool({
+                            provider: model.provider,
+                            name: "weather",
+                            description:
+                                "Fetch the current weather in a location",
+                            parameters: z.object({
+                                location: z.string(),
+                            }),
+                            execute: async ({ location }) => {
+                                const response = await fetch(
+                                    `https://api.weatherapi.com/v1/current.json?q=${location}&key=88f97127772c41a991095603230604`
+                                );
+                                const data = await response.json();
+                                return data;
+                            },
+                        }),
+                    },
+                });
+
+                const analystAgent = new Agent({
+                    name: "analyst agent",
+                    model,
+                    description:
+                        "You are an analyst that analyzes weather information.",
+                    instructions: [
+                        "Analyze and summarize the weather information provided.",
+                    ],
+                });
+
+                const zee = new ZeeWorkflow({
+                    goal: "What's the weather in Delhi? Elaborate on the weather.",
+                    agents: [weatherAgent, analystAgent],
+                    model,
+                });
+
+                const result = await zee.run();
+
+                console.log(result);
+            });
+
+            test("workflow with goldrush tools", async () => {
+                const nftBalancesAgent = new Agent({
+                    name: "nft balances agent",
+                    model,
+                    description:
+                        "You are provide NFT balances for a wallet address for a chain.",
+                    instructions: ["Provide the nft holdings"],
+                    tools: {
+                        nftBalances: new NFTBalancesTool(
+                            model.provider,
+                            process.env["GOLDRUSH_API_KEY"]!
+                        ),
+                    },
+                });
+
+                const tokenBalancesAgent = new Agent({
+                    name: "token balances agent",
+                    model,
+                    description:
+                        "You are provide token balances for a wallet address for a chain.",
+                    instructions: ["Provide the token holdings"],
+                    tools: {
+                        tokenBalances: new TokenBalancesTool(
+                            model.provider,
+                            process.env["GOLDRUSH_API_KEY"]!
+                        ),
+                    },
+                });
+
+                const analystAgent = new Agent({
+                    name: "analyst agent",
+                    model,
+                    description:
+                        "You are an expert blockchain analyst that analyzes wallet activities across different chains.",
+                    instructions: [
+                        "Analyze and summarize the wallet balances.",
+                    ],
+                });
+
+                const zee = new ZeeWorkflow({
+                    goal: "Whats are the NFT and Token balances of 'karanpargal.eth' on 'eth-mainnet'? Elaborate on the balances.",
+                    agents: [
+                        nftBalancesAgent,
+                        tokenBalancesAgent,
+                        analystAgent,
+                    ],
+                    model,
+                });
+
+                const result = await zee.run();
+
+                console.log(result);
+            });
+
+            test("exceeding max iterations", async () => {
+                const strategist = new Agent({
+                    name: "campaign strategist",
+                    description:
+                        "You are an experienced political campaign strategist who specializes in message development and voter outreach strategies.",
+                    instructions: [
+                        "Analyze the campaign goal and develop key messaging points.",
+                        "Identify target voter demographics.",
+                        "Propose specific outreach strategies.",
+                    ],
+                    model,
+                });
+
+                const mediaManager = new Agent({
+                    name: "media manager",
+                    description:
+                        "You are a media and communications expert who transforms campaign strategies into actionable media plans.",
+                    instructions: [
+                        "Review the campaign strategy.",
+                        "Create a detailed media plan including social media, traditional media, and advertising.",
+                        "Suggest content themes and timing for different platforms.",
+                    ],
+                    model,
+                });
+
+                const budgetManager = new Agent({
+                    name: "budget manager",
+                    description:
+                        "You are a budget manager who manages the campaign budget.",
+                    instructions: [
+                        "Review the campaign strategy.",
+                        "Create a detailed budget plan for the campaign",
+                        "Suggest content themes and timing for different platforms.",
+                    ],
+                    model,
+                });
+
+                const zee = new ZeeWorkflow({
+                    goal: "Develop a 30-day local political campaign strategy focusing on environmental policies and community engagement. Include both traditional and digital media approaches. Summarize a budget for the provided campaign strategy.",
+                    agents: [strategist, mediaManager, budgetManager],
+                    model,
+                    maxIterations: 5,
+                });
+
+                const result = await zee.run();
+
                 console.log(result);
             });
         });
     });
-
-    // test("workflow with custom tools", async () => {
-    //     const weather = createTool({
-    //         id: "weather-tool",
-    //         description: "Fetch the current weather in Vancouver, BC",
-    //         schema: z.object({
-    //             temperature: z.number(),
-    //         }),
-    //         execute: async (_args) => {
-    //             const lat = 49.2827,
-    //                 lon = -123.1207;
-
-    //             const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
-
-    //             const r = await fetch(url);
-    //             const data = await r.json();
-
-    //             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //             // @ts-expect-error
-    //             return `Current temperature in Vancouver, BC is ${data.current_weather.temperature}°C`;
-    //         },
-    //     });
-
-    //     const agent = new Agent({
-    //         name: "research agent",
-    //         model: {
-    //             provider: "OPEN_AI",
-    //             name: "gpt-4o-mini",
-    //         },
-    //         description:
-    //             "You are a senior NYT researcher writing an article on the current weather in Vancouver, BC.",
-    //         instructions: ["Use the weather tool to get the current weather"],
-    //         tools: {
-    //             weather,
-    //         },
-    //     });
-
-    //     const zee = new ZeeWorkflow({
-    //         description:
-    //             "Plan a script for a movie that is 10 minutes long and has a climax dealing with the weather.",
-    //         output: "A scene by scene outline of the movie script.",
-    //         agents: {
-    //             agent,
-    //         },
-    //     });
-
-    //     const result = await ZeeWorkflow.run(zee);
-
-    //     console.log(result);
-    // });
-
-    // test("workflow with goldrush tools", async () => {
-    //     const tools = {
-    //         tokenBalances: new TokenBalancesTool(
-    //             process.env["GOLDRUSH_API_KEY"]
-    //         ),
-    //         transactions: new TransactionsTool(process.env["GOLDRUSH_API_KEY"]),
-    //     };
-
-    //     const portfolio_analyst = new Agent({
-    //         name: "portfolio analyst",
-    //         model: {
-    //             provider: "OPEN_AI",
-    //             name: "gpt-4o-mini",
-    //         },
-    //         description:
-    //             "You are a blockchain portfolio analyst that analyzes wallet holdings and provides insights.",
-    //         instructions: [
-    //             "Provide a comprehensive overview of the wallet's portfolio",
-    //         ],
-    //         tools: {
-    //             tokenBalances: tools.tokenBalances,
-    //         },
-    //     });
-
-    //     const transaction_analyst = new Agent({
-    //         name: "transaction analyst",
-    //         model: {
-    //             provider: "OPEN_AI",
-    //             name: "gpt-4o-mini",
-    //         },
-    //         description:
-    //             "You are a blockchain transaction analyst that analyzes trading patterns and token price movements.",
-    //         instructions: [
-    //             "Provide a comprehensive overview of the transaction",
-    //         ],
-    //         tools: {
-    //             transactions: tools.transactions,
-    //         },
-    //     });
-
-    //     const zee = new ZeeWorkflow({
-    //         description: "Analyze a wallet's blockchain activity",
-    //         output: "A comprehensive report on the wallet's holdings and trading patterns.",
-    //         agents: {
-    //             portfolio_analyst,
-    //             transaction_analyst,
-    //         },
-    //     });
-
-    //     const initialState = StateFn.root(zee.description);
-    //     initialState.messages.push(
-    //         user(
-    //             "Analyze the wallet address 'karanpargal.eth' on 'eth-mainnet' for the last 24 hours. Provide a complete analysis of their portfolio and trading activity."
-    //         )
-    //     );
-
-    //     const result = await ZeeWorkflow.run(zee, initialState);
-
-    //     console.log(result);
-
-    //     expect(result.messages.length).toBeGreaterThan(0);
-    //     expect(result.status).toEqual("finished");
-
-    //     const finalMessage = result.messages[result.messages.length - 1];
-    //     expect(finalMessage?.content).toBeDefined();
-    //     console.log("Final Analysis:", finalMessage?.content);
-    // });
-
-    // test("workflow with dynamic maxIterations", async () => {
-    //     const script_writer = new Agent({
-    //         name: "script writer",
-    //         description:
-    //             "You are an expert screenplay writer. Given a movie idea and genre, develop a compelling script outline with character descriptions and key plot points.",
-    //         instructions: [
-    //             "Write a script outline with 3-5 main characters and key plot points.",
-    //             "Outline the three-act structure and suggest 2-3 twists.",
-    //             "Ensure the script aligns with the specified genre and target audience.",
-    //         ],
-    //         model: {
-    //             provider: "OPEN_AI",
-    //             name: "gpt-4o-mini",
-    //         },
-    //     });
-
-    //     const producer = new Agent({
-    //         name: "movie producer",
-    //         description:
-    //             "Experienced movie producer overseeing script and casting.",
-    //         instructions: [
-    //             "Ask script writer for a script outline based on the movie idea.",
-    //             "Summarize the script outline.",
-    //             "Provide a concise movie concept overview.",
-    //         ],
-
-    //         model: {
-    //             provider: "OPEN_AI",
-    //             name: "gpt-4o-mini",
-    //         },
-    //     });
-
-    //     const zeeWorkflowParams = {
-    //         description:
-    //             "Plan a script for a movie that is 10 minutes long and has a happy ending.",
-    //         output: "A scene by scene outline of the movie script.",
-    //         agents: {
-    //             script_writer,
-    //             producer,
-    //         },
-    //     };
-    //     const zeeWithMaxIterationsFive = new ZeeWorkflow({
-    //         ...zeeWorkflowParams,
-    //         maxIterations: 5,
-    //     });
-    //     expect(zeeWithMaxIterationsFive.maxIterations).toEqual(5);
-
-    //     const zeeWithMaxIterationsNotSet = new ZeeWorkflow({
-    //         ...zeeWorkflowParams,
-    //     });
-    //     expect(zeeWithMaxIterationsNotSet.maxIterations).toEqual(50);
-
-    //     const zeeWithMaxIterationsZero = new ZeeWorkflow({
-    //         ...zeeWorkflowParams,
-    //         maxIterations: 0,
-    //     });
-    //     expect(zeeWithMaxIterationsZero.maxIterations).toEqual(50);
-
-    //     const zeeWithMaxIterationsMinus = new ZeeWorkflow({
-    //         ...zeeWorkflowParams,
-    //         maxIterations: -10,
-    //     });
-    //     expect(zeeWithMaxIterationsMinus.maxIterations).toEqual(50);
-
-    //     const zeeWithMaxIterationsAThousand = new ZeeWorkflow({
-    //         ...zeeWorkflowParams,
-    //         maxIterations: 1000,
-    //     });
-    //     expect(zeeWithMaxIterationsAThousand.maxIterations).toEqual(1000);
-    // });
 });
