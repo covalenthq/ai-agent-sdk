@@ -4,6 +4,7 @@ import type {
     ZeeWorkflowOptions,
     ZEEWorkflowResponse,
 } from ".";
+import { ZEEActionResponseType } from ".";
 import { systemMessage, Tool, userMessage } from "../..";
 import { Agent } from "../agent";
 import { Base } from "../base/base";
@@ -237,8 +238,7 @@ export class ZeeWorkflow extends Base {
                       .join("\n")) || null;
 
         console.log(`\n🔍 Filtered relevant context for '${action.to}'`);
-
-        console.log("\n📤 Sending context:", {
+        console.log("\n📤 Sending information:", {
             relevantContext: relevantContext,
             content: action.content,
         });
@@ -255,14 +255,14 @@ export class ZeeWorkflow extends Base {
                         3. If you ABSOLUTELY need additional information to complete your task, request more information by asking a question
 
                         Instructions for responding:
-                        - If you need more information, start with "NEED_INFO:" followed by your question
-                        - If this is your answer, start with "COMPLETE:" followed by your response.`
+                        - If you need more information, start with "${ZEEActionResponseType.NEED_INFO}" followed by your question
+                        - If this is your answer, start with "${ZEEActionResponseType.COMPLETE}" followed by your response.`
                           ),
                       ]
                     : action.type === "followup"
                       ? [
                             systemMessage(
-                                `start your response with "FOLLOWUP_COMPLETE:[agent name]:" followed by the response from the agent. Replace 'agent name' with the name of the agent that is responding.`
+                                `start your response with "${ZEEActionResponseType.FOLLOWUP_COMPLETE}[agent name]:" followed by the response from the agent. Replace 'agent name' with the name of the agent that is responding.`
                             ),
                         ]
                       : []),
@@ -275,12 +275,14 @@ export class ZeeWorkflow extends Base {
 
         const responseContent = response.value;
 
-        if (responseContent.startsWith("NEED_INFO:")) {
+        if (responseContent.startsWith(ZEEActionResponseType.NEED_INFO)) {
             const infoResponse: AgentAction = {
                 type: "followup",
                 from: action.to!,
                 to: "mastermind",
-                content: responseContent.replace("NEED_INFO:", "").trim(),
+                content: responseContent
+                    .replace(ZEEActionResponseType.NEED_INFO, "")
+                    .trim(),
             };
             this.actionQueue.unshift(action);
             this.actionQueue.unshift(infoResponse);
@@ -288,16 +290,21 @@ export class ZeeWorkflow extends Base {
                 `\n❓ '${action.to}' needs more information`,
                 infoResponse.content
             );
-        } else if (responseContent.startsWith("FOLLOWUP_COMPLETE:")) {
-            const agentName = responseContent
-                .match(/FOLLOWUP_COMPLETE:\[?([\w\s]+)\]?:/)?.[1]
-                ?.trim();
+        } else if (
+            responseContent.startsWith(ZEEActionResponseType.FOLLOWUP_COMPLETE)
+        ) {
+            const followupCompletePattern = `${ZEEActionResponseType.FOLLOWUP_COMPLETE}\\[(.*?)\\]:\\s*`;
+            const match = responseContent.match(followupCompletePattern);
+            const agentName = match?.[1]?.trim();
 
-            console.log(`\n⚙️ Handling followup response from '${agentName}'`);
+            console.log(
+                `\n⚙️ Handling followup response from '${agentName}'`,
+                action.to
+            );
 
             if (!agentName) {
                 console.error(
-                    "\n❌ No agent name found in response from 'mastermind'"
+                    `\n❌ No agent name - '${agentName}' found in response from '${action.to}'`
                 );
                 return;
             }
@@ -306,20 +313,20 @@ export class ZeeWorkflow extends Base {
                 type: "response",
                 from: agentName,
                 to: action.from,
-                content: responseContent
-                    .replace(/FOLLOWUP_COMPLETE:\w+:/, "")
-                    .trim(),
+                content: responseContent.replace(match?.[0] || "", "").trim(),
                 metadata: {
                     isTaskComplete: true,
                 },
             };
             this.actionQueue.unshift(followupResponse);
-        } else if (responseContent.startsWith("COMPLETE:")) {
+        } else if (responseContent.startsWith(ZEEActionResponseType.COMPLETE)) {
             const completeAction: AgentAction = {
                 type: "complete",
                 from: action.to!,
                 to: action.from,
-                content: responseContent.replace("COMPLETE:", "").trim(),
+                content: responseContent
+                    .replace(ZEEActionResponseType.COMPLETE, "")
+                    .trim(),
                 metadata: {
                     isTaskComplete: true,
                 },

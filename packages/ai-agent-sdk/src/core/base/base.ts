@@ -16,6 +16,7 @@ export class Base {
         this.module = module;
     }
 
+    // TODO: setup logger for different levels
     info(message: string, ...args: unknown[]) {
         // this.logger.info(`[${this.module}] ${message}`, ...args);
         console.log(`[${this.module}] ${message}`, ...args);

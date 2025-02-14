@@ -28,3 +28,9 @@ export interface ZEEWorkflowResponse {
     content: string;
     context: ContextItem[];
 }
+
+export enum ZEEActionResponseType {
+    NEED_INFO = "NEED_INFO:",
+    FOLLOWUP_COMPLETE = "FOLLOWUP_COMPLETE:",
+    COMPLETE = "COMPLETE:",
+}
