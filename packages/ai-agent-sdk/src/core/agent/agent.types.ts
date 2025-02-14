@@ -11,6 +11,7 @@ export type AgentConfig = {
     description: string;
     instructions?: string[];
     tools?: ToolSet;
+    temperature?: number;
 };
 
 export type AgentGenerateParameters = Omit<

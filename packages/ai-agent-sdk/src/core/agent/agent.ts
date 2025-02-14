@@ -41,6 +41,7 @@ export class Agent extends Base {
                     // @ts-expect-error
                     ...(args.messages ?? []),
                 ],
+                temperature: this._config.temperature,
             },
             true
         );

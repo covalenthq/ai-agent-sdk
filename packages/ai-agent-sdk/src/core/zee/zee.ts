@@ -14,19 +14,27 @@ export class ZeeWorkflow extends Base {
     private agents: Record<string, Agent> = {};
     private context: ContextItem[] = [];
     private actionQueue: AgentAction[] = [];
-    private maxIterations: number;
+    private maxIterations: number = 50;
+    private temperature: number = 0.5;
 
-    constructor({
-        agents,
-        model,
-        goal,
-        maxIterations = 50,
-    }: ZeeWorkflowOptions) {
+    constructor({ agents, model, goal, config }: ZeeWorkflowOptions) {
         super("zee");
         console.log("\n🚀 Initializing ZeeWorkflow");
         console.log("Goal:", goal);
 
-        this.maxIterations = maxIterations;
+        if (config?.maxIterations) {
+            this.maxIterations = config.maxIterations;
+        }
+
+        if (
+            config?.temperature !== undefined &&
+            config?.temperature >= 0 &&
+            config?.temperature <= 1
+        ) {
+            this.temperature = config.temperature;
+        } else {
+            throw new Error("Invalid temperature. Must be between 0 and 1.");
+        }
 
         this.context.push(userMessage(goal));
 
@@ -71,6 +79,7 @@ export class ZeeWorkflow extends Base {
                 "Return ONLY the JSON array, no other text",
             ],
             model,
+            temperature: this.temperature,
         });
 
         const mastermindAgent = new Agent({
@@ -113,6 +122,7 @@ export class ZeeWorkflow extends Base {
                     provider: model.provider,
                 }),
             },
+            temperature: this.temperature,
         });
 
         const endgameAgent = new Agent({
@@ -124,6 +134,7 @@ export class ZeeWorkflow extends Base {
                 "Ensure the response addresses the original goal.",
             ],
             model,
+            temperature: this.temperature,
         });
 
         [breakdownAgent, mastermindAgent, endgameAgent, ...agents].forEach(

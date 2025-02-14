@@ -47,6 +47,9 @@ describe("@ai-agent-sdk/zee", () => {
                     goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget for the provided script. Suggest a cast and crew for the movie.",
                     agents: [scriptWriter, producer],
                     model,
+                    config: {
+                        temperature: 1,
+                    },
                 });
 
                 const result = await zee.run();
@@ -236,7 +239,9 @@ describe("@ai-agent-sdk/zee", () => {
                     goal: "Develop a 30-day local political campaign strategy focusing on environmental policies and community engagement. Include both traditional and digital media approaches. Summarize a budget for the provided campaign strategy.",
                     agents: [strategist, mediaManager, budgetManager],
                     model,
-                    maxIterations: 5,
+                    config: {
+                        maxIterations: 5,
+                    },
                 });
 
                 const result = await zee.run();

@@ -4,8 +4,11 @@ import type { ModelProvider } from "../llm";
 export type ZeeWorkflowOptions = {
     goal: string;
     agents: Agent[];
-    maxIterations?: number;
     model: ModelProvider;
+    config?: {
+        maxIterations?: number;
+        temperature?: number;
+    };
 };
 
 export interface AgentAction {
