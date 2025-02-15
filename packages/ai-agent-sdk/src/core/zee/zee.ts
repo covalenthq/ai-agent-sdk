@@ -30,7 +30,9 @@ export class ZeeWorkflow extends Base {
             if (config.temperature >= 0 && config.temperature <= 1) {
                 this.temperature = config.temperature;
             } else {
-                throw new Error("Invalid temperature. Must be between 0 and 1.");
+                throw new Error(
+                    "Invalid temperature. Must be between 0 and 1."
+                );
             }
         }
 
