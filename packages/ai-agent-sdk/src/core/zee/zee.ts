@@ -26,14 +26,12 @@ export class ZeeWorkflow extends Base {
             this.maxIterations = config.maxIterations;
         }
 
-        if (
-            config?.temperature !== undefined &&
-            config?.temperature >= 0 &&
-            config?.temperature <= 1
-        ) {
-            this.temperature = config.temperature;
-        } else {
-            throw new Error("Invalid temperature. Must be between 0 and 1.");
+        if (config?.temperature !== undefined) {
+            if (config.temperature >= 0 && config.temperature <= 1) {
+                this.temperature = config.temperature;
+            } else {
+                throw new Error("Invalid temperature. Must be between 0 and 1.");
+            }
         }
 
         this.context.push(userMessage(goal));
