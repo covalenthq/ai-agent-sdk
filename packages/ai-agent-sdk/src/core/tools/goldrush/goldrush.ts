@@ -1,5 +1,5 @@
-import { type GoldRushToolParams } from ".";
 import { Tool } from "../tool";
+import { type ToolParams } from "../tool.types";
 import { GoldRushClient } from "@covalenthq/client-sdk";
 import type { AnyZodObject } from "zod";
 
@@ -8,9 +8,9 @@ export abstract class BaseGoldRushTool<
 > extends Tool<ZOD_OBJECT> {
     protected client: GoldRushClient;
 
-    constructor(params: GoldRushToolParams<ZOD_OBJECT>) {
-        if (!params.apiKey) {
-            throw new Error("GOLDRUSH_API_KEY is not set");
+    constructor(params: ToolParams<ZOD_OBJECT>) {
+        if (!process.env["GOLDRUSH_API_KEY"]) {
+            throw new Error("GOLDRUSH_API_KEY is not set in the env");
         }
 
         super({
@@ -21,7 +21,7 @@ export abstract class BaseGoldRushTool<
             execute: params.execute,
         });
 
-        this.client = new GoldRushClient(params.apiKey);
+        this.client = new GoldRushClient(process.env["GOLDRUSH_API_KEY"]!);
     }
 
     public static bigIntSerializer(data: object | object[]) {

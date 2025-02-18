@@ -11,14 +11,13 @@ const NFTBalancesSchema = z.object({
 export class NFTBalancesTool extends BaseGoldRushTool<
     typeof NFTBalancesSchema
 > {
-    constructor(provider: ModelProvider["provider"], apiKey: string) {
+    constructor(provider: ModelProvider["provider"]) {
         super({
             provider,
             name: "nft-balances",
             description:
                 "Fetch NFT balances for a wallet address on a specific blockchain",
             parameters: NFTBalancesSchema,
-            apiKey,
             execute: async ({ address, chain }) => {
                 const nfts = await this.client.NftService.getNftsForAddress(
                     chain as Chain,

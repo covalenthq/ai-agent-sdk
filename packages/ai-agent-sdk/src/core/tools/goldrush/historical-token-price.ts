@@ -12,14 +12,13 @@ const HistoricalTokenPriceSchema = z.object({
 export class HistoricalTokenPriceTool extends BaseGoldRushTool<
     typeof HistoricalTokenPriceSchema
 > {
-    constructor(provider: ModelProvider["provider"], apiKey: string) {
+    constructor(provider: ModelProvider["provider"]) {
         super({
             provider,
             name: "historical-token-price",
             description:
                 "Fetch historical token prices for a specific token on a blockchain",
             parameters: HistoricalTokenPriceSchema,
-            apiKey,
             execute: async ({ chain, contractAddress, timeframe }) => {
                 let from: string | null = null;
 

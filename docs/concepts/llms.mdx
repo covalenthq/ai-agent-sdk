@@ -4,45 +4,72 @@ description: Overview of supported language models, including OpenAI, Anthropic,
 icon: "computer-classic"
 ---
 
-Each LLM is an adapter around a language model provider and the specific model version, eg: `gpt-4o-mini`. Each [Agent](./agents) can pick their own model and a [ZeeWorkflow](./zeeworkflows) can be configured to use a specific LLM as default.
+Each LLM is an adapter around a language model provider and the specific model version, eg: `gpt-4o-mini`. Each [Agent](/agents) can pick their own model and a [ZeeWorkflow](/zee-workflows) can be configured to use a specific LLM as default.
 
 ```tsx
 const llm = new LLM({
-    provider: "OPEN_AI",
-    name: "gpt-4o-mini",
-    apiKey: process.env.OPENAI_API_KEY,
-    temperature: 0.7
+    provider: "openai",
+    id: "gpt-4o-mini",
 });
 ```
 
-## List of supported LLMs
-
-### Open AI
+## List of supported LLM Model IDs
 
 <CodeGroup>
 
 ```plaintext OpenAI
-"gpt-4"
-"gpt-4-turbo"
-"gpt-3.5-turbo"
 "gpt-4o"
 "gpt-4o-mini"
-"o3-mini"
+"gpt-4o-2024-05-13"
+"gpt-4o-2024-08-06"
+"gpt-4o-2024-11-20"
+"gpt-4o-audio-preview"
+"gpt-4o-audio-preview-2024-10-01"
+"gpt-4o-audio-preview-2024-12-17"
+"gpt-4o-mini-2024-07-18"
+"gpt-4-turbo"
+"gpt-4-turbo-2024-04-09"
+"gpt-4-turbo-preview"
+"gpt-4-0125-preview"
+"gpt-4-1106-preview"
+"gpt-4"
+"gpt-4-0613"
+"gpt-3.5-turbo-0125"
+"gpt-3.5-turbo"
+"gpt-3.5-turbo-1106"
 ```
 
-```plaintext DeepSeek
-"deepseek-chat"
-"deepseek-coder"
+```plaintext Anthropic
+"claude-3-5-sonnet-latest"
+"claude-3-5-sonnet-20241022"
+"claude-3-5-sonnet-20240620"
+"claude-3-5-haiku-latest"
+"claude-3-5-haiku-20241022"
+"claude-3-opus-latest"
+"claude-3-opus-20240229"
+"claude-3-sonnet-20240229"
+"claude-3-haiku-20240307"
 ```
 
-```plaintext Grok
-"grok-2-latest"
-"grok-beta"
-```
-
-```plaintext Gemini
+```plaintext Google
+"gemini-2.0-flash-001"
 "gemini-1.5-flash"
+"gemini-1.5-flash-latest"
+"gemini-1.5-flash-001"
+"gemini-1.5-flash-002"
+"gemini-1.5-flash-8b"
+"gemini-1.5-flash-8b-latest"
+"gemini-1.5-flash-8b-001"
 "gemini-1.5-pro"
+"gemini-1.5-pro-latest"
+"gemini-1.5-pro-001"
+"gemini-1.5-pro-002"
+"gemini-2.0-flash-lite-preview-02-05"
+"gemini-2.0-pro-exp-02-05"
+"gemini-2.0-flash-thinking-exp-01-21"
+"gemini-2.0-flash-exp"
+"gemini-exp-1206"
+"learnlm-1.5-pro-experimental"
 ```
 
 </CodeGroup>
@@ -55,16 +82,12 @@ const llm = new LLM({
 OPENAI_API_KEY
 ```
 
-```plaintext DeepSeek
-DEEPSEEK_API_KEY
+```plaintext Anthropic
+ANTHROPIC_API_KEY
 ```
 
-```plaintext Grok
-GROK_API_KEY
-```
-
-```plaintext Gemini
-GEMINI_API_KEY
+```plaintext Google
+GOOGLE_GENERATIVE_AI_API_KEY
 ```
 
 </CodeGroup>
@@ -77,57 +100,41 @@ LLMs can also process images along with text using image URL messages. Here's an
 
 ```typescript
 const messages = [
-    {
-        role: "user",
-        content: [
-            {
-                type: "text",
-                text: "What's in this image? Analyze the logo and suggest improvements.",
-            },
-            {
-                type: "image_url",
-                image_url: {
-                    url: "https://example.com/logo.png",
-                    detail: "auto",
-                },
-            },
-        ],
-    },
-];
+    userMessage(
+        "What's in this image?"
+    ),
+    userMessage([
+        {
+            type: "image",
+            image: "https://example.com/logo.png",
+        },
+    ]),
+],
 
-const schema = {
-    analysis: z.object({
-        description: z.string(),
-        colors: z.array(z.string()),
-        text_content: z.string().optional(),
-        improvements: z.string().optional(),
-    }),
-};
+const schema = z.object({
+    description: z.string(),
+    colors: z.array(z.string()),
+    text_content: z.string().optional(),
+    improvements: z.string().optional(),
+});
 
-const result = await llm.generate(messages, schema, {});
+const result = await llm.generate({
+    messages,
+    schema,
+    temperature: 0.8,
+});
 ```
 
 The LLM will analyze the image and return a structured response containing the description, colors used, and potential improvements. You can also use base64-encoded images by providing the data URL:
 
 ```typescript
 const messages = [
-    {
-        role: "user",
-        content: [
-            {
-                type: "text",
-                text: "What's in this image and what color is it?",
-            },
-            {
-                type: "image_url",
-                image_url: {
-                    url: "data:image/png;base64,..." // Your base64 image data
-                    detail: "auto",
-                },
-            },
-        ],
-    },
+    userMessage("What's in this image?"),
+    userMessage([
+        {
+            type: "image",
+            image: "data:image/png;base64,...",
+        },
+    ]),
 ];
 ```
-
-Note: Image analysis is currently supported by OpenAI models. Some providers like Gemini may have limited or no support for image analysis.

@@ -133,6 +133,8 @@ describe("@ai-agent-sdk/llm", () => {
                 expect(result.type).toBe("assistant");
                 expect(result.value).toBeDefined();
             });
+
+            // TODO: add audio and file multimodal input tests
         });
     });
 });

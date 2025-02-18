@@ -8,6 +8,8 @@ description: Tools for interacting with blockchain data through the GoldRush API
 
 The SDK includes built-in tools for interacting with blockchain data through the [GoldRush API](https://goldrush.dev/). These tools allow agents to fetch token balances, NFT holdings, and transaction history across 100+ blockchains.
 
+> Each GoldRush tool requires an API key which can be set through the `GOLDRUSH_API_KEY` environment variable. Tools can be used independently or combined for comprehensive blockchain analysis.
+
 ### Available GoldRush Tools
 
 1. **Token Balances Tool**: Fetch token balances for any wallet address across supported blockchains. This tool provides detailed information including:
@@ -15,7 +17,7 @@ The SDK includes built-in tools for interacting with blockchain data through the
     - Token metadata (symbol, decimals, contract address)
 
 ```typescript
-const tokenBalances = new TokenBalancesTool(apiKey);
+const tokenBalances = new TokenBalancesTool("openai");
 ```
 
 2. **NFT Holdings Tool**: Fetch NFT holdings for any wallet address with comprehensive metadata:
@@ -25,7 +27,7 @@ const tokenBalances = new TokenBalancesTool(apiKey);
     - Floor prices and estimated values
 
 ```typescript
-const nftHoldings = new NFTHoldingsTool(apiKey);
+const nftHoldings = new NFTHoldingsTool("openai");
 ```
 
 3. **Transaction History Tool**: Fetch detailed transaction history for any wallet address including:
@@ -35,7 +37,7 @@ const nftHoldings = new NFTHoldingsTool(apiKey);
     - Gas costs and transaction status
 
 ```typescript
-const transactionHistory = new TransactionHistoryTool(apiKey);
+const transactionHistory = new TransactionHistoryTool("openai");
 ```
 
 4. **Historical Token Price Tool**: Fetch historical price data for any token across supported blockchains:
@@ -44,7 +46,7 @@ const transactionHistory = new TransactionHistoryTool(apiKey);
     - Detailed price data points within the selected timeframe
 
 ```typescript
-const historicalPrices = new HistoricalTokenPriceTool(apiKey);
+const historicalPrices = new HistoricalTokenPriceTool("openai");
 ```
 
 ### Using GoldRush Tools
@@ -56,15 +58,19 @@ const agent = new Agent({
     name: "blockchain researcher",
     model: {
         provider: "OPEN_AI",
-        name: "gpt-4o-mini",
+        id: "gpt-4o-mini",
     },
-    description: "You are a blockchain researcher analyzing wallet activities.",
+    description:
+        "You are a blockchain researcher analyzing wallet activities using the GoldRush On Chain Data APIs.",
+    instructions: [
+        "Analyze wallet activities using the provided blockchain tools",
+        "Summarize token holdings, NFT collections, and recent transactions",
+        "Provide insights about the wallet's activity patterns",
+    ],
     tools: {
-        tokenBalances: new TokenBalancesTool(apiKey),
-        nftBalances: new NFTBalancesTool(apiKey),
-        transactions: new TransactionsTool(apiKey),
+        tokenBalances: new TokenBalancesTool("openai"),
+        nftBalances: new NFTBalancesTool("openai"),
+        transactions: new TransactionsTool("openai"),
     },
 });
 ```
-
-Each GoldRush tool requires an API key which can be set through the `GOLDRUSH_API_KEY` environment variable or passed directly to the tool constructor. Tools can be used independently or combined for comprehensive blockchain analysis.

@@ -156,10 +156,7 @@ describe("@ai-agent-sdk/zee", () => {
                         "You are provide NFT balances for a wallet address for a chain.",
                     instructions: ["Provide the nft holdings"],
                     tools: {
-                        nftBalances: new NFTBalancesTool(
-                            model.provider,
-                            process.env["GOLDRUSH_API_KEY"]!
-                        ),
+                        nftBalances: new NFTBalancesTool(model.provider),
                     },
                 });
 
@@ -170,10 +167,7 @@ describe("@ai-agent-sdk/zee", () => {
                         "You are provide token balances for a wallet address for a chain.",
                     instructions: ["Provide the token holdings"],
                     tools: {
-                        tokenBalances: new TokenBalancesTool(
-                            model.provider,
-                            process.env["GOLDRUSH_API_KEY"]!
-                        ),
+                        tokenBalances: new TokenBalancesTool(model.provider),
                     },
                 });
 

@@ -10,23 +10,26 @@ Tools are functions that can be used to extend the capabilities of your agents. 
 
 2. **Structured Output**: Tools are functions that can be used to generate structured output. This is useful for generating JSON, CSV, or other structured data.
 
-Tools are optional and can be added to an Agent to extend its capabilities. Tools are included in the calls to the language model through features like OpenAI's [function calling](https://platform.openai.com/docs/guides/function-calling) or Claude's [tool use](https://docs.anthropic.com/en/docs/build-with-claude/tool-use).
+Tools are optional and can be added to an Agent to extend its capabilities. Tools are included in the calls to the language model through the [tools](https://sdk.vercel.ai/docs/ai-sdk-core/tools-and-tool-calling) property.
 
 ## Creating a Tool
 
-Tools are created using the `createTool` function and can be sent to the agent using the `tools` property during initialization.
+Tools are created using the `Tool` class and can be sent to the agent using the `tools` property during initialization.
 
 ```typescript
-const tool = createTool({
-    id: "get-company-report",
-    description: "This tool is used to get the current state of the company",
-    schema: z.object({}),
-    execute: async (params) => {
-        return "The current state of the company is good";
+const tool = new Tool({
+    provider: "openai",
+    name: "get weather",
+    description: "This tool is used to get the current weather in a location",
+    parameters: z.object({
+        location: z.string(),
+    }),
+    execute: async ({ location }) => {
+        return "The current weather in " + location + " is sunny";
     },
 });
 ```
 
-## Available Tools
+## Default Tools
 
 - [GoldRush Onchain Data](/tools/goldrush-onchain-data) - Tools for interacting with blockchain data

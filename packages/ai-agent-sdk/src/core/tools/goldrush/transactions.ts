@@ -11,14 +11,13 @@ const TransactionsSchema = z.object({
 export class TransactionsTool extends BaseGoldRushTool<
     typeof TransactionsSchema
 > {
-    constructor(provider: ModelProvider["provider"], apiKey: string) {
+    constructor(provider: ModelProvider["provider"]) {
         super({
             provider,
             name: "transactions",
             description:
                 "Fetch transactions for a wallet address on a specific blockchain",
             parameters: TransactionsSchema,
-            apiKey,
             execute: async ({ address, chain }) => {
                 const txs =
                     await this.client.TransactionService.getAllTransactionsForAddressByPage(

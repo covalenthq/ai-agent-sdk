@@ -27,10 +27,7 @@ describe("@ai-agent-sdk/tools/goldrush", () => {
         describe(`${model.provider}::${model.id}`, () => {
             test("token balances tool with an agent", async () => {
                 const tools: ToolSet = {
-                    tokenBalances: new TokenBalancesTool(
-                        model.provider,
-                        process.env["GOLDRUSH_API_KEY"]!
-                    ),
+                    tokenBalances: new TokenBalancesTool(model.provider),
                 };
 
                 const agent = new Agent({
@@ -61,10 +58,7 @@ describe("@ai-agent-sdk/tools/goldrush", () => {
 
             test("token balances tool with an agent", async () => {
                 const tools: ToolSet = {
-                    transactions: new TransactionsTool(
-                        model.provider,
-                        process.env["GOLDRUSH_API_KEY"]!
-                    ),
+                    transactions: new TransactionsTool(model.provider),
                 };
 
                 const agent = new Agent({
@@ -95,10 +89,7 @@ describe("@ai-agent-sdk/tools/goldrush", () => {
 
             test("nft balances tool with an agent", async () => {
                 const tools: ToolSet = {
-                    nftBalances: new NFTBalancesTool(
-                        model.provider,
-                        process.env["GOLDRUSH_API_KEY"]!
-                    ),
+                    nftBalances: new NFTBalancesTool(model.provider),
                 };
 
                 const agent = new Agent({
@@ -130,8 +121,7 @@ describe("@ai-agent-sdk/tools/goldrush", () => {
             test("nft balances tool with an agent", async () => {
                 const tools: ToolSet = {
                     historicalTokenPrice: new HistoricalTokenPriceTool(
-                        model.provider,
-                        process.env["GOLDRUSH_API_KEY"]!
+                        model.provider
                     ),
                 };
 
@@ -163,18 +153,9 @@ describe("@ai-agent-sdk/tools/goldrush", () => {
 
             test("multiple goldrush tools with an agent", async () => {
                 const tools: ToolSet = {
-                    tokenBalances: new TokenBalancesTool(
-                        model.provider,
-                        process.env["GOLDRUSH_API_KEY"]!
-                    ),
-                    nftBalances: new NFTBalancesTool(
-                        model.provider,
-                        process.env["GOLDRUSH_API_KEY"]!
-                    ),
-                    transactions: new TransactionsTool(
-                        model.provider,
-                        process.env["GOLDRUSH_API_KEY"]!
-                    ),
+                    tokenBalances: new TokenBalancesTool(model.provider),
+                    nftBalances: new NFTBalancesTool(model.provider),
+                    transactions: new TransactionsTool(model.provider),
                 };
 
                 const agent = new Agent({

@@ -11,14 +11,13 @@ const TokenBalancesSchema = z.object({
 export class TokenBalancesTool extends BaseGoldRushTool<
     typeof TokenBalancesSchema
 > {
-    constructor(provider: ModelProvider["provider"], apiKey: string) {
+    constructor(provider: ModelProvider["provider"]) {
         super({
             provider,
             name: "token-balances",
             description:
                 "Fetch token balances for a wallet address on a specific blockchain",
             parameters: TokenBalancesSchema,
-            apiKey,
             execute: async ({ address, chain }) => {
                 const balances =
                     await this.client.BalanceService.getTokenBalancesForWalletAddress(
