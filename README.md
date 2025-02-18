@@ -2,7 +2,7 @@
 
 # AI Agent SDK for TypeScript
 
-[📖 Documentation](https://cxt.build/) | 
+[📖 Documentation](https://cxt.build/) |
 [✍🏻 ZEE Use-cases](https://cxt.build/docs/use-cases/overview)
 
 <br />
@@ -15,7 +15,6 @@
 [![GitHub issues](https://img.shields.io/github/issues/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/issues)
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/pulls)
 
-
 [![GitHub stars](https://img.shields.io/github/stars/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/covalenthq/ai-agent-sdk)](https://github.com/covalenthq/ai-agent-sdk/network/members)
 
@@ -25,10 +24,10 @@
 
 ## Features
 
-- LLMs - a unified interface for all LLMs
-- Agents - a single model with a system prompt and a set of tools
-- Tools - extend the capabilities of agents with external tools
-- ZEE Workflows - compose agents to solve complex problems
+-   LLMs - a unified interface for all LLMs
+-   Agents - a single model with a system prompt and a set of tools
+-   Tools - extend the capabilities of agents with external tools
+-   ZEE Workflows - compose agents to solve complex problems
 
 ## Using the SDK (Quick Start)
 
@@ -45,9 +44,10 @@ const agent1 = new Agent({
     name: "Agent1",
     model: {
         provider: "OPEN_AI",
-        name: "gpt-4o-mini",
+        id: "gpt-4o-mini",
     },
     description: "A helpful AI assistant that can engage in conversation.",
+    instructions: ["Interact with the user in a friendly and helpful manner"],
 });
 ```
 
@@ -55,9 +55,12 @@ const agent1 = new Agent({
 
 ```js
 const zee = new ZeeWorkflow({
-    description: "A workflow of agents that do stuff together",
-    output: "Just bunch of stuff",
-    agents: { agent1, agent2 },
+    goal: "A workflow of agents that do stuff together",
+    agents: [agent1, agent2],
+    model: {
+        provider: "OPEN_AI",
+        id: "gpt-4o-mini",
+    },
 });
 ```
 
@@ -65,7 +68,7 @@ const zee = new ZeeWorkflow({
 
 ```js
 (async function main() {
-    const result = await ZeeWorkflow.run(zee);
+    const result = await zee.run();
     console.log(result);
 })();
 ```
