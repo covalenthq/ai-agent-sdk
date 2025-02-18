@@ -1,6 +1,6 @@
 import {
     Agent,
-    ModelProvider,
+    type ModelProvider,
     NFTBalancesTool,
     TokenBalancesTool,
     ZeeWorkflow,
