@@ -1,17 +1,27 @@
-import { Agent, ZeeWorkflow, createTool } from "@covalenthq/ai-agent-sdk";
-import { user } from "@covalenthq/ai-agent-sdk/dist/core/base";
-import { StateFn } from "@covalenthq/ai-agent-sdk/dist/core/state";
+import {
+    Agent,
+    type ModelProvider,
+    Tool,
+    ZeeWorkflow,
+} from "@covalenthq/ai-agent-sdk";
 import "dotenv/config";
 import { z } from "zod";
 
-const fetchNews = createTool({
-    id: "fetch-news",
-    description: "Fetch the latest news articles about a given topic",
-    schema: z.object({
+const model: ModelProvider = {
+    provider: "openai",
+    id: "gpt-4o-mini",
+};
+
+const fetchNews = new Tool({
+    provider: model.provider,
+    name: "fetch-news",
+    description:
+        "Fetch the latest news articles about a given topic. The maximum limit is 3",
+    parameters: z.object({
         topic: z.string().describe("The topic to search for"),
         limit: z.number().describe("Number of articles to fetch"),
     }),
-    execute: async (args) => {
+    execute: async ({ limit = 3 }) => {
         const articles = [
             {
                 title: "AI Advances in 2024",
@@ -29,17 +39,13 @@ const fetchNews = createTool({
                     "Leading companies are pushing boundaries in technological innovation...",
             },
         ];
-        const limit = (args as any).limit || 3;
-        return JSON.stringify(articles.slice(0, limit));
+        return articles.slice(0, limit);
     },
 });
 
 const researchAgent = new Agent({
     name: "Research Agent",
-    model: {
-        provider: "OPEN_AI",
-        name: "gpt-4o-mini",
-    },
+    model,
     description: "An AI researcher that fetches and analyzes news articles.",
     instructions: [
         "Use the fetch-news tool to get articles about the requested topic",
@@ -53,10 +59,7 @@ const researchAgent = new Agent({
 
 const summaryAgent = new Agent({
     name: "Summary Agent",
-    model: {
-        provider: "OPEN_AI",
-        name: "gpt-4o-mini",
-    },
+    model,
     description:
         "An AI writer that creates concise summaries from research analysis.",
     instructions: [
@@ -68,20 +71,17 @@ const summaryAgent = new Agent({
 });
 
 const zee = new ZeeWorkflow({
-    description: "Analyze latest technology news and create a summary report",
-    output: "A comprehensive summary of technology news trends",
-    agents: { researchAgent, summaryAgent },
+    goal: "Analyze latest technology news and create a summary report",
+    agents: [researchAgent, summaryAgent],
+    model,
+    config: {
+        temperature: 1,
+        maxIterations: 50,
+    },
 });
 
 (async function main() {
-    const initialState = StateFn.root(zee.description);
-    initialState.messages.push(
-        user(
-            "Analyze the latest news about artificial intelligence and provide a summary of key trends."
-        )
-    );
-
-    const result = await ZeeWorkflow.run(zee, initialState);
+    const result = await zee.run();
     console.log("\nFinal Summary:");
-    console.log(result.messages[result.messages.length - 1].content);
+    console.log(result);
 })();

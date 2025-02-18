@@ -37,6 +37,6 @@
     },
     "dependencies": {
         "dotenv": "^16.4.7",
-        "@covalenthq/ai-agent-sdk": "^0.2.0"
+        "@covalenthq/ai-agent-sdk": "^0.2.6"
     }
 }

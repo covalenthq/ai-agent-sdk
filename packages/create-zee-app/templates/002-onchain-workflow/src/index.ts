@@ -1,24 +1,20 @@
 import {
     Agent,
-    ZeeWorkflow,
-    TokenBalancesTool,
+    ModelProvider,
     NFTBalancesTool,
-    TransactionsTool,
+    TokenBalancesTool,
+    ZeeWorkflow,
 } from "@covalenthq/ai-agent-sdk";
 import "dotenv/config";
 
-const tools = {
-    tokenBalances: new TokenBalancesTool(process.env.GOLDRUSH_API_KEY),
-    nftBalances: new NFTBalancesTool(process.env.GOLDRUSH_API_KEY),
-    transactions: new TransactionsTool(process.env.GOLDRUSH_API_KEY),
+const model: ModelProvider = {
+    provider: "openai",
+    id: "gpt-4o-mini",
 };
 
 const walletAnalyzer = new Agent({
-    name: "WalletAnalyzer",
-    model: {
-        provider: "OPEN_AI",
-        name: "gpt-4o-mini",
-    },
+    name: "wallet analyzer",
+    model,
     description:
         "An AI assistant that analyzes wallet activities and provides insights about holdings and transactions.",
     instructions: [
@@ -27,16 +23,19 @@ const walletAnalyzer = new Agent({
         "Review recent transactions and identify patterns",
         "Provide comprehensive analysis of the wallet's activity",
     ],
-    tools,
+    tools: {
+        nftBalances: new NFTBalancesTool(model.provider),
+        tokenBalances: new TokenBalancesTool(model.provider),
+    },
 });
 
 const zee = new ZeeWorkflow({
-    description: "A workflow that analyzes onchain wallet activities",
-    output: "Comprehensive analysis of wallet activities including token holdings, NFTs, and transactions",
-    agents: { walletAnalyzer },
+    goal: "What are the NFT and Token balances of 'demo.eth' on 'eth-mainnet'? Elaborate on the balances.",
+    agents: [walletAnalyzer],
+    model,
 });
 
 (async function main() {
-    const result = await ZeeWorkflow.run(zee);
+    const result = await zee.run();
     console.log(result);
 })();
