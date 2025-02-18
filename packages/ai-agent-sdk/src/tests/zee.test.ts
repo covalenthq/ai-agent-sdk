@@ -16,10 +16,15 @@ describe("@ai-agent-sdk/zee", () => {
             provider: "openai",
             id: "gpt-4o-mini",
         },
-        // ! FIX: ZEE is not working with Google models
+        // ! FIX: ZEE is not working with Google models (content is needed)
         // {
         //     provider: "google",
         //     id: "gemini-1.5-flash",
+        // },
+        // ! FIX: ZEE is not working with Anthropic models (messages: at least one message is required)
+        // {
+        //     provider: "anthropic",
+        //     id: "claude-3-5-sonnet-20240620",
         // },
     ];
     providers.forEach((model) => {

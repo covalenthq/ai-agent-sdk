@@ -13,6 +13,10 @@ describe("@ai-agent-sdk/agent", () => {
             provider: "google",
             id: "gemini-1.5-flash",
         },
+        {
+            provider: "anthropic",
+            id: "claude-3-5-sonnet-20240620",
+        },
     ];
 
     providers.forEach((model) => {

@@ -1,3 +1,8 @@
+import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
+import { openai } from "@ai-sdk/openai";
+import { generateObject, generateText, type LanguageModel, type ToolSet } from "ai";
+import type { AnyZodObject, z } from "zod";
 import { Base } from "../base";
 import type {
     GenerateObjectParams,
@@ -8,11 +13,6 @@ import type {
     LLMTextResponse,
     ModelProvider,
 } from "./llm.types";
-import { anthropic } from "@ai-sdk/anthropic";
-import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
-import { generateObject, generateText, type LanguageModel } from "ai";
-import type { AnyZodObject, z } from "zod";
 
 export class LLM extends Base {
     private model: LanguageModel;
@@ -49,9 +49,7 @@ export class LLM extends Base {
                     toolChoice: "auto",
                     maxSteps: 3,
                     maxRetries: 5,
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    tools,
+                    tools: tools as ToolSet,
                     ...textArgs,
                 });
 
@@ -69,10 +67,7 @@ export class LLM extends Base {
                 const objectArgs = args as GenerateObjectParams;
                 const response = await generateObject<z.infer<ZOD_OBJECT>>({
                     model: this.model,
-                    mode: "json",
                     maxRetries: 5,
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
                     output: "object",
                     ...objectArgs,
                 });
