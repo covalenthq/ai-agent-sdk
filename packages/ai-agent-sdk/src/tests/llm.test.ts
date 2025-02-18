@@ -1,6 +1,4 @@
-import { LLM, type ModelProvider } from ".";
-import { userMessage } from "../../functions";
-import { Tool, type ToolSet } from "../tools";
+import { LLM, type ModelProvider, Tool, type ToolSet, userMessage } from "..";
 import fetch from "node-fetch";
 import { describe, expect, test } from "vitest";
 import { z } from "zod";
@@ -15,6 +13,11 @@ describe("@ai-agent-sdk/llm", () => {
             provider: "google",
             id: "gemini-1.5-flash",
         },
+        // ! FIX: anthropic does not support structured output
+        // {
+        //     provider: "anthropic",
+        //     id: "claude-3-5-sonnet-20240620",
+        // },
     ];
 
     providers.forEach((model) => {

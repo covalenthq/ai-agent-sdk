@@ -1,12 +1,13 @@
 import {
+    Agent,
     HistoricalTokenPriceTool,
     NFTBalancesTool,
     TokenBalancesTool,
     TransactionsTool,
-} from ".";
-import { type ToolSet, userMessage } from "../../..";
-import { Agent } from "../../agent";
-import { type ModelProvider } from "../../llm";
+    userMessage,
+    type ModelProvider,
+    type ToolSet,
+} from "..";
 import "dotenv/config";
 import { describe, expect, test } from "vitest";
 

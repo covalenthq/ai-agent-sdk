@@ -1,7 +1,11 @@
-import { ZeeWorkflow } from ".";
-import { Agent } from "../agent";
-import { type ModelProvider } from "../llm";
-import { NFTBalancesTool, TokenBalancesTool, Tool } from "../tools";
+import {
+    Agent,
+    type ModelProvider,
+    NFTBalancesTool,
+    TokenBalancesTool,
+    Tool,
+    ZeeWorkflow,
+} from "..";
 import fetch from "node-fetch";
 import { describe, test } from "vitest";
 import { z } from "zod";
