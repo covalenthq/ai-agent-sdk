@@ -56,11 +56,11 @@ export class ZeeWorkflow extends Base {
                         })
                     )
                 )}`,
-                `Return a JSON array of tasks, where each task has:
-                - agentName: the name of the agent to handle the task,
-                - instructions: array of instructions for the agent,
-                - dependencies: object mapping agent names to why they are needed,
-                Example response format:
+                "Return a JSON array of tasks, where each task has:",
+                "- agentName: the name of the agent to handle the task",
+                "- instructions: array of instructions for the agent",
+                "- dependencies: object mapping agent names to why they are needed",
+                "Example response format:",
                 JSON.stringify(
                     [
                         {
@@ -78,7 +78,7 @@ export class ZeeWorkflow extends Base {
                     ],
                     null,
                     2
-                )`,
+                ),
                 "Return ONLY the JSON array, no other text",
             ],
             model,
