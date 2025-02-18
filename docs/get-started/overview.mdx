@@ -46,7 +46,6 @@ flowchart LR
 
 The SDK enables developers to compose simple single-agent systems or entire systems of agents that work together to form the Zero-Employee Enterprise (ZEE). [Agents](./concepts/agents) are the building blocks of the ZEE. Each agent is backed by a language model that can be configured to use a variety of [LLMs](./concepts/llms). Agents can additionally use [Tools](./concepts/tools) to perform actions on the ZEE using outside information.
 
-
 ```typescript
 const agent = new Agent({
     name: "Reporting Agent",
@@ -63,7 +62,7 @@ const zee = new ZeeWorkflow({
 
 ### Concepts
 
-- [LLMs](./concepts/llms) - a unified interface for all LLMs
-- [Agents](./concepts/agents) - a single model with a system prompt and a set of tools
-- [Tools](./concepts/tools) - extend the capabilities of agents with external tools
-- [ZEE Workflows](./concepts/zeeworkflows) - compose agents to solve complex problems
+-   [LLMs](./concepts/llms) - a unified interface for all LLMs
+-   [Agents](./concepts/agents) - a single model with a system prompt and a set of tools
+-   [Tools](./concepts/tools) - extend the capabilities of agents with external tools
+-   [ZEE Workflows](./concepts/zeeworkflows) - compose agents to solve complex problems

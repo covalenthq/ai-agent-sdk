@@ -41,9 +41,9 @@
         {
             "group": "Get Started",
             "pages": [
-                "overview",
-                "getting-started/quickstart",
-                "getting-started/installation"
+                "get-started/overview",
+                "get-started/quickstart",
+                "get-started/installation"
             ]
         },
         {
@@ -57,15 +57,11 @@
         },
         {
             "group": "",
-            "pages": [
-                "use-cases/overview"
-            ]
+            "pages": ["use-cases/overview"]
         },
         {
             "group": "Tools",
-            "pages": [
-                "tools/goldrush-onchain-data"
-            ]
+            "pages": ["tools/goldrush-onchain-data"]
         }
     ],
     "footerSocials": {
