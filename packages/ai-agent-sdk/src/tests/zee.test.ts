@@ -21,18 +21,17 @@ describe("@ai-agent-sdk/zee", () => {
         //     provider: "google",
         //     id: "gemini-1.5-flash",
         // },
-        // ! FIX: ZEE is not working with Anthropic models (messages: at least one message is required)
-        // {
-        //     provider: "anthropic",
-        //     id: "claude-3-5-sonnet-20240620",
-        // },
+        {
+            provider: "anthropic",
+            id: "claude-3-5-sonnet-20240620",
+        },
     ];
     providers.forEach((model) => {
         describe(`${model.provider}::${model.id}`, () => {
             test("workflow with two agents", async () => {
                 const scriptWriter = new Agent({
                     name: "script writer",
-                    description: "You are an expert screenplay writer...",
+                    description: "You are an expert screenplay writer",
                     instructions: [
                         "Write a script outline with 3-5 main characters and key plot points.",
                         "Outline the three-act structure and suggest 2-3 twists.",
@@ -43,7 +42,7 @@ describe("@ai-agent-sdk/zee", () => {
 
                 const producer = new Agent({
                     name: "movie producer",
-                    description: "Experienced movie producer...",
+                    description: "Experienced movie producer",
                     instructions: [
                         "Based on the script outline, plan the cast and crew for the movie.",
                         "Summarize the budget for the movie.",

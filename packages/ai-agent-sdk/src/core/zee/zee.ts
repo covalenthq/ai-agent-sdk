@@ -16,6 +16,7 @@ export class ZeeWorkflow extends Base {
     private actionQueue: AgentAction[] = [];
     private maxIterations: number = 50;
     private temperature: number = 0.5;
+    private goal: string;
 
     constructor({ agents, model, goal, config }: ZeeWorkflowOptions) {
         super("zee");
@@ -36,6 +37,8 @@ export class ZeeWorkflow extends Base {
             }
         }
 
+        this.goal = goal;
+
         this.context.push(userMessage(goal));
 
         const breakdownAgent = new Agent({
@@ -53,11 +56,11 @@ export class ZeeWorkflow extends Base {
                         })
                     )
                 )}`,
-                "Return a JSON array of tasks, where each task has:",
-                "- agentName: the name of the agent to handle the task",
-                "- instructions: array of instructions for the agent",
-                "- dependencies: object mapping agent names to why they are needed",
-                "Example response format:",
+                `Return a JSON array of tasks, where each task has:
+                - agentName: the name of the agent to handle the task,
+                - instructions: array of instructions for the agent,
+                - dependencies: object mapping agent names to why they are needed,
+                Example response format:
                 JSON.stringify(
                     [
                         {
@@ -75,7 +78,7 @@ export class ZeeWorkflow extends Base {
                     ],
                     null,
                     2
-                ),
+                )`,
                 "Return ONLY the JSON array, no other text",
             ],
             model,
@@ -350,7 +353,9 @@ export class ZeeWorkflow extends Base {
         console.log("\n🎬 Starting workflow execution");
 
         console.log("\n📋 Getting task breakdown from 'breakdown'...");
-        const breakdownResponse = await this.getAgent("breakdown").generate({});
+        const breakdownResponse = await this.getAgent("breakdown").generate({
+            messages: [userMessage(this.goal)],
+        });
 
         const tasks = this.parseBreakdownResponse(breakdownResponse.value);
 
