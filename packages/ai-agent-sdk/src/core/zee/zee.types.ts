@@ -1,5 +1,5 @@
 import type { Agent } from "../agent";
-import type { ModelProvider } from "../llm";
+import type { ModelProvider, UserContentAttachments } from "../llm";
 
 export type ZeeWorkflowOptions = {
     goal: string;
@@ -19,6 +19,7 @@ export interface AgentAction {
     metadata?: {
         dependencies?: Record<string, string>;
         isTaskComplete?: boolean;
+        attachments?: UserContentAttachments[];
     };
 }
 
@@ -36,4 +37,11 @@ export enum ZEEActionResponseType {
     NEED_INFO = "NEED_INFO:",
     FOLLOWUP_COMPLETE = "FOLLOWUP_COMPLETE:",
     COMPLETE = "COMPLETE:",
+}
+
+export interface ZEETask {
+    agentName: string;
+    instructions: string[];
+    attachments: UserContentAttachments[];
+    dependencies: Record<string, string>;
 }

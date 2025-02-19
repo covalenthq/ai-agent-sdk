@@ -1,5 +1,5 @@
 import type { ToolSet } from "../tools";
-import type { generateObject, generateText } from "ai";
+import type { FilePart, generateObject, generateText, ImagePart } from "ai";
 import type { AnyZodObject, z } from "zod";
 
 export type OpenAIModelId =
@@ -100,3 +100,5 @@ export interface LLMTextResponse {
 export type LLMResponse<T extends AnyZodObject> =
     | LLMStructuredResponse<T>
     | LLMTextResponse;
+
+export type UserContentAttachments = Array<ImagePart | FilePart>;

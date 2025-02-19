@@ -186,7 +186,7 @@ describe("@ai-agent-sdk/zee", () => {
                 });
 
                 const zee = new ZeeWorkflow({
-                    goal: "Whats are the NFT and Token balances of 'karanpargal.eth' on 'eth-mainnet'? Elaborate on the balances.",
+                    goal: "Whats are the NFT and Token balances of the wallet address 'karanpargal.eth' on the chain 'eth-mainnet'? Elaborate on the balances.",
                     agents: [
                         nftBalancesAgent,
                         tokenBalancesAgent,
@@ -243,6 +243,29 @@ describe("@ai-agent-sdk/zee", () => {
                     model,
                     config: {
                         maxIterations: 5,
+                    },
+                });
+                const result = await zee.run();
+
+                console.log(result);
+            });
+
+            test("workflow with image messages", async () => {
+                const imageAnalyser = new Agent({
+                    name: "image analyser",
+                    description: "You are an expert image analyser",
+                    instructions: [
+                        "Analyze the image and provide a detailed description of the image.",
+                    ],
+                    model,
+                });
+
+                const zee = new ZeeWorkflow({
+                    goal: "Analyze the image at https://drive.usercontent.google.com/download?id=1NwUfXIVOus3mPz8EA0UIib3ZxM6hNIjx and provide a detailed analysis of what it depicts.",
+                    agents: [imageAnalyser],
+                    model,
+                    config: {
+                        temperature: 1,
                     },
                 });
 

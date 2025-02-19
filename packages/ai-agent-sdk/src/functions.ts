@@ -1,15 +1,14 @@
+import type { UserContentAttachments } from "./core/llm/llm.types";
 import type {
     AssistantContent,
     CoreAssistantMessage,
     CoreSystemMessage,
     CoreUserMessage,
-    UserContent,
 } from "ai";
-import { tool } from "ai";
 
-export const createTool = tool;
-
-export const userMessage = (content: UserContent): CoreUserMessage => {
+export const userMessage = (
+    content: string | UserContentAttachments
+): CoreUserMessage => {
     return {
         role: "user",
         content,
