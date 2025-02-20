@@ -94,6 +94,10 @@ async function main() {
                 value: "002-onchain-workflow",
                 label: "Analyze blockchain data to get a wallet's token balances, etc.",
             },
+            {
+                value: "003-telegram-workflow",
+                label: "Setup a telegram bot that can drive a ZEE.",
+            },
         ],
     });
 

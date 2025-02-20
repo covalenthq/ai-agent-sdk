@@ -1,0 +1,47 @@
+{
+  "name": "tg-example",
+  "version": "0.2.2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "blockchain",
+    "cryptocurrency",
+    "web3",
+    "blockchain-data",
+    "ai-agent",
+    "ai-agents-framework",
+    "zero-employee-enterprise",
+    "zee",
+    "autonomous-agents",
+    "autonomous-agent-framework",
+    "autonomous-agent-sdk",
+    "ai-agent-sdk"
+  ],
+  "author": "Covalent",
+  "homepage": "https://github.com/covalenthq/ai-agent-sdk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/covalenthq/ai-agent-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/covalenthq/ai-agent-sdk/issues"
+  },
+  "license": "MIT",
+  "description": "A barebones template for creating a new ZEE application.",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.1.9",
+    "@covalenthq/ai-agent-sdk": "^0.2.0",
+    "@types/node-telegram-bot-api": "^0.64.7",
+    "ai": "^4.1.21",
+    "dotenv": "^16.4.7",
+    "node-telegram-bot-api": "^0.66.0",
+    "zod": "^3.24.1"
+  }
+}
