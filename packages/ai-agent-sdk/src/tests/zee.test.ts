@@ -29,8 +29,8 @@ describe("@ai-agent-sdk/zee", () => {
     providers.forEach((model) => {
         describe(`${model.provider}::${model.id}`, () => {
             test("workflow with two agents", async () => {
-                const scriptWriter = new Agent({
-                    name: "script writer",
+                const screenplayWriter = new Agent({
+                    name: "screenplay writer",
                     description: "You are an expert screenplay writer",
                     instructions: [
                         "Write a script outline with 3-5 main characters and key plot points.",
@@ -53,7 +53,7 @@ describe("@ai-agent-sdk/zee", () => {
 
                 const zee = new ZeeWorkflow({
                     goal: "Plan a scene-by-scene script for a movie that is 10 minutes long and has a happy ending. Create a scene-by-scene budget for the provided script. Suggest a cast and crew for the movie.",
-                    agents: [scriptWriter, producer],
+                    agents: [screenplayWriter, producer],
                     model,
                     config: {
                         temperature: 1,
@@ -85,7 +85,7 @@ describe("@ai-agent-sdk/zee", () => {
                         "Review the script outline.",
                         "You MUST ask the script writer for detailed character descriptions before making casting decisions.",
                         "Once you have character details, provide casting suggestions and budget breakdown.",
-                        "Use 'NEED_INFO:' to ask for character details.",
+                        "Use 'FOLLOWUP:' to ask for character details.",
                         "Start your final plan with 'COMPLETE:'",
                     ],
                     model,

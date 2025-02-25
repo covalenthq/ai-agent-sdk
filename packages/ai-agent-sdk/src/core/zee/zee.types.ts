@@ -17,9 +17,14 @@ export interface AgentAction {
     to: string;
     content: string;
     metadata?: {
-        dependencies?: Record<string, string>;
+        dependencies?: {
+            agentName: string;
+            task: string;
+        }[];
         isTaskComplete?: boolean;
         attachments?: UserContentAttachments[];
+        originalTask?: string;
+        originalFrom?: string;
     };
 }
 
@@ -34,14 +39,21 @@ export interface ZEEWorkflowResponse {
 }
 
 export enum ZEEActionResponseType {
-    NEED_INFO = "NEED_INFO:",
-    FOLLOWUP_COMPLETE = "FOLLOWUP_COMPLETE:",
+    FOLLOWUP = "FOLLOWUP:",
+    ANSWER = "ANSWER:",
     COMPLETE = "COMPLETE:",
 }
 
-export interface ZEETask {
-    agentName: string;
+export interface RawTask {
     instructions: string[];
     attachments: UserContentAttachments[];
-    dependencies: Record<string, string>;
+    dependencies: string[];
+}
+
+export interface ZEETask extends Omit<RawTask, "dependencies"> {
+    agentName: string;
+    dependencies: {
+        agentName: string;
+        task: string;
+    }[];
 }
