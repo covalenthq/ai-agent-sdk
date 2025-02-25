@@ -2,6 +2,7 @@ import type { AgentConfig, AgentGenerateParameters, AgentResponse } from ".";
 import { systemMessage } from "../../functions";
 import { Base } from "../base";
 import { LLM } from "../llm";
+import { type CoreMessage } from "ai";
 
 export class Agent extends Base {
     private _config: AgentConfig;
@@ -26,21 +27,17 @@ export class Agent extends Base {
     }
 
     async generate(args: AgentGenerateParameters): Promise<AgentResponse> {
+        const _messages = [
+            systemMessage(this.description),
+            ...(this.instructions?.map(systemMessage) ?? []),
+            ...(args.messages ?? []),
+        ] as CoreMessage[];
+
         const response = await this._llm.generate(
             {
                 ...args,
                 tools: this._config.tools,
-                messages: [
-                    systemMessage(this.description),
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    ...(this.instructions?.map((instruction) =>
-                        systemMessage(instruction)
-                    ) ?? []),
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
-                    ...(args.messages ?? []),
-                ],
+                messages: _messages,
                 temperature: this._config.temperature,
             },
             true

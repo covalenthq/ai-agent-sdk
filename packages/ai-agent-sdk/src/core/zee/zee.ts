@@ -590,7 +590,7 @@ export class ZeeWorkflow extends Base {
                        - dependencies: the restructured dependencies array with objects
                     5. Reorder the tasks based on the dependencies for easier processing
                     
-                    Return ONLY the JSON array, no other text`
+                    IMPORTANT: Return ONLY the JSON array, no other text`
                 ),
                 userMessage(JSON.stringify(rawTasks)),
             ],
