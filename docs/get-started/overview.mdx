@@ -14,7 +14,7 @@ The Agent SDK supports single model inference calls to multi-agent systems that 
 flowchart LR
     %% Styling
     classDef input fill:#ffffff,stroke:#000000,stroke-width:2px, color:#000
-    classDef breakdown fill:#f0f0f0,stroke:#000000,stroke-width:2px, color:#000
+    classDef planner fill:#f0f0f0,stroke:#000000,stroke-width:2px, color:#000
     classDef agent fill:#e0e0e0,stroke:#000000,stroke-width:2px, color:#000
     classDef tool fill:#d0d0d0,stroke:#000000,stroke-width:2px, color:#000
     classDef state fill:#fafafa,stroke:#000000,stroke-width:2px,stroke-dasharray: 5 5, color:#000
@@ -25,8 +25,8 @@ flowchart LR
 
     subgraph "Zero-Employee Enterprise"
         direction LR
-        breakdown{"🔍 Breakdown Agent"}
-        mastermind{"🧠 Mastermind Agent"}
+        planner{"🔍 Planner Agent"}
+        router{"🧠 Router Agent"}
         agent1("🤖 Primary Agent")
         agent2("🤖 Support Agent")
         agent3("🤖 Task Agent")
@@ -45,11 +45,11 @@ flowchart LR
     end
 
     %% Connections
-    inp1 --> breakdown
-    breakdown --> mastermind
-    mastermind <--> agent1
-    mastermind <--> agent2
-    mastermind <--> agent3
+    inp1 --> planner
+    planner --> router
+    router <--> agent1
+    router <--> agent2
+    router <--> agent3
     agent1 <--> tool1
     agent2 <--> tool2
     agent3 <--> tool3
@@ -57,8 +57,8 @@ flowchart LR
 
     %% Apply styles
     class inp1 input
-    class breakdown breakdown
-    class mastermind breakdown
+    class planner planner
+    class router router
     class agent1,agent2,agent3 agent
     class tool1,tool2,tool3,tool4 tool
     class id1 state
