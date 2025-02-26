@@ -37,5 +37,6 @@ const zee = new ZeeWorkflow({
 
 (async function main() {
     const result = await zee.run();
-    console.log(result);
+    console.log("\nFinal Summary:");
+    console.dir(result, { depth: null });
 })();
