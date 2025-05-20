@@ -4,13 +4,13 @@ icon: "head-side-gear"
 description: Overview of agents in the Zero-Employee Enterprise.
 ---
 
-Agents are the building blocks of Zero-Employee Enterprise. They are the ones that do the work. Agents are stateless and have a single purpose and can optionally use [Tools](/concepts/tools) to help them achieve their goal.
+Agents are the building blocks of Zero-Employee Enterprise. They are the ones who do the work. Agents are stateless and have a single purpose, and can optionally use [Tools](/concepts/tools) to help them achieve their goal.
 
 Agents can be called individually or composed together to form a ZEE to iteratively and collaboratively solve complex problems.
 
 ## Creating an Agent
 
-The simplest way to create an Agent is to use initialize an Agent with a model, description, instructions and optionally tools.
+The simplest way to create an Agent is to initialize an Agent with a model, description, instructions, and optionally tools.
 
 ```typescript
 const agent = new Agent({
@@ -21,8 +21,8 @@ const agent = new Agent({
     },
     description: "This agent is responsible for generating reports",
     instructions: [
-        "Generate a report on the current state of the company",
-        "Use the following tools to help you generate the report",
+        "Generate a report on the current state of the company.",
+        "Use the following tools to help you generate the report.",
     ],
 });
 ```
