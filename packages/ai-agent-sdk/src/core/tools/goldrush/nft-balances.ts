@@ -1,35 +1,35 @@
-import { BaseGoldRushTool, BaseGoldRushSchema } from "./base";
-import { type Chain } from "@covalenthq/client-sdk";
-import type { z } from "zod";
+import { type ModelProvider } from "../../llm";
+import { BaseGoldRushTool } from "./goldrush";
+import { ChainName, type Chain } from "@covalenthq/client-sdk";
+import { z } from "zod";
 
-export const NFTBalancesSchema = BaseGoldRushSchema;
-export type NFTBalancesParams = z.infer<typeof NFTBalancesSchema>;
+const NFTBalancesSchema = z.object({
+    chain: z.enum(Object.values(ChainName) as [string, ...string[]]),
+    address: z.string(),
+});
 
-export class NFTBalancesTool extends BaseGoldRushTool {
-    constructor(apiKey?: string) {
-        super(
-            "nft-balances",
-            "Fetch NFT balances for a wallet address on a specific blockchain",
-            NFTBalancesSchema,
-            apiKey
-        );
-    }
+export class NFTBalancesTool extends BaseGoldRushTool<
+    typeof NFTBalancesSchema
+> {
+    constructor(provider: ModelProvider["provider"]) {
+        super({
+            provider,
+            name: "nft-balances",
+            description:
+                "Fetch NFT balances for a wallet address on a specific blockchain",
+            parameters: NFTBalancesSchema,
+            execute: async ({ address, chain }) => {
+                const nfts = await this.client.NftService.getNftsForAddress(
+                    chain as Chain,
+                    address
+                );
 
-    protected async fetchData(params: NFTBalancesParams): Promise<string> {
-        try {
-            const { chain, address } = params;
-            const nfts = await this.client.NftService.getNftsForAddress(
-                chain as Chain,
-                address
-            );
+                if (nfts.error) {
+                    throw new Error(nfts.error_message);
+                }
 
-            if (nfts.error) {
-                throw new Error(nfts.error_message);
-            }
-
-            return `NFT balances for ${address} on ${chain}: ${JSON.stringify(nfts.data, this.bigIntReplacer)}`;
-        } catch (error) {
-            return `Error fetching NFT balances: ${error instanceof Error ? error.message : "Unknown error"}`;
-        }
+                return BaseGoldRushTool.bigIntSerializer(nfts.data.items ?? []);
+            },
+        });
     }
 }

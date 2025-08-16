@@ -1,0 +1,59 @@
+---
+title: Quickstart
+icon: "bolt"
+description: Learn the basics of the AI Agent SDK in a few minutes.
+---
+
+<Steps>
+    <Step title="Start with a template">
+        ```bash
+        npx @covalenthq/create-zee-app
+        ```
+    </Step>
+
+    <Step title="Modify the agent">
+    <CodeGroup>
+    ```typescript
+    const agent1 = new Agent({
+        name: "Agent1",
+        model: {
+            provider: "openai",
+            id: "gpt-4o-mini",
+        },
+        description: "A helpful AI assistant that can engage in conversation.",
+        instructions: [
+            "You are a helpful AI assistant that can engage in conversation.",
+            "You are able to use the following tools to help the user.",
+        ],
+    });
+    ```
+    </CodeGroup>
+    </Step>
+
+    <Step title="Modify the ZEE Workflow">
+    <CodeGroup>
+    ```typescript
+    const zee = new ZeeWorkflow({
+        goal: "A workflow of agents that come up with the most creative greeting ever!",
+        model: {
+            provider: "openai",
+            id: "gpt-4o-mini",
+        },
+        agents: [agent1, agent2],
+    });
+    ```
+    </CodeGroup>
+    </Step>
+
+    <Step title="Run the Zee Workflow">
+    <CodeGroup>
+    ```typescript
+        (async function main() {
+            const result = await zee.run();
+            console.log(result);
+        })();
+    ```
+    </CodeGroup>
+    </Step>
+
+</Steps>

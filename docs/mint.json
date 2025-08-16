@@ -41,9 +41,9 @@
         {
             "group": "Get Started",
             "pages": [
-                "overview",
-                "getting-started/quickstart",
-                "getting-started/installation"
+                "get-started/overview",
+                "get-started/quickstart",
+                "get-started/installation"
             ]
         },
         {
@@ -52,24 +52,21 @@
                 "concepts/llms",
                 "concepts/agents",
                 "concepts/tools",
-                "concepts/zeeworkflows"
+                "concepts/zee-workflows"
             ]
         },
         {
             "group": "",
-            "pages": [
-                "use-cases/overview"
-            ]
+            "pages": ["zee-use-cases"]
         },
         {
             "group": "Tools",
-            "pages": [
-                "tools/goldrush-onchain-data"
-            ]
+            "pages": ["tools/goldrush-onchain-data"]
         }
     ],
     "footerSocials": {
         "x": "https://x.com/Covalent_HQ",
+        "telegram": "https://t.me/CXT_Agent_SDK",
         "github": "https://github.com/covalenthq/ai-agent-sdk"
     }
 }

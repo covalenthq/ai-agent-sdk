@@ -1,6 +1,6 @@
 {
     "name": "@covalenthq/ai-agent-sdk",
-    "version": "0.2.6",
+    "version": "0.3.0",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "files": [
@@ -36,10 +36,10 @@
     },
     "scripts": {
         "test": "vitest",
-        "test:agent": "vitest src/core/agent/agent.test.ts",
-        "test:llm": "vitest src/core/llm/llm.test.ts",
-        "test:tools:goldrush": "vitest src/core/tools/goldrush/index.test.ts",
-        "test:zee": "vitest src/core/zee/zee.test.ts",
+        "test:agent": "vitest src/tests/agent.test.ts",
+        "test:llm": "vitest src/tests/llm.test.ts",
+        "test:tools:goldrush": "vitest src/tests/goldrush.tools.test.ts",
+        "test:zee": "vitest src/tests/zee.test.ts",
         "build": "tsc",
         "clean": "rm -rf dist",
         "prepublishOnly": "cp ../../README.md . && npm run clean && npm run build",
@@ -48,7 +48,11 @@
         "pretty": "prettier . --write"
     },
     "dependencies": {
+        "@ai-sdk/anthropic": "^1.1.6",
+        "@ai-sdk/google": "^1.1.11",
+        "@ai-sdk/openai": "^1.1.9",
         "@covalenthq/client-sdk": "^2.2.3",
+        "ai": "^4.1.41",
         "commander": "^13.1.0",
         "dotenv": "^16.4.7",
         "openai": "^4.79.1",
@@ -62,6 +66,6 @@
         "@types/node": "^22.10.7",
         "node-fetch": "^3.3.2",
         "prettier": "^3.4.2",
-        "vitest": "^3.0.2"
+        "vitest": "^3.0.5"
     }
 }

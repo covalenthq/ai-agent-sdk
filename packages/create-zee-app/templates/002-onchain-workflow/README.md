@@ -31,28 +31,35 @@ GOLDRUSH_API_KEY=your_goldrush_api_key
 npm run dev
 ```
 
-
 ## Available Tools
 
 ### 1. Token Balances Tool
+
 Fetches token balances for any wallet address with:
+
 - Token amounts and USD values
 - Token metadata (symbol, decimals, contract address)
 
 ### 2. NFT Holdings Tool
+
 Retrieves NFT holdings with:
+
 - Collection information
 - Token IDs and ownership details
 - Media URLs and metadata
 
 ### 3. Transaction History Tool
+
 Analyzes transaction history including:
+
 - Transaction types (transfers, swaps, mints)
 - Token movements and values
 - Timestamps and block information
 
 ### 4. Historical Token Price Tool
+
 Provides historical price data with:
+
 - Price history over customizable timeframes (1h, 24h, 7d, 30d)
 - Token prices in USD
 - Detailed price data points
@@ -65,22 +72,24 @@ import {
     ZeeWorkflow,
     TokenBalancesTool,
     NFTBalancesTool,
+    ToolSet,
     TransactionsTool,
 } from "@covalenthq/ai-agent-sdk";
 
-const tools = {
-    tokenBalances: new TokenBalancesTool(process.env.GOLDRUSH_API_KEY),
-    nftBalances: new NFTBalancesTool(process.env.GOLDRUSH_API_KEY),
-    transactions: new TransactionsTool(process.env.GOLDRUSH_API_KEY),
+const tools: ToolSet = {
+    tokenBalances: new TokenBalancesTool("openai"),
+    nftBalances: new NFTBalancesTool("openai"),
+    transactions: new TransactionsTool("openai"),
 };
 
 const walletAnalyzer = new Agent({
     name: "WalletAnalyzer",
     model: {
         provider: "OPEN_AI",
-        name: "gpt-4o-mini",
+        id: "gpt-4o-mini",
     },
-    description: "An AI assistant that analyzes wallet activities and provides insights about holdings and transactions.",
+    description:
+        "An AI assistant that analyzes wallet activities and provides insights about holdings and transactions.",
     instructions: [
         "Analyze wallet token balances and provide insights about holdings",
         "Check NFT collections owned by the wallet",
@@ -90,7 +99,6 @@ const walletAnalyzer = new Agent({
     tools,
 });
 ```
-
 
 ## License
 

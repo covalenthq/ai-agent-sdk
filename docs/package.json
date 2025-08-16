@@ -1,5 +1,6 @@
 {
     "devDependencies": {
-        "mintlify": "^4.0.346"
+        "mintlify": "^4.0.346",
+        "prettier": "^3.4.2"
     }
 }
