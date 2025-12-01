@@ -35,7 +35,8 @@
     },
     "pnpm": {
         "overrides": {
-            "form-data": "^4.0.4"
+            "form-data": "^4.0.5",
+            "jsondiffpatch": "^0.7.2"
         }
     }
 }
