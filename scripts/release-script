@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+
+const axios = require("axios");
+const fs = require("fs");
+require("dotenv").config();
+
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const REPO_OWNER = "covalenthq";
+const REPO_NAME = "ai-agent-sdk";
+const RELEASE_TAG = "v0.2.0";
+
+async function getContributors(owner, repo, releaseTag) {
+    const url = `https://api.github.com/repos/${owner}/${repo}/commits?sha=${releaseTag}`;
+    const headers = {
+        Authorization: `token ${GITHUB_TOKEN}`,
+        Accept: "application/vnd.github.v3+json",
+    };
+
+    try {
+        const response = await axios.get(url, { headers });
+        const commits = response.data;
+
+        const contributors = new Set();
+        commits.forEach((commit) => {
+            if (commit.author && commit.author.login) {
+                contributors.add(commit.author.login);
+            } else if (commit.commit && commit.commit.author) {
+                contributors.add(commit.commit.author.name);
+            }
+        });
+
+        return Array.from(contributors);
+    } catch (error) {
+        console.error("Error fetching contributors: ", error);
+        return [];
+    }
+}
+
+function generateReleaseNotes(contributors) {
+    let releaseNotes = `## Release ${RELEASE_TAG}\n\n`;
+    releaseNotes += "### Contributors\n\n";
+    releaseNotes += contributors
+        .map((contributor) => `- @${contributor}`)
+        .join("\n");
+    return releaseNotes;
+}
+
+async function main() {
+    const contributors = await getContributors(
+        REPO_OWNER,
+        REPO_NAME,
+        RELEASE_TAG
+    );
+    const releaseNotes = generateReleaseNotes(contributors);
+    console.log(releaseNotes);
+
+    // Optionally, write the release notes to a file
+    fs.writeFileSync(`release_notes_${RELEASE_TAG}.md`, releaseNotes);
+}
+
+main();
